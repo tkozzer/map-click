@@ -201,3 +201,22 @@ body {
     text-align: center;
     margin-right: 5px;
 }
+
+#json-export-context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    width: 200px;
+}
+
+#json-export-context-menu div {
+    margin: 5px 0;
+}
+
+#json-export-context-menu label {
+    margin-left: 5px;
+}

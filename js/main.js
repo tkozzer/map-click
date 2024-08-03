@@ -5,8 +5,7 @@ import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
 import { initializeColorPicker } from './colorPicker.js';
 import { initializeCounties } from './countySelection.js';
 import { initializeCameraButton } from './cameraButton.js';
-import './exportJson.js';
-import './exportPng.js';
+import { initializeJsonExport } from './exportJson.js';
 
 let nationData;
 
@@ -47,4 +46,5 @@ d3.select("#zoom-out").on("click", zoomOut);
 initializeTooltipAndContextMenu();
 initializeColorPicker();
 initializeCameraButton();
+initializeJsonExport();
 cleanupZoom();
