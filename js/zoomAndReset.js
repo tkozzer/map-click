@@ -1,4 +1,4 @@
-import { svg, g, width, height, projection, path } from './mapSetup.js';
+import { svg, g, projection, path } from './mapSetup.js';
 import { clearSelectedCounties } from './countySelection.js';
 
 export const zoom = d3.zoom()
@@ -6,12 +6,15 @@ export const zoom = d3.zoom()
     .on("zoom", zoomed);
 
 let initialTransform;
+let nationData;
 
 function zoomed(event) {
     g.attr("transform", event.transform);
 }
 
 export function initializeZoom(nation) {
+    nationData = nation;
+    const { width, height } = getSvgSize();
     const [[x0, y0], [x1, y1]] = path.bounds(nation);
     const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
     const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
@@ -20,21 +23,73 @@ export function initializeZoom(nation) {
 
     svg.call(zoom)
        .call(zoom.transform, initialTransform);
+
+    // Add window resize event listener
+    window.addEventListener('resize', handleWindowResize);
 }
 
-export function resetMap(nation) {
-    const newWidth = window.innerWidth;
-    const newHeight = window.innerHeight;
+export function resetMap() {
+    recenterMap();
+    clearSelectedCounties();
+}
 
-    svg.attr("width", newWidth).attr("height", newHeight);
+export function clearMap() {
+    clearSelectedCounties();
+}
 
-    const [[x0, y0], [x1, y1]] = path.bounds(nation);
-    const scale = 0.95 / Math.max((x1 - x0) / newWidth, (y1 - y0) / newHeight);
-    const translate = [newWidth / 2 - scale * (x0 + x1) / 2, newHeight / 2 - scale * (y0 + y1) / 2];
+export function recenterMap() {
+    const { width, height } = getSvgSize();
+    const [[x0, y0], [x1, y1]] = path.bounds(nationData);
+    const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
+    const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
 
     svg.transition()
        .duration(750)  // Smooth transition over 750ms
        .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+}
 
-    clearSelectedCounties();
+export function zoomIn() {
+    svg.transition().duration(300).call(zoom.scaleBy, 1.5);
+}
+
+export function zoomOut() {
+    svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5);
+}
+
+function handleWindowResize() {
+    const { width, height } = getSvgSize();
+    svg.attr("width", width).attr("height", height);
+
+    const [[x0, y0], [x1, y1]] = path.bounds(nationData);
+    const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
+    const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
+
+    // Get the current zoom state
+    const currentTransform = d3.zoomTransform(svg.node());
+
+    // Calculate the new transform
+    const newTransform = d3.zoomIdentity
+        .translate(translate[0], translate[1])
+        .scale(scale)
+        .scale(currentTransform.k / scale)
+        .translate(
+            (currentTransform.x - translate[0]) / (currentTransform.k / scale),
+            (currentTransform.y - translate[1]) / (currentTransform.k / scale)
+        );
+
+    // Apply the new transform with a smooth transition
+    svg.transition()
+       .duration(300)
+       .call(zoom.transform, newTransform);
+}
+
+function getSvgSize() {
+    return {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+}
+
+export function cleanupZoom() {
+    window.removeEventListener('resize', handleWindowResize);
 }

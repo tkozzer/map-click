@@ -1,9 +1,9 @@
 // main.js
 import { svg, g, path } from './mapSetup.js';
-import { zoom, initializeZoom, resetMap } from './zoomAndReset.js';
+import { initializeZoom, resetMap, clearMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
 import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
 import { initializeColorPicker } from './colorPicker.js';
-import { initializeCounties, clearSelectedCounties } from './countySelection.js';
+import { initializeCounties } from './countySelection.js';
 import './exportJson.js';
 import './exportPng.js';
 
@@ -37,18 +37,12 @@ Promise.all([
     initializeZoom(nationData);
 });
 
-d3.select("#zoom-in").on("click", function() {
-    zoom.scaleBy(svg.transition().duration(300), 1.5);
-});
-
-d3.select("#zoom-out").on("click", function() {
-    zoom.scaleBy(svg.transition().duration(300), 1 / 1.5);
-});
-
-d3.select("#reset-button").on("click", function() {
-    resetMap(nationData);
-});
-d3.select("#clear-button").on("click", clearSelectedCounties);
+d3.select("#reset-button").on("click", resetMap);
+d3.select("#clear-button").on("click", clearMap);
+d3.select("#recenter-button").on("click", recenterMap);
+d3.select("#zoom-in").on("click", zoomIn);
+d3.select("#zoom-out").on("click", zoomOut);
 
 initializeTooltipAndContextMenu();
 initializeColorPicker();
+cleanupZoom();

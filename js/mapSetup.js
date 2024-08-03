@@ -4,8 +4,8 @@ export const height = window.innerHeight;
 
 export const svg = d3.select("#map")
     .append("svg")
-    .attr("width", width)
-    .attr("height", height);
+    .attr("width", "100%")
+    .attr("height", "100%");
 
 export const g = svg.append("g");
 
