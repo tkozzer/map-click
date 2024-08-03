@@ -1,14 +1,14 @@
-// exportPng.js
+// exportJpg.js
 import { g } from './mapSetup.js';
 import { defaultCountyColor } from './colorPicker.js';
 
-export function exportPng() {
-    console.log("Exporting as PNG");
+export function exportJpg() {
+    console.log("Exporting as JPG");
 
     const offscreenSvg = d3.select("body")
         .append("svg")
-        .attr("width", 5200)  // Increased width for higher resolution
-        .attr("height", 3200)  // Increased height for higher resolution
+        .attr("width", 5200)
+        .attr("height", 3200)
         .style("display", "none");
 
     offscreenSvg.append("rect")
@@ -37,9 +37,8 @@ export function exportPng() {
             county.properties.stateName = stateIdToName[stateId];
         });
 
-        // Correct the projection for the offscreen SVG
         const offscreenProjection = d3.geoAlbersUsa()
-            .scale(6250)  // Adjusted scale to match the zoom level
+            .scale(6250)
             .translate([2600, 1600]);
 
         const offscreenPath = d3.geoPath().projection(offscreenProjection);
@@ -79,8 +78,8 @@ export function exportPng() {
         console.log("Serialized SVG", svgString);
 
         const canvas = document.createElement("canvas");
-        canvas.width = 5200;  // Increased width for higher resolution
-        canvas.height = 3200;  // Increased height for higher resolution
+        canvas.width = 5200;
+        canvas.height = 3200;
         const context = canvas.getContext("2d");
 
         context.fillStyle = "white";
@@ -90,11 +89,11 @@ export function exportPng() {
         image.onload = function() {
             context.drawImage(image, 0, 0);
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-            const filename = `us-county-map-${timestamp}.png`;
+            const filename = `us-county-map-${timestamp}.jpg`;
 
             const link = document.createElement('a');
             link.download = filename;
-            link.href = canvas.toDataURL("image/png");
+            link.href = canvas.toDataURL("image/jpeg", 0.9);  // Use JPEG format with 90% quality
 
             console.log("Image ready for download");
 

@@ -172,3 +172,32 @@ body {
 #color-picker {
     width: 100%;
 }
+
+#camera-context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+    z-index: 1000;
+    width: 150px;
+}
+
+#camera-context-menu div {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#camera-context-menu div:hover {
+    background: #f0f0f0;
+}
+
+.checkmark {
+    width: 20px;
+    display: inline-block;
+    text-align: center;
+    margin-right: 5px;
+}
