@@ -7,13 +7,13 @@ export let selectedCounties = [];
 
 let cmdPressed = false;
 
-document.addEventListener("keydown", function(event) {
+document.addEventListener("keydown", function (event) {
     if (event.key === "Meta") {
         cmdPressed = true;
     }
 });
 
-document.addEventListener("keyup", function(event) {
+document.addEventListener("keyup", function (event) {
     if (event.key === "Meta") {
         cmdPressed = false;
     }
@@ -31,9 +31,9 @@ function toggleCountySelection(element, d) {
         // If the county is currently the default color, change it to the current color
         d3.select(element).style("fill", currentColorHex);
         if (countyIndex === -1) {
-            selectedCounties.push({ id: d.id, color: currentColorHex });
+            selectedCounties.push({ ...d, color: currentColorHex });
         } else {
-            selectedCounties[countyIndex].color = currentColorHex;
+            selectedCounties[countyIndex] = { ...d, color: currentColorHex };
         }
         updateKeyMap(d, currentColorHex);
     } else {
@@ -47,9 +47,9 @@ function toggleCountySelection(element, d) {
             // Change to current color (from another color)
             d3.select(element).style("fill", currentColorHex);
             if (countyIndex === -1) {
-                selectedCounties.push({ id: d.id, color: currentColorHex });
+                selectedCounties.push({ ...d, color: currentColorHex });
             } else {
-                selectedCounties[countyIndex].color = currentColorHex;
+                selectedCounties[countyIndex] = { ...d, color: currentColorHex };
             }
             removeFromKeyMap(d, currentFill);
             updateKeyMap(d, currentColorHex);
@@ -79,14 +79,14 @@ export function initializeCounties(countyFeatures, stateIdToName) {
         .style("stroke-width", "0.5px");
 
     counties
-        .on("mouseover", function(event, d) {
+        .on("mouseover", function (event, d) {
             showTooltip(event, d);
             if (cmdPressed) {
                 toggleCountySelection(this, d);
             }
         })
         .on("mouseout", hideTooltip)
-        .on("click", function(event, d) {
+        .on("click", function (event, d) {
             if (!cmdPressed) {
                 toggleCountySelection(this, d);
             }

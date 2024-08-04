@@ -10,18 +10,18 @@ let selectedFields = new Set(['county_name', 'state_name', 'county_number']);
 
 export function initializeJsonExport() {
     // Show context menu on right-click
-    exportJsonButton.addEventListener('contextmenu', function(event) {
+    exportJsonButton.addEventListener('contextmenu', function (event) {
         event.preventDefault();
         showJsonExportContextMenu(event);
     });
 
     // Export JSON on left-click
-    exportJsonButton.addEventListener('click', async function() {
+    exportJsonButton.addEventListener('click', async function () {
         await exportJson();
     });
 
     // Close menu when clicking outside
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (!jsonExportContextMenu.contains(event.target) && event.target !== exportJsonButton) {
             jsonExportContextMenu.style.display = 'none';
         }
@@ -29,7 +29,7 @@ export function initializeJsonExport() {
 
     // Add event listeners for checkboxes
     jsonExportContextMenu.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             const fieldName = this.id.replace('json-', '').replace('-', '_');
             if (this.checked) {
                 selectedFields.add(fieldName);
@@ -53,76 +53,101 @@ function showJsonExportContextMenu(event) {
 }
 
 async function exportJson() {
-    // Show the spinner and hide the export icon
-    exportIcon.style.display = 'none';
-    spinnerIcon.style.display = 'inline-block';
+    try {
+        console.log("Starting JSON export");
+        exportIcon.style.display = 'none';
+        spinnerIcon.style.display = 'inline-block';
 
-    const exportData = [];
+        const exportData = [];
 
-    for (const county of selectedCounties) {
-        const countyData = {};
-        const countyDetails = await getCountyData(county.properties.name, county.properties.stateName);
+        console.log("Selected counties:", selectedCounties);
 
-        if (countyDetails) {
-            selectedFields.forEach(field => {
-                switch(field) {
-                    case 'county_name':
-                        countyData.county_name = county.properties.name;
-                        break;
-                    case 'state_name':
-                        countyData.state_name = county.properties.stateName;
-                        break;
-                    case 'county_number':
-                        countyData.county_number = county.id;
-                        break;
-                    case 'population':
-                        countyData.population = countyDetails.population || 'N/A';
-                        break;
-                    case 'coordinates':
-                        countyData.coordinates = countyDetails.coordinates.latitude && countyDetails.coordinates.longitude ? `${countyDetails.coordinates.latitude}, ${countyDetails.coordinates.longitude}` : 'N/A';
-                        break;
-                    case 'area':
-                        countyData.area = countyDetails.area ? `${countyDetails.area.value} ${countyDetails.area.unit}` : 'N/A';
-                        break;
-                    case 'country':
-                        countyData.country = countyDetails.country || 'N/A';
-                        break;
-                    case 'official_website':
-                        countyData.official_website = countyDetails.officialWebsite || 'N/A';
-                        break;
-                    case 'capital':
-                        countyData.capital = countyDetails.capital || 'N/A';
-                        break;
-                    case 'osm_relation':
-                        countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
-                        break;
-                    case 'wikipedia':
-                        countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
-                        break;
-                    default:
-                        console.warn(`Unknown field: ${field}`);
-                        break;
+        for (const county of selectedCounties) {
+            console.log("Processing county:", county);
+            const countyData = {};
+            try {
+                const countyName = county.properties.name;
+                const stateName = county.properties.stateName;
+
+                console.log("Fetching data for county:", countyName, stateName);
+                const countyDetails = await getCountyData(countyName, stateName);
+
+                console.log("County details:", countyDetails);
+
+                if (countyDetails) {
+                    selectedFields.forEach(field => {
+                        console.log("Processing field:", field);
+                        switch (field) {
+                            case 'county_name':
+                                countyData.county_name = countyName;
+                                break;
+                            case 'state_name':
+                                countyData.state_name = stateName;
+                                break;
+                            case 'county_number':
+                                countyData.county_number = county.id;
+                                break;
+                            case 'population':
+                                countyData.population = countyDetails.population || 'N/A';
+                                break;
+                            case 'coordinates':
+                                countyData.coordinates = countyDetails.coordinates.latitude && countyDetails.coordinates.longitude ? `${countyDetails.coordinates.latitude}, ${countyDetails.coordinates.longitude}` : 'N/A';
+                                break;
+                            case 'area':
+                                countyData.area = countyDetails.area ? `${countyDetails.area.value} ${countyDetails.area.unit}` : 'N/A';
+                                break;
+                            case 'country':
+                                countyData.country = countyDetails.country || 'N/A';
+                                break;
+                            case 'official_website':
+                                countyData.official_website = countyDetails.officialWebsite || 'N/A';
+                                break;
+                            case 'capital':
+                                countyData.capital = countyDetails.capital || 'N/A';
+                                break;
+                            case 'osm_relation':
+                                countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
+                                break;
+                            case 'wikipedia':
+                                countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
+                                break;
+                            default:
+                                console.warn(`Unknown field: ${field}`);
+                                break;
+                        }
+                    });
+                } else {
+                    console.warn(`No details found for county: ${countyName}, ${stateName}`);
                 }
-            });
-        } else {
-            console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
+            } catch (error) {
+                console.error(`Error fetching data for county:`, county, error);
+            }
+
+            console.log("Processed county data:", countyData);
+            exportData.push(countyData);
         }
 
-        exportData.push(countyData);
+        console.log("Preparing JSON string");
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        console.log("Creating download link");
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        console.log("Export completed successfully");
+        alert('Export completed successfully!');
+    } catch (error) {
+        console.error('Error during export:', error);
+        console.error('Error stack:', error.stack);
+        alert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+    } finally {
+        spinnerIcon.style.display = 'none';
+        exportIcon.style.display = 'inline-block';
     }
-
-    const jsonString = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-    link.click();
-
-    URL.revokeObjectURL(url);
-
-    // Hide the spinner and show the export icon
-    spinnerIcon.style.display = 'none';
-    exportIcon.style.display = 'inline-block';
 }
