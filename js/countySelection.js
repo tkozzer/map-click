@@ -21,21 +21,45 @@ document.addEventListener("keyup", function(event) {
 
 function toggleCountySelection(element, d) {
     const currentFill = d3.select(element).style("fill");
-    const currentColorHex = d3.rgb(currentColor).toString();
     const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+    const currentColorHex = d3.rgb(currentColor).toString();
+
+    // Find the index of the county in the selectedCounties array
+    const countyIndex = selectedCounties.findIndex(county => county.id === d.id);
 
     if (currentFill === defaultColorHex) {
-        // Change to the current color
-        d3.select(element).style("fill", currentColor);
-        selectedCounties.push({ ...d, color: currentColor });
-        updateKeyMap(d, currentColor);
+        // If the county is currently the default color, change it to the current color
+        d3.select(element).style("fill", currentColorHex);
+        if (countyIndex === -1) {
+            selectedCounties.push({ id: d.id, color: currentColorHex });
+        } else {
+            selectedCounties[countyIndex].color = currentColorHex;
+        }
+        updateKeyMap(d, currentColorHex);
     } else {
-        // Change to the default color
-        d3.select(element).style("fill", defaultCountyColor);
-        selectedCounties = selectedCounties.filter(county => county.id !== d.id);
-        removeFromKeyMap(d, currentFill);
+        // If the county is currently colored, toggle between current color and default color
+        if (currentFill === currentColorHex) {
+            // Change to default color
+            d3.select(element).style("fill", defaultCountyColor);
+            selectedCounties.splice(countyIndex, 1);
+            removeFromKeyMap(d, currentColorHex);
+        } else {
+            // Change to current color (from another color)
+            d3.select(element).style("fill", currentColorHex);
+            if (countyIndex === -1) {
+                selectedCounties.push({ id: d.id, color: currentColorHex });
+            } else {
+                selectedCounties[countyIndex].color = currentColorHex;
+            }
+            removeFromKeyMap(d, currentFill);
+            updateKeyMap(d, currentColorHex);
+        }
     }
+
+    console.log("Selected counties after:", selectedCounties);
 }
+
+
 
 export function initializeCounties(countyFeatures, stateIdToName) {
     countyFeatures.forEach(county => {
