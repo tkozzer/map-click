@@ -186,7 +186,7 @@ body {
     padding: 5px;
     cursor: pointer;
     z-index: 1000;
-    width: 150px;
+    width: 16x0px;
 }
 
 #camera-context-menu div {
@@ -216,7 +216,7 @@ body {
     border-radius: 5px;
     padding: 10px;
     z-index: 1000;
-    width: 200px;
+    width: 220px;
 }
 
 #json-export-context-menu div {

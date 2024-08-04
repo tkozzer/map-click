@@ -1,6 +1,7 @@
 // exportPng.js
 import { g } from './mapSetup.js';
 import { defaultCountyColor } from './colorPicker.js';
+import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
 
 export function exportPng() {
     console.log("Exporting as PNG");
@@ -51,7 +52,7 @@ export function exportPng() {
             .attr("d", offscreenPath)
             .style("fill", d => {
                 const county = g.selectAll("path.county")
-                    .filter(function(data) { return data.id === d.id; });
+                    .filter(function (data) { return data.id === d.id; });
                 if (!county.empty()) {
                     console.log(`County found: ${county.datum().properties.name}`);
                     return county.style("fill");
@@ -87,7 +88,7 @@ export function exportPng() {
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const image = new Image();
-        image.onload = function() {
+        image.onload = function () {
             context.drawImage(image, 0, 0);
             const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
             const filename = `us-county-map-${timestamp}.png`;
@@ -100,13 +101,18 @@ export function exportPng() {
 
             link.click();
             offscreenSvg.remove();
+
+            // Add success alert
+            showSuccessAlert(`Successfully exported as PNG: ${filename}`);
         };
-        image.onerror = function(error) {
+        image.onerror = function (error) {
             console.error("Image loading error", error);
+            showErrorAlert("Error exporting as PNG. See console for details.");
         };
         image.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgString)));
         console.log("Image source set", image.src);
     }).catch(error => {
         console.error("Error fetching data or processing SVG", error);
+        showErrorAlert("Error exporting as PNG. See console for details.");
     });
 }
