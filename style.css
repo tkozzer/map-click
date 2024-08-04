@@ -1,9 +1,11 @@
+/* Reset margin and padding for the body and set font family */
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
 
+/* Set the map dimensions and position */
 #map {
     width: 100vw;
     height: 100vh;
@@ -12,22 +14,26 @@ body {
     background-color: white;
 }
 
+/* Style for county elements */
 .county {
     fill: #f0f0f0;
     stroke: #7d7d7d;
     stroke-width: 0.5;
 }
 
+/* Change fill color on county hover */
 .county:hover {
     fill: #e0e0e0;
 }
 
+/* Style for state borders */
 .state {
     fill: none;
     stroke: #000000;
     stroke-width: 1;
 }
 
+/* Toolbar positioning and style */
 #toolbar {
     position: absolute;
     top: 10px;
@@ -41,6 +47,7 @@ body {
     padding: 10px;
 }
 
+/* Style for toolbar buttons */
 .toolbar-button {
     background: white;
     border: 1px solid #ccc;
@@ -53,10 +60,12 @@ body {
     position: relative;
 }
 
+/* Hover effect for toolbar buttons */
 .toolbar-button:hover {
     background: #f0f0f0;
 }
 
+/* Tooltip for toolbar buttons */
 .toolbar-button::after {
     content: attr(title);
     position: absolute;
@@ -74,16 +83,19 @@ body {
     pointer-events: none;
 }
 
+/* Show tooltip on hover */
 .toolbar-button:hover::after {
     opacity: 1;
 }
 
+/* Style for zoom control container */
 .zoom-controls {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
+/* Style for zoom buttons */
 .zoom-button {
     background: white;
     border: 1px solid #ccc;
@@ -96,10 +108,12 @@ body {
     position: relative;
 }
 
+/* Hover effect for zoom buttons */
 .zoom-button:hover {
     background: #f0f0f0;
 }
 
+/* Tooltip for zoom buttons */
 .zoom-button::after {
     content: attr(title);
     position: absolute;
@@ -117,10 +131,12 @@ body {
     pointer-events: none;
 }
 
+/* Show tooltip on hover */
 .zoom-button:hover::after {
     opacity: 1;
 }
 
+/* Style for tooltips */
 .tooltip {
     position: absolute;
     background: white;
@@ -132,20 +148,7 @@ body {
     transition: opacity 0.3s;
 }
 
-#context-menu {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 5px;
-    cursor: pointer;
-}
-
-#context-menu div:hover {
-    background: #f0f0f0;
-}
-
+/* Style for color controls container */
 #color-controls {
     position: absolute;
     top: 10px;
@@ -156,11 +159,13 @@ body {
     padding: 5px;
 }
 
+/* Style for color palette */
 #color-palette {
     display: flex;
     margin-bottom: 5px;
 }
 
+/* Style for individual color buttons */
 .color-btn {
     width: 20px;
     height: 20px;
@@ -169,10 +174,12 @@ body {
     cursor: pointer;
 }
 
+/* Style for color picker */
 #color-picker {
     width: 100%;
 }
 
+/* Style for camera context menu */
 #camera-context-menu {
     display: none;
     position: absolute;
@@ -185,16 +192,19 @@ body {
     width: 150px;
 }
 
+/* Style for individual items in camera context menu */
 #camera-context-menu div {
     padding: 5px;
     display: flex;
     align-items: center;
 }
 
+/* Hover effect for camera context menu items */
 #camera-context-menu div:hover {
     background: #f0f0f0;
 }
 
+/* Style for checkmark element */
 .checkmark {
     width: 20px;
     display: inline-block;
@@ -202,6 +212,7 @@ body {
     margin-right: 5px;
 }
 
+/* Style for JSON export context menu */
 #json-export-context-menu {
     display: none;
     position: absolute;
@@ -213,10 +224,154 @@ body {
     width: 200px;
 }
 
+/* Style for individual items in JSON export context menu */
 #json-export-context-menu div {
     margin: 5px 0;
 }
 
+/* Style for labels in JSON export context menu */
 #json-export-context-menu label {
     margin-left: 5px;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+
+}
+
+.modal-dialog {
+    margin: 0 auto;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    padding-top: 0;
+    /* Remove top padding */
+    border: 1px solid #888;
+    width: 100%;
+    /* Ensures it fills the width of the dialog */
+    max-height: 80vh;
+    /* 80% of the viewport height */
+    overflow-y: auto;
+    /* Adds a scroll bar if content exceeds the height */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    /* Adjust padding as needed */
+}
+
+.modal-header h2 {
+    margin: 0;
+    padding: 0;
+    /* Ensure no padding for h2 */
+}
+
+.modal-header .close {
+    margin: 0;
+    padding: 0;
+    width: 30px;
+    /* Set the desired width */
+    height: 30px;
+    /* Set the desired height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-header .close span {
+    font-size: 1.5rem;
+    /* Adjust the size of the "X" as needed */
+}
+
+/* Media query for small screens */
+@media (max-width: 600px) {
+    .modal-dialog {
+        max-width: 90vw;
+        /* 90% of the viewport width */
+    }
+}
+
+/* Media query for medium screens */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .modal-dialog {
+        max-width: 70vw;
+        /* 70% of the viewport width */
+    }
+}
+
+/* Media query for large screens */
+@media (min-width: 1025px) {
+    .modal-dialog {
+        max-width: 50vw;
+        /* 50% of the viewport width */
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Spinner container styles */
+.spinner-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Spinner styles */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* County data spinner styles */
+#countyDataSpinner {
+    min-height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal map styling */
+#modalMap {
+    height: 400px;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100% - 1rem);
 }

@@ -1,4 +1,3 @@
-// main.js
 import { svg, g, path } from './mapSetup.js';
 import { initializeZoom, resetMap, clearMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
 import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
