@@ -269,76 +269,65 @@ body {
 }
 
 .modal-dialog {
-    margin: 0 auto;
+    margin: 1.75rem auto;
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
 }
 
 .modal-content {
     background-color: #fefefe;
     padding: 20px;
-    padding-top: 0;
     border: 1px solid #888;
     width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
+    max-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 1rem;
 }
 
-.modal-header h2 {
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1rem;
+}
+
+.modal-header h5 {
     margin: 0;
-    padding: 0;
 }
 
 .modal-header .close {
-    margin: 0;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-header .close span {
-    font-size: 1.5rem;
+    padding: 1rem;
+    margin: -1rem -1rem -1rem auto;
 }
 
 .close {
-    color: #aaa;
     float: right;
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
+    color: #000;
     text-decoration: none;
-    cursor: pointer;
-}
-
-/* Modal Responsiveness */
-@media (max-width: 600px) {
-    .modal-dialog {
-        max-width: 90vw;
-    }
-}
-
-@media (min-width: 601px) and (max-width: 1024px) {
-    .modal-dialog {
-        max-width: 70vw;
-    }
-}
-
-@media (min-width: 1025px) {
-    .modal-dialog {
-        max-width: 50vw;
-    }
+    opacity: .75;
 }
 
 /* Spinner Styles
@@ -359,6 +348,31 @@ body {
 .spinner-border {
     width: 3rem;
     height: 3rem;
+}
+
+/* Modal Responsiveness */
+@media (max-width: 600px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        min-height: calc(100% - 1rem);
+        max-width: 90vw;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 1rem);
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    .modal-dialog {
+        max-width: 70vw;
+    }
+}
+
+@media (min-width: 1025px) {
+    .modal-dialog {
+        max-width: 50vw;
+    }
 }
 
 /* JSON Export Progress Bar
@@ -393,14 +407,15 @@ body {
 /* Modal Map
 -------------------------------------------------- */
 #modalMap {
-    height: 400px;
+    height: 50vh;
+    max-height: 400px;
+    width: 100%;
 }
 
 .modal-dialog-centered {
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: calc(100% - 1rem);
+    min-height: calc(100% - 3.5rem);
 }
 
 /* Key Map

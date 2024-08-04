@@ -24,9 +24,12 @@ export function initializeTooltipAndContextMenu() {
     });
 
     // Prevent modal from closing when clicking inside it
-    d3.select("#mapModal .modal-content").on("click", function () {
-        d3.event.stopPropagation();
+    d3.select("#mapModal .modal-content").on("click", function (event) {
+        event.stopPropagation();
     });
+
+    // Ensure the event listener is attached only once
+    $('#mapModal').on('shown.bs.modal', handleModalShow);
 }
 
 export function showTooltip(event, d) {
@@ -45,7 +48,6 @@ export function showContextMenu(event, d) {
     activeCounty = d;
     $('#mapModalLabel').text(`${d.properties.name} County Border`);
     $('#mapModal').modal('show');
-    handleModalShow();
 }
 
 function handleModalShow() {
@@ -54,6 +56,7 @@ function handleModalShow() {
     } else {
         map.invalidateSize(); // This makes sure the map container is properly sized
     }
+
     $('.spinner-container').show();
     const selectedCounty = activeCounty.properties.name;
     const selectedState = activeCounty.properties.stateName;
@@ -63,28 +66,27 @@ function handleModalShow() {
 }
 
 function initializeMap() {
-    // Wait for the modal to be shown completely before initializing the map
-    $('#mapModal').on('shown.bs.modal', function () {
-        if (!map) {
-            map = L.map('modalMap').setView([37.8, -96], 4); // Center of the US
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 18,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-        } else {
-            map.invalidateSize(); // Ensure the map resizes correctly
-        }
-    });
+    console.log("Initializing map");
+    map = L.map('modalMap').setView([37.8, -96], 4); // Center of the US
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 }
 
 function fetchCountyBorder(county, state) {
+    console.log(`Fetching border for ${county} County, ${state}`);
+
+    // Remove the previous county border if it exists
     if (countyBorder) {
         map.removeLayer(countyBorder);
+        countyBorder = null; // Ensure the reference is cleared
     }
 
     fetch(`https://nominatim.openstreetmap.org/search?q=${county}+County,+${state}&format=json&polygon_geojson=1`)
         .then(response => response.json())
         .then(data => {
+            console.log("Data fetched:", data);
             if (data.length > 0 && data[0].geojson) {
                 countyBorder = L.geoJSON(data[0].geojson, {
                     style: {
