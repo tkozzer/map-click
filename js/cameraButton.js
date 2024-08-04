@@ -8,26 +8,26 @@ let selectedFormat = 'png'; // Default format
 export function initializeCameraButton() {
     const cameraButton = d3.select("#camera-button");
 
-    cameraButton.on("contextmenu", function(event) {
+    cameraButton.on("contextmenu", function (event) {
         event.preventDefault();
         showCameraContextMenu(event);
     });
 
-    cameraButton.on("click", function() {
+    cameraButton.on("click", function () {
         exportImage(selectedFormat);
     });
 
-    d3.select("body").on("click", function() {
+    d3.select("body").on("click", function () {
         cameraContextMenu.style("display", "none");
     });
 
-    d3.select("#export-png").on("click", function() {
+    d3.select("#export-png").on("click", function () {
         selectedFormat = 'png';
         updateCheckmarks();
         cameraContextMenu.style("display", "none");
     });
 
-    d3.select("#export-jpg").on("click", function() {
+    d3.select("#export-jpg").on("click", function () {
         selectedFormat = 'jpg';
         updateCheckmarks();
         cameraContextMenu.style("display", "none");
@@ -61,7 +61,7 @@ function updateCheckmarks() {
 }
 
 function exportImage(format) {
-    console.log(`Exporting image as ${format}`);
+    console.debug(`Exporting image as ${format}`);
     if (format === 'png') {
         exportPng();
     } else if (format === 'jpg') {

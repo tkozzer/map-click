@@ -1,8 +1,10 @@
 async function getPropertyValue(entityId, propertyId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${entityId}&property=${propertyId}&format=json&origin=*`;
+    console.debug(`Fetching property ${propertyId} for entity ${entityId}: ${url}`);
     const response = await fetch(url);
     const data = await response.json();
-    if (data.claims && data.claims[propertyId]) {
+    console.debug(`Response for property ${propertyId} of entity ${entityId}:`, data);
+    if (data.claims?.[propertyId]) {
         return data.claims[propertyId][0].mainsnak.datavalue.value;
     }
     return null;
@@ -13,9 +15,11 @@ async function getLabel(entityId) {
         entityId = entityId.id;
     }
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=labels&languages=en&format=json&origin=*`;
+    console.debug(`Fetching label for entity ${entityId}: ${url}`);
     const response = await fetch(url);
     const data = await response.json();
-    if (data.entities && data.entities[entityId]) {
+    console.debug(`Response for label of entity ${entityId}:`, data);
+    if (data.entities?.[entityId]) {
         return data.entities[entityId].labels.en.value;
     }
     return null;
@@ -23,11 +27,13 @@ async function getLabel(entityId) {
 
 async function getWikipediaLink(entityId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=sitelinks/urls&sitefilter=enwiki&format=json&origin=*`;
+    console.debug(`Fetching Wikipedia link for entity ${entityId}: ${url}`);
     const response = await fetch(url);
     const data = await response.json();
-    if (data.entities && data.entities[entityId]) {
+    console.debug(`Response for Wikipedia link of entity ${entityId}:`, data);
+    if (data.entities?.[entityId]) {
         const sitelinks = data.entities[entityId].sitelinks;
-        if (sitelinks && sitelinks.enwiki) {
+        if (sitelinks?.enwiki) {
             return sitelinks.enwiki.url;
         }
     }
@@ -39,7 +45,7 @@ function cleanAmount(amount) {
 }
 
 async function formatArea(area) {
-    if (area && area.amount && area.unit) {
+    if (area?.amount && area?.unit) {
         const amount = cleanAmount(area.amount);
         const unitEntity = area.unit.split('/').pop();
         const unitLabel = await getLabel(unitEntity);
@@ -50,31 +56,46 @@ async function formatArea(area) {
 
 async function searchWikidata(query) {
     const searchUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
+    console.debug(`Searching Wikidata with query: ${searchUrl}`);
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
+    console.debug(`Search results for query "${query}":`, searchData);
     return searchData.search;
+}
+
+async function searchWikidataForCounty(countyName, stateName, regionType) {
+    let searchResults = await searchWikidata(`${countyName} ${regionType}, ${stateName}`);
+
+    // If no results, try searching without "Parish" or "County"
+    if (!searchResults || searchResults.length === 0) {
+        console.debug(`No results for ${countyName} ${regionType}, ${stateName}. Trying without ${regionType}.`);
+        searchResults = await searchWikidata(`${countyName}, ${stateName}`);
+    }
+
+    // If still no results, try searching just the county name
+    if (!searchResults || searchResults.length === 0) {
+        console.debug(`No results for ${countyName}, ${stateName}. Trying with just the county name.`);
+        searchResults = await searchWikidata(countyName);
+    }
+
+    return searchResults;
 }
 
 export async function getCountyData(countyName, stateName) {
     try {
-        // Try searching with full "County, State" specification
-        let searchResults = await searchWikidata(`${countyName} County, ${stateName}`);
-        
-        // If no results, try searching without "County"
-        if (!searchResults || searchResults.length === 0) {
-            searchResults = await searchWikidata(`${countyName}, ${stateName}`);
-        }
+        const isLouisiana = stateName.toLowerCase() === 'louisiana';
+        const regionType = isLouisiana ? 'Parish' : 'County';
+        console.debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
 
-        // If still no results, try searching just the county name
-        if (!searchResults || searchResults.length === 0) {
-            searchResults = await searchWikidata(countyName);
-        }
+        const searchResults = await searchWikidataForCounty(countyName, stateName, regionType);
 
         if (!searchResults || searchResults.length === 0) {
+            console.debug(`No results found for ${countyName}.`);
             return null;
         }
 
         const wikidataId = searchResults[0].id;
+        console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
 
         // Fetch data from Wikidata using the ID
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
@@ -99,7 +120,7 @@ export async function getCountyData(countyName, stateName) {
         ]);
 
         // Create and return the data object
-        return {
+        const data = {
             population: population ? cleanAmount(population.amount) : 'N/A',
             coordinates: { latitude, longitude },
             area: areaFormatted || 'N/A',
@@ -109,17 +130,18 @@ export async function getCountyData(countyName, stateName) {
             osmRelationId: osmRelationId || 'N/A',
             wikipediaLink: wikipediaLink || 'N/A'
         };
+        console.debug(`Formatted data for ${countyName}:`, data);
+        return data;
     } catch (error) {
         console.error('Error in getCountyData:', error);
         return null;
     }
 }
 
-
 function displayCountyData(data) {
     const dataContainer = document.getElementById('countyData');
     if (data) {
-        const osmRelationUrl = data.osmRelationId !== 'N/A' ? 
+        const osmRelationUrl = data.osmRelationId !== 'N/A' ?
             `https://www.openstreetmap.org/relation/${data.osmRelationId}` : null;
 
         dataContainer.innerHTML = `
@@ -141,11 +163,11 @@ function displayCountyData(data) {
 export async function fetchAndDisplayCountyData(countyName, stateName) {
     const spinner = document.getElementById('countyDataSpinner');
     const dataContainer = document.getElementById('countyData');
-    
+
     try {
         spinner.style.display = 'flex';
         dataContainer.innerHTML = '';
-        
+
         const data = await getCountyData(countyName, stateName);
         displayCountyData(data);
     } catch (error) {

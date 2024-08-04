@@ -4,7 +4,7 @@ let keyMapEntries = {};
 
 export function initializeKeyMap() {
     const keyButton = document.getElementById('key-button');
-    keyButton.addEventListener('click', function() {
+    keyButton.addEventListener('click', function () {
         toggleKeyMap();
     });
 }
@@ -58,7 +58,7 @@ function generateKeyMap() {
     keyMapContainer.innerHTML = '';
 
     if (Object.keys(keyMapEntries).length === 0) {
-        console.log('No counties selected');
+        console.debug('No counties selected');
         return;
     }
 
@@ -78,7 +78,7 @@ function generateKeyMap() {
         countiesCount.className = 'counties-count';
         countiesCount.textContent = `(${counties.size} counties)`;
 
-        nameInput.addEventListener('change', function() {
+        nameInput.addEventListener('change', function () {
             const newLabel = this.value.trim();
             counties.forEach(county => {
                 county.properties.label = newLabel;

@@ -80,121 +80,159 @@ function showJsonExportContextMenu(event) {
 
 async function exportJson() {
     const startTime = new Date().getTime();
-    console.log("Starting JSON export");
+    console.debug("Starting JSON export");
 
     try {
-        if (exportIcon) exportIcon.style.display = 'none';
-        if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
-        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
-        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
-        if (progressBarContainer) progressBarContainer.style.display = 'block';
-        if (progressBar) progressBar.style.width = '0%';
-
-        const exportData = [];
-
-        console.log(`Number of selected counties: ${selectedCounties.length}`);
+        toggleExportIcons(true);
+        initializeProgressBar();
 
         if (selectedCounties.length === 0) {
-            console.warn("No counties selected for export");
-            showErrorAlert('No counties selected for export. Please select counties and try again.');
+            handleNoCountiesSelected();
             return;
         }
 
-        // Use for...of loop with index
-        for (let [index, county] of selectedCounties.entries()) {
-            console.log("Processing county:", county);
-            const countyData = {};
-            try {
-                const countyName = county.properties.name;
-                const stateName = county.properties.stateName;
+        const exportData = await processCounties();
+        const jsonString = prepareJsonString(exportData);
+        downloadJson(jsonString);
 
-                console.log("Fetching data for county:", countyName, stateName);
-                const countyDetails = await getCountyData(countyName, stateName);
-
-                if (countyDetails) {
-                    selectedFields.forEach(field => {
-                        switch (field) {
-                            case 'county_name':
-                                countyData.county_name = countyName;
-                                break;
-                            case 'state_name':
-                                countyData.state_name = stateName;
-                                break;
-                            case 'county_number':
-                                countyData.county_number = county.id;
-                                break;
-                            case 'population':
-                                countyData.population = countyDetails.population || 'N/A';
-                                break;
-                            case 'coordinates':
-                                countyData.coordinates = countyDetails.coordinates.latitude && countyDetails.coordinates.longitude ? `${countyDetails.coordinates.latitude}, ${countyDetails.coordinates.longitude}` : 'N/A';
-                                break;
-                            case 'area':
-                                countyData.area = countyDetails.area ? `${countyDetails.area.value} ${countyDetails.area.unit}` : 'N/A';
-                                break;
-                            case 'country':
-                                countyData.country = countyDetails.country || 'N/A';
-                                break;
-                            case 'official_website':
-                                countyData.official_website = countyDetails.officialWebsite || 'N/A';
-                                break;
-                            case 'capital':
-                                countyData.capital = countyDetails.capital || 'N/A';
-                                break;
-                            case 'osm_relation':
-                                countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
-                                break;
-                            case 'wikipedia':
-                                countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
-                                break;
-                            default:
-                                console.warn(`Unknown field: ${field}`);
-                                break;
-                        }
-                    });
-                } else {
-                    console.warn(`No details found for county: ${countyName}, ${stateName}`);
-                }
-            } catch (error) {
-                console.error(`Error fetching data for county:`, county, error);
-            }
-
-            exportData.push(countyData);
-
-            // Update progress bar
-            if (progressBar) {
-                const progress = ((index + 1) / selectedCounties.length) * 100;
-                progressBar.style.width = `${progress}%`;
-            }
-        }
-
-        console.log("Preparing JSON string");
-        const jsonString = JSON.stringify(exportData, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-
-        console.log("Creating download link");
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-        link.click();
-
-        URL.revokeObjectURL(url);
-
-        const endTime = new Date().getTime();
-        const totalTime = (endTime - startTime) / 1000; // Convert to seconds
-        console.log(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
+        logExportSuccess(startTime);
         showSuccessAlert('Export completed successfully!');
     } catch (error) {
-        console.error('Error during export:', error);
-        console.error('Error stack:', error.stack);
-        showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+        handleExportError(error);
     } finally {
-        if (spinnerIcon) spinnerIcon.style.display = 'none';
-        if (exportIcon) exportIcon.style.display = 'inline-block';
-        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
-        if (progressBarContainer) progressBarContainer.style.display = 'none';
-        const finalProgressBar = document.querySelector('#export-json .json-export-progress-bar');
-        if (finalProgressBar) finalProgressBar.style.width = '0%';
+        resetExportIconsAndProgressBar();
     }
+}
+
+function toggleExportIcons(isExporting) {
+    if (exportIcon) exportIcon.style.display = isExporting ? 'none' : 'inline-block';
+    if (spinnerIcon) spinnerIcon.style.display = isExporting ? 'inline-block' : 'none';
+}
+
+function initializeProgressBar() {
+    const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+    if (progressBarContainer) progressBarContainer.style.display = 'block';
+    if (progressBar) progressBar.style.width = '0%';
+}
+
+function handleNoCountiesSelected() {
+    console.warn("No counties selected for export");
+    showErrorAlert('No counties selected for export. Please select counties and try again.');
+}
+
+async function processCounties() {
+    const exportData = [];
+    for (let [index, county] of selectedCounties.entries()) {
+        const countyData = await processCounty(county);
+        exportData.push(countyData);
+        updateProgressBar(index + 1, selectedCounties.length);
+    }
+    return exportData;
+}
+
+async function processCounty(county) {
+    console.debug("Processing county:", county);
+    const countyData = {};
+    try {
+        const countyName = county.properties.name;
+        const stateName = county.properties.stateName;
+        console.debug("Fetching data for county:", countyName, stateName);
+        const countyDetails = await getCountyData(countyName, stateName);
+        populateCountyData(countyData, county, countyDetails);
+    } catch (error) {
+        console.error(`Error fetching data for county:`, county, error);
+    }
+    return countyData;
+}
+
+function populateCountyData(countyData, county, countyDetails) {
+    if (countyDetails) {
+        selectedFields.forEach(field => {
+            switch (field) {
+                case 'county_name':
+                    countyData.county_name = county.properties.name;
+                    break;
+                case 'state_name':
+                    countyData.state_name = county.properties.stateName;
+                    break;
+                case 'county_number':
+                    countyData.county_number = county.id;
+                    break;
+                case 'population':
+                    countyData.population = countyDetails.population || 'N/A';
+                    break;
+                case 'coordinates':
+                    countyData.coordinates = countyDetails.coordinates.latitude && countyDetails.coordinates.longitude ? `${countyDetails.coordinates.latitude}, ${countyDetails.coordinates.longitude}` : 'N/A';
+                    break;
+                case 'area':
+                    countyData.area = countyDetails.area ? `${countyDetails.area.value} ${countyDetails.area.unit}` : 'N/A';
+                    break;
+                case 'country':
+                    countyData.country = countyDetails.country || 'N/A';
+                    break;
+                case 'official_website':
+                    countyData.official_website = countyDetails.officialWebsite || 'N/A';
+                    break;
+                case 'capital':
+                    countyData.capital = countyDetails.capital || 'N/A';
+                    break;
+                case 'osm_relation':
+                    countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
+                    break;
+                case 'wikipedia':
+                    countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
+                    break;
+                default:
+                    console.warn(`Unknown field: ${field}`);
+                    break;
+            }
+        });
+    } else {
+        console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
+    }
+}
+
+function updateProgressBar(currentIndex, totalCount) {
+    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+    if (progressBar) {
+        const progress = (currentIndex / totalCount) * 100;
+        progressBar.style.width = `${progress}%`;
+    }
+}
+
+function prepareJsonString(exportData) {
+    console.debug("Preparing JSON string");
+    return JSON.stringify(exportData, null, 2);
+}
+
+function downloadJson(jsonString) {
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    console.debug("Creating download link");
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+}
+
+function logExportSuccess(startTime) {
+    const endTime = new Date().getTime();
+    const totalTime = (endTime - startTime) / 1000; // Convert to seconds
+    console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
+}
+
+function handleExportError(error) {
+    console.error('Error during export:', error);
+    console.error('Error stack:', error.stack);
+    showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+}
+
+function resetExportIconsAndProgressBar() {
+    toggleExportIcons(false);
+    const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+    if (progressBarContainer) progressBarContainer.style.display = 'none';
+    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+    if (progressBar) progressBar.style.width = '0%';
 }

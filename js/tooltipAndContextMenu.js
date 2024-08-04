@@ -46,7 +46,13 @@ export function hideTooltip() {
 export function showContextMenu(event, d) {
     event.preventDefault();
     activeCounty = d;
-    $('#mapModalLabel').text(`${d.properties.name} County Border`);
+
+    // Check if the state is Louisiana and adjust the label accordingly
+    const stateName = d.properties.stateName.toLowerCase();
+    const regionType = stateName === 'louisiana' ? 'Parish' : 'County';
+    console.debug(`Showing context menu for ${d.properties.name} ${regionType}`);
+
+    $('#mapModalLabel').text(`${d.properties.name} ${regionType} Border`);
     $('#mapModal').modal('show');
 }
 
@@ -62,11 +68,13 @@ function handleModalShow() {
     const selectedState = activeCounty.properties.stateName;
     fetchCountyBorder(selectedCounty, selectedState);
     document.getElementById('countyData').innerHTML = '';  // Clear previous data
-    fetchAndDisplayCountyData(selectedCounty + ' County', selectedState);
+    const isLouisiana = selectedState.toLowerCase() === 'louisiana';
+    const regionType = isLouisiana ? 'Parish' : 'County';
+    fetchAndDisplayCountyData(selectedCounty + ` ${regionType}`, selectedState);
 }
 
 function initializeMap() {
-    console.log("Initializing map");
+    console.debug("Initializing map");
     map = L.map('modalMap').setView([37.8, -96], 4); // Center of the US
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
@@ -75,7 +83,7 @@ function initializeMap() {
 }
 
 function fetchCountyBorder(county, state) {
-    console.log(`Fetching border for ${county} County, ${state}`);
+    console.debug(`Fetching border for ${county} County, ${state}`);
 
     // Remove the previous county border if it exists
     if (countyBorder) {
@@ -83,29 +91,42 @@ function fetchCountyBorder(county, state) {
         countyBorder = null; // Ensure the reference is cleared
     }
 
-    fetch(`https://nominatim.openstreetmap.org/search?q=${county}+County,+${state}&format=json&polygon_geojson=1`)
+    const isLouisiana = state.toLowerCase() === 'louisiana';
+    const encodedCounty = encodeURIComponent(county);
+    const encodedState = encodeURIComponent(state);
+
+    const regionType = isLouisiana ? 'Parish' : 'County';
+    const query = `https://nominatim.openstreetmap.org/search?q=${encodedCounty}+${regionType},+${encodedState}&format=json&polygon_geojson=1`;
+    console.debug(`Querying OSM for ${regionType.toLowerCase()}: ${query}`);
+
+    fetch(query)
         .then(response => response.json())
         .then(data => {
-            console.log("Data fetched:", data);
+            console.debug(`OSM response for ${regionType.toLowerCase()}:`, data);
             if (data.length > 0 && data[0].geojson) {
-                countyBorder = L.geoJSON(data[0].geojson, {
-                    style: {
-                        color: 'blue',
-                        weight: 2,
-                        fillOpacity: 0.2
-                    }
-                }).addTo(map);
-                map.fitBounds(countyBorder.getBounds());
+                addCountyBorderToMap(data[0].geojson);
             } else {
-                console.error('No valid GeoJSON data found for ' + county + ' County');
+                console.error(`No valid GeoJSON data found for ${county} ${regionType}`);
             }
         })
         .catch(error => {
-            console.error('Error fetching county border:', error);
+            console.error(`Error fetching ${regionType.toLowerCase()} border: ${error}`);
         })
         .finally(() => {
             $('.spinner-container').hide();
         });
+}
+
+function addCountyBorderToMap(geojson) {
+    countyBorder = L.geoJSON(geojson, {
+        style: {
+            color: 'blue',
+            weight: 2,
+            fillOpacity: 0.2
+        }
+    }).addTo(map);
+    map.fitBounds(countyBorder.getBounds());
+    $('.spinner-container').hide();
 }
 
 export function applyCountyInteractions(selection) {
