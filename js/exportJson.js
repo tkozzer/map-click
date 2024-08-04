@@ -1,10 +1,11 @@
 import { selectedCounties } from './countySelection.js';
-import { getCountyData } from './county.js'; // Directly import the necessary function to get data
+import { getCountyData } from './county.js';
+import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 const exportJsonButton = document.getElementById('export-json');
-const exportIcon = exportJsonButton.querySelector('.fa-file-export');
-const spinnerIcon = exportJsonButton.querySelector('.fa-spinner');
+const exportIcon = exportJsonButton?.querySelector('.fa-file-export');
+const spinnerIcon = exportJsonButton?.querySelector('.fa-spinner');
 
 let selectedFields = new Set(['county_name', 'state_name', 'county_number']);
 
@@ -82,16 +83,22 @@ async function exportJson() {
     console.log("Starting JSON export");
 
     try {
-        exportIcon.style.display = 'none';
-        spinnerIcon.style.display = 'inline-block';
-        const progressBarContainer = document.querySelector('#export-json .progress-bar-container');
-        const progressBar = document.querySelector('#export-json .progress-bar');
-        progressBarContainer.style.display = 'block'; // Show the progress bar container
-        progressBar.style.width = '0%';
+        if (exportIcon) exportIcon.style.display = 'none';
+        if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (progressBarContainer) progressBarContainer.style.display = 'block';
+        if (progressBar) progressBar.style.width = '0%';
 
         const exportData = [];
 
         console.log(`Number of selected counties: ${selectedCounties.length}`);
+
+        if (selectedCounties.length === 0) {
+            console.warn("No counties selected for export");
+            showErrorAlert('No counties selected for export. Please select counties and try again.');
+            return;
+        }
 
         // Use for...of loop with index
         for (let [index, county] of selectedCounties.entries()) {
@@ -155,8 +162,10 @@ async function exportJson() {
             exportData.push(countyData);
 
             // Update progress bar
-            const progress = ((index + 1) / selectedCounties.length) * 100;
-            progressBar.style.width = `${progress}%`;
+            if (progressBar) {
+                const progress = ((index + 1) / selectedCounties.length) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
         }
 
         console.log("Preparing JSON string");
@@ -175,16 +184,17 @@ async function exportJson() {
         const endTime = new Date().getTime();
         const totalTime = (endTime - startTime) / 1000; // Convert to seconds
         console.log(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
-        alert('Export completed successfully!');
+        showSuccessAlert('Export completed successfully!');
     } catch (error) {
         console.error('Error during export:', error);
         console.error('Error stack:', error.stack);
-        alert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+        showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
     } finally {
-        spinnerIcon.style.display = 'none';
-        exportIcon.style.display = 'inline-block';
-        const progressBarContainer = document.querySelector('#export-json .progress-bar-container');
-        progressBarContainer.style.display = 'none'; // Hide the progress bar container
-        document.querySelector('#export-json .progress-bar').style.width = '0%';
+        if (spinnerIcon) spinnerIcon.style.display = 'none';
+        if (exportIcon) exportIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        if (progressBarContainer) progressBarContainer.style.display = 'none';
+        const finalProgressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (finalProgressBar) finalProgressBar.style.width = '0%';
     }
 }

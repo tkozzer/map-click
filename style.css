@@ -1,11 +1,13 @@
-/* Reset margin and padding for the body and set font family */
+/* Global Styles
+-------------------------------------------------- */
 body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
 
-/* Set the map dimensions and position */
+/* Map Styles
+-------------------------------------------------- */
 #map {
     width: 100vw;
     height: 100vh;
@@ -14,26 +16,26 @@ body {
     background-color: white;
 }
 
-/* Style for county elements */
+/* County and State Styles
+-------------------------------------------------- */
 .county {
     fill: #f0f0f0;
     stroke: #7d7d7d;
     stroke-width: 0.5;
 }
 
-/* Change fill color on county hover */
 .county:hover {
     fill: #e0e0e0;
 }
 
-/* Style for state borders */
 .state {
     fill: none;
     stroke: #000000;
     stroke-width: 1;
 }
 
-/* Toolbar positioning and style */
+/* Toolbar Styles
+-------------------------------------------------- */
 #toolbar {
     position: absolute;
     top: 10px;
@@ -47,7 +49,6 @@ body {
     padding: 10px;
 }
 
-/* Style for toolbar buttons */
 .toolbar-button {
     background: white;
     border: 1px solid #ccc;
@@ -60,12 +61,11 @@ body {
     position: relative;
 }
 
-/* Hover effect for toolbar buttons */
 .toolbar-button:hover {
     background: #f0f0f0;
 }
 
-/* Tooltip for toolbar buttons */
+/* Toolbar Button Tooltip */
 .toolbar-button::after {
     content: attr(title);
     position: absolute;
@@ -83,20 +83,18 @@ body {
     pointer-events: none;
 }
 
-/* Show tooltip on hover */
 .toolbar-button:hover::after {
     opacity: 1;
 }
 
-
-/* Style for zoom control container */
+/* Zoom Controls
+-------------------------------------------------- */
 .zoom-controls {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-/* Style for zoom buttons */
 .zoom-button {
     background: white;
     border: 1px solid #ccc;
@@ -109,12 +107,11 @@ body {
     position: relative;
 }
 
-/* Hover effect for zoom buttons */
 .zoom-button:hover {
     background: #f0f0f0;
 }
 
-/* Tooltip for zoom buttons */
+/* Zoom Button Tooltip */
 .zoom-button::after {
     content: attr(title);
     position: absolute;
@@ -132,12 +129,12 @@ body {
     pointer-events: none;
 }
 
-/* Show tooltip on hover */
 .zoom-button:hover::after {
     opacity: 1;
 }
 
-/* Style for tooltips */
+/* Tooltip Styles
+-------------------------------------------------- */
 .tooltip {
     position: absolute;
     background: white;
@@ -149,7 +146,8 @@ body {
     transition: opacity 0.3s;
 }
 
-/* Style for color controls container */
+/* Color Controls
+-------------------------------------------------- */
 #color-controls {
     position: absolute;
     top: 10px;
@@ -160,13 +158,11 @@ body {
     padding: 5px;
 }
 
-/* Style for color palette */
 #color-palette {
     display: flex;
     margin-bottom: 5px;
 }
 
-/* Style for individual color buttons */
 .color-btn {
     width: 20px;
     height: 20px;
@@ -175,12 +171,12 @@ body {
     cursor: pointer;
 }
 
-/* Style for color picker */
 #color-picker {
     width: 100%;
 }
 
-/* Style for camera context menu */
+/* Camera Context Menu
+-------------------------------------------------- */
 #camera-context-menu {
     display: none;
     position: absolute;
@@ -193,19 +189,16 @@ body {
     width: 150px;
 }
 
-/* Style for individual items in camera context menu */
 #camera-context-menu div {
     padding: 5px;
     display: flex;
     align-items: center;
 }
 
-/* Hover effect for camera context menu items */
 #camera-context-menu div:hover {
     background: #f0f0f0;
 }
 
-/* Style for checkmark element */
 .checkmark {
     width: 20px;
     display: inline-block;
@@ -213,7 +206,8 @@ body {
     margin-right: 5px;
 }
 
-/* Style for JSON export context menu */
+/* JSON Export Context Menu
+-------------------------------------------------- */
 #json-export-context-menu {
     display: none;
     position: absolute;
@@ -225,12 +219,10 @@ body {
     width: 200px;
 }
 
-/* Style for individual items in JSON export context menu */
 #json-export-context-menu div {
     margin: 5px 0;
 }
 
-/* Style for labels in JSON export context menu */
 #json-export-context-menu label {
     margin-left: 5px;
 }
@@ -262,7 +254,8 @@ body {
     margin-right: 5px;
 }
 
-/* Modal styles */
+/* Modal Styles
+-------------------------------------------------- */
 .modal {
     display: none;
     position: fixed;
@@ -272,9 +265,7 @@ body {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
-
 }
 
 .modal-dialog {
@@ -285,14 +276,10 @@ body {
     background-color: #fefefe;
     padding: 20px;
     padding-top: 0;
-    /* Remove top padding */
     border: 1px solid #888;
     width: 100%;
-    /* Ensures it fills the width of the dialog */
     max-height: 80vh;
-    /* 80% of the viewport height */
     overflow-y: auto;
-    /* Adds a scroll bar if content exceeds the height */
 }
 
 .modal-header {
@@ -300,22 +287,18 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    /* Adjust padding as needed */
 }
 
 .modal-header h2 {
     margin: 0;
     padding: 0;
-    /* Ensure no padding for h2 */
 }
 
 .modal-header .close {
     margin: 0;
     padding: 0;
     width: 30px;
-    /* Set the desired width */
     height: 30px;
-    /* Set the desired height */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -323,31 +306,6 @@ body {
 
 .modal-header .close span {
     font-size: 1.5rem;
-    /* Adjust the size of the "X" as needed */
-}
-
-/* Media query for small screens */
-@media (max-width: 600px) {
-    .modal-dialog {
-        max-width: 90vw;
-        /* 90% of the viewport width */
-    }
-}
-
-/* Media query for medium screens */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .modal-dialog {
-        max-width: 70vw;
-        /* 70% of the viewport width */
-    }
-}
-
-/* Media query for large screens */
-@media (min-width: 1025px) {
-    .modal-dialog {
-        max-width: 50vw;
-        /* 50% of the viewport width */
-    }
 }
 
 .close {
@@ -364,7 +322,27 @@ body {
     cursor: pointer;
 }
 
-/* Spinner container styles */
+/* Modal Responsiveness */
+@media (max-width: 600px) {
+    .modal-dialog {
+        max-width: 90vw;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    .modal-dialog {
+        max-width: 70vw;
+    }
+}
+
+@media (min-width: 1025px) {
+    .modal-dialog {
+        max-width: 50vw;
+    }
+}
+
+/* Spinner Styles
+-------------------------------------------------- */
 .spinner-container {
     position: absolute;
     top: 0;
@@ -378,14 +356,14 @@ body {
     z-index: 1000;
 }
 
-/* Spinner styles */
 .spinner-border {
     width: 3rem;
     height: 3rem;
 }
 
-/* Progress bar container styles */
-.progress-bar-container {
+/* JSON Export Progress Bar
+-------------------------------------------------- */
+.json-export-progress-bar-container {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -396,14 +374,15 @@ body {
     display: none;
 }
 
-.progress-bar {
+.json-export-progress-bar {
     width: 0;
     height: 100%;
     background-color: #4CAF50;
     transition: width 0.3s ease;
 }
 
-/* County data spinner styles */
+/* County Data Spinner
+-------------------------------------------------- */
 #countyDataSpinner {
     min-height: 100px;
     display: flex;
@@ -411,7 +390,8 @@ body {
     align-items: center;
 }
 
-/* Modal map styling */
+/* Modal Map
+-------------------------------------------------- */
 #modalMap {
     height: 400px;
 }
@@ -423,7 +403,8 @@ body {
     min-height: calc(100% - 1rem);
 }
 
-/* Add styles for key map */
+/* Key Map
+-------------------------------------------------- */
 #key-map {
     position: absolute;
     bottom: 10px;
@@ -451,6 +432,62 @@ body {
     flex: 1;
 }
 
+/* Utility Classes
+-------------------------------------------------- */
 .hidden {
     display: none;
+}
+
+/* Custom Alert Styles
+-------------------------------------------------- */
+.alert {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Alert Progress Bar
+-------------------------------------------------- */
+.alert-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+@keyframes alertProgressBar {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
 }

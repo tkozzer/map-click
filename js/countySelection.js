@@ -55,11 +55,7 @@ function toggleCountySelection(element, d) {
             updateKeyMap(d, currentColorHex);
         }
     }
-
-    console.log("Selected counties after:", selectedCounties);
 }
-
-
 
 export function initializeCounties(countyFeatures, stateIdToName) {
     countyFeatures.forEach(county => {
