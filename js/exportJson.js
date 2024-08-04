@@ -53,14 +53,16 @@ function showJsonExportContextMenu(event) {
 }
 
 async function exportJson() {
+    const startTime = new Date().getTime();
+    console.log("Starting JSON export");
+
     try {
-        console.log("Starting JSON export");
         exportIcon.style.display = 'none';
         spinnerIcon.style.display = 'inline-block';
 
         const exportData = [];
 
-        console.log("Selected counties:", selectedCounties);
+        console.log(`Number of selected counties: ${selectedCounties.length}`);
 
         for (const county of selectedCounties) {
             console.log("Processing county:", county);
@@ -72,11 +74,8 @@ async function exportJson() {
                 console.log("Fetching data for county:", countyName, stateName);
                 const countyDetails = await getCountyData(countyName, stateName);
 
-                console.log("County details:", countyDetails);
-
                 if (countyDetails) {
                     selectedFields.forEach(field => {
-                        console.log("Processing field:", field);
                         switch (field) {
                             case 'county_name':
                                 countyData.county_name = countyName;
@@ -123,7 +122,6 @@ async function exportJson() {
                 console.error(`Error fetching data for county:`, county, error);
             }
 
-            console.log("Processed county data:", countyData);
             exportData.push(countyData);
         }
 
@@ -140,7 +138,9 @@ async function exportJson() {
 
         URL.revokeObjectURL(url);
 
-        console.log("Export completed successfully");
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000; // Convert to seconds
+        console.log(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
         alert('Export completed successfully!');
     } catch (error) {
         console.error('Error during export:', error);
