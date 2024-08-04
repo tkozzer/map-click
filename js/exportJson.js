@@ -59,12 +59,17 @@ async function exportJson() {
     try {
         exportIcon.style.display = 'none';
         spinnerIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .progress-bar-container');
+        const progressBar = document.querySelector('#export-json .progress-bar');
+        progressBarContainer.style.display = 'block'; // Show the progress bar container
+        progressBar.style.width = '0%';
 
         const exportData = [];
 
         console.log(`Number of selected counties: ${selectedCounties.length}`);
 
-        for (const county of selectedCounties) {
+        // Use for...of loop with index
+        for (let [index, county] of selectedCounties.entries()) {
             console.log("Processing county:", county);
             const countyData = {};
             try {
@@ -123,6 +128,10 @@ async function exportJson() {
             }
 
             exportData.push(countyData);
+
+            // Update progress bar
+            const progress = ((index + 1) / selectedCounties.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
 
         console.log("Preparing JSON string");
@@ -149,5 +158,8 @@ async function exportJson() {
     } finally {
         spinnerIcon.style.display = 'none';
         exportIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .progress-bar-container');
+        progressBarContainer.style.display = 'none'; // Hide the progress bar container
+        document.querySelector('#export-json .progress-bar').style.width = '0%';
     }
 }
