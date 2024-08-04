@@ -22,16 +22,25 @@
         <div id="clear-button" class="toolbar-button" title="Clear"><i class="fas fa-eraser"></i></div>
         <div id="recenter-button" class="toolbar-button" title="Recenter"><i class="fas fa-compress-arrows-alt"></i>
         </div>
-        <div class="zoom-controls">
-            <div id="zoom-in" class="zoom-button" title="Zoom In"><i class="fas fa-search-plus"></i></div>
-            <div id="zoom-out" class="zoom-button" title="Zoom Out"><i class="fas fa-search-minus"></i></div>
-        </div>
         <div id="camera-button" class="toolbar-button" title="Camera"><i class="fas fa-camera"></i></div>
         <div id="export-json" class="toolbar-button" title="Export JSON">
             <i class="fas fa-file-export"></i>
             <i class="fas fa-spinner fa-spin" style="display: none;"></i>
         </div>
+        <div id="key-button" class="toolbar-button" title="Key Map"><i class="fas fa-key"></i></div>
+        <div class="zoom-controls">
+            <div id="zoom-in" class="zoom-button" title="Zoom In"><i class="fas fa-search-plus"></i></div>
+            <div id="zoom-out" class="zoom-button" title="Zoom Out"><i class="fas fa-search-minus"></i></div>
+        </div>
     </div>
+    <div id="key-map" class="hidden">
+        <div id="key-map-entries"></div>
+    </div>
+
+    <div id="key-map" class="hidden">
+        <div id="key-map-entries"></div>
+    </div>
+
     <div id="camera-context-menu">
         <div id="export-png">Export as PNG</div>
         <div id="export-jpg">Export as JPG</div>
@@ -95,6 +104,11 @@
             <button class="color-btn" style="background-color: violet;"></button>
         </div>
         <input type="color" id="color-picker" value="#ff0000">
+    </div>
+
+    <div id="key-map" class="key-map hidden">
+        <h3>Color Key Map</h3>
+        <div id="key-map-entries"></div>
     </div>
 
     <!-- Modal -->

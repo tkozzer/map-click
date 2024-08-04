@@ -1,3 +1,4 @@
+// main.js
 import { svg, g, path } from './mapSetup.js';
 import { initializeZoom, resetMap, clearMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
 import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
@@ -5,6 +6,7 @@ import { initializeColorPicker } from './colorPicker.js';
 import { initializeCounties } from './countySelection.js';
 import { initializeCameraButton } from './cameraButton.js';
 import { initializeJsonExport } from './exportJson.js';
+import { initializeKeyMap } from './keyMap.js';
 
 let nationData;
 
@@ -46,4 +48,5 @@ initializeTooltipAndContextMenu();
 initializeColorPicker();
 initializeCameraButton();
 initializeJsonExport();
+initializeKeyMap();
 cleanupZoom();

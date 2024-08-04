@@ -376,3 +376,35 @@ body {
     justify-content: center;
     min-height: calc(100% - 1rem);
 }
+
+/* Add styles for key map */
+#key-map {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.key-map-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.key-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.key-name {
+    flex: 1;
+}
+
+.hidden {
+    display: none;
+}

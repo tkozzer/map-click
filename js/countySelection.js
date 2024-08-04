@@ -2,6 +2,7 @@
 import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
+import { updateKeyMap, removeFromKeyMap } from './keyMap.js';
 
 export let selectedCounties = [];
 
@@ -24,9 +25,11 @@ function toggleCountySelection(element, d) {
     if (currentFill === d3.rgb(currentColor).toString()) {
         d3.select(element).style("fill", defaultCountyColor);
         selectedCounties = selectedCounties.filter(county => county.id !== d.id);
+        removeFromKeyMap(d, currentFill);
     } else {
         d3.select(element).style("fill", currentColor);
         selectedCounties.push(d);
+        updateKeyMap(d, currentColor);
     }
 }
 
@@ -42,6 +45,7 @@ export function initializeCounties(countyFeatures, stateIdToName) {
         .enter().append("path")
         .attr("class", "county")
         .attr("d", path)
+        .attr("data-id", d => d.id)
         .style("fill", defaultCountyColor)
         .style("stroke", "#7d7d7d")
         .style("stroke-width", "0.5px");
