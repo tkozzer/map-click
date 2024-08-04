@@ -9,16 +9,31 @@ let map;
 let countyBorder;
 
 export function initializeTooltipAndContextMenu() {
-    d3.select("body").on("click", function() {
+    d3.select("body").on("click", function () {
         $('#mapModal').modal('hide');
+    });
+
+    // Add event listener for the close button in the modal footer
+    d3.select("#mapModal .modal-footer button").on("click", function () {
+        $('#mapModal').modal('hide');
+    });
+
+    // Add event listener for the 'X' button in the modal header
+    d3.select("#mapModal .modal-header .close").on("click", function () {
+        $('#mapModal').modal('hide');
+    });
+
+    // Prevent modal from closing when clicking inside it
+    d3.select("#mapModal .modal-content").on("click", function () {
+        d3.event.stopPropagation();
     });
 }
 
 export function showTooltip(event, d) {
     tooltip.style("opacity", 1)
-           .html(`${d.properties.name}, ${d.properties.stateName}`)
-           .style("left", (event.pageX + 10) + "px")
-           .style("top", (event.pageY - 28) + "px");
+        .html(`${d.properties.name}, ${d.properties.stateName}`)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
 }
 
 export function hideTooltip() {
