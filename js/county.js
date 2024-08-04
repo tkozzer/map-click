@@ -1,3 +1,5 @@
+// county.js
+
 async function getPropertyValue(entityId, propertyId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${entityId}&property=${propertyId}&format=json&origin=*`;
     const response = await fetch(url);
@@ -23,11 +25,8 @@ async function getLabel(entityId) {
 
 async function getWikipediaLink(entityId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=sitelinks/urls&sitefilter=enwiki&format=json&origin=*`;
-    console.log(`Fetching Wikipedia link from URL: ${url}`);
     const response = await fetch(url);
     const data = await response.json();
-    console.log('Raw response for Wikipedia link:', data);
-    
     if (data.entities && data.entities[entityId]) {
         const sitelinks = data.entities[entityId].sitelinks;
         if (sitelinks && sitelinks.enwiki) {
@@ -55,7 +54,6 @@ async function searchWikidata(query) {
     const searchUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
     const searchResponse = await fetch(searchUrl);
     const searchData = await searchResponse.json();
-    console.log('Search results:', searchData);
     return searchData.search;
 }
 
@@ -66,23 +64,19 @@ async function getCountyData(countyName, stateName) {
         
         // If no results, try searching without "County"
         if (!searchResults || searchResults.length === 0) {
-            console.log('No results with "County", trying without...');
             searchResults = await searchWikidata(`${countyName}, ${stateName}`);
         }
 
         // If still no results, try searching just the county name
         if (!searchResults || searchResults.length === 0) {
-            console.log('No results with "State", trying just county name...');
             searchResults = await searchWikidata(countyName);
         }
 
         if (!searchResults || searchResults.length === 0) {
-            console.error('County not found after all attempts');
             return null;
         }
 
         const wikidataId = searchResults[0].id;
-        console.log('Selected Wikidata ID:', wikidataId);
 
         // Fetch data from Wikidata using the ID
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
@@ -96,8 +90,6 @@ async function getCountyData(countyName, stateName) {
             getWikipediaLink(wikidataId)
         ]);
 
-        console.log('Fetched data:', { population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink });
-
         // Extract and format the data
         const latitude = coordinates ? coordinates.latitude : null;
         const longitude = coordinates ? coordinates.longitude : null;
@@ -110,14 +102,14 @@ async function getCountyData(countyName, stateName) {
 
         // Create and return the data object
         return {
-            population: population ? cleanAmount(population.amount) : null,
+            population: population ? cleanAmount(population.amount) : 'N/A',
             coordinates: { latitude, longitude },
-            area: areaFormatted,
-            country: countryLabel,
-            officialWebsite: officialWebsite,
-            capital: capitalLabel,
-            osmRelationId: osmRelationId,
-            wikipediaLink: wikipediaLink
+            area: areaFormatted || 'N/A',
+            country: countryLabel || 'N/A',
+            officialWebsite: officialWebsite || 'N/A',
+            capital: capitalLabel || 'N/A',
+            osmRelationId: osmRelationId || 'N/A',
+            wikipediaLink: wikipediaLink || 'N/A'
         };
     } catch (error) {
         console.error('Error in getCountyData:', error);
@@ -156,6 +148,9 @@ export async function fetchAndDisplayCountyData(countyName, stateName) {
         dataContainer.innerHTML = '';
         
         const data = await getCountyData(countyName, stateName);
+        if (data) {
+            return data;
+        }
         displayCountyData(data);
     } catch (error) {
         console.error('Error fetching county data:', error);

@@ -1,5 +1,6 @@
 // exportJson.js
 import { selectedCounties } from './countySelection.js';
+import { fetchAndDisplayCountyData } from './county.js';
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 let selectedFields = new Set(['county_name', 'state_name', 'county_number']);
@@ -50,42 +51,60 @@ function showJsonExportContextMenu(event) {
     event.stopPropagation();
 }
 
-function exportJson() {
-    const exportData = selectedCounties.map(county => {
+async function exportJson() {
+    const exportData = [];
+
+    for (const county of selectedCounties) {
         const countyData = {};
-        selectedFields.forEach(field => {
-            switch(field) {
-                case 'county_name':
-                    countyData.county_name = county.properties.name;
-                    break;
-                case 'state_name':
-                    countyData.state_name = county.properties.stateName;
-                    break;
-                case 'county_number':
-                    countyData.county_number = county.id;
-                    break;
-                case 'population':
-                    countyData.population = Math.floor(Math.random() * 1000000); // Placeholder
-                    break;
-                case 'area':
-                    countyData.area_sq_km = Math.floor(Math.random() * 10000); // Placeholder
-                    break;
-                case 'county_seat':
-                    countyData.county_seat = "Sample City"; // Placeholder
-                    break;
-                case 'median_income':
-                    countyData.median_income = Math.floor(Math.random() * 100000); // Placeholder
-                    break;
-                case 'unemployment':
-                    countyData.unemployment_rate = (Math.random() * 10).toFixed(1) + "%"; // Placeholder
-                    break;
-                case 'industries':
-                    countyData.primary_industries = ["Agriculture", "Manufacturing"]; // Placeholder
-                    break;
-            }
-        });
-        return countyData;
-    });
+        const countyDetails = await fetchAndDisplayCountyData(county.properties.name, county.properties.stateName);
+
+        if (countyDetails) {
+            selectedFields.forEach(field => {
+                switch(field) {
+                    case 'county_name':
+                        countyData.county_name = county.properties.name;
+                        break;
+                    case 'state_name':
+                        countyData.state_name = county.properties.stateName;
+                        break;
+                    case 'county_number':
+                        countyData.county_number = county.id;
+                        break;
+                    case 'population':
+                        countyData.population = countyDetails.population || 'N/A';
+                        break;
+                    case 'coordinates':
+                        countyData.coordinates = countyDetails.coordinates.latitude && countyDetails.coordinates.longitude ? `${countyDetails.coordinates.latitude}, ${countyDetails.coordinates.longitude}` : 'N/A';
+                        break;
+                    case 'area':
+                        countyData.area = countyDetails.area ? `${countyDetails.area.value} ${countyDetails.area.unit}` : 'N/A';
+                        break;
+                    case 'country':
+                        countyData.country = countyDetails.country || 'N/A';
+                        break;
+                    case 'official_website':
+                        countyData.official_website = countyDetails.officialWebsite || 'N/A';
+                        break;
+                    case 'capital':
+                        countyData.capital = countyDetails.capital || 'N/A';
+                        break;
+                    case 'osm_relation':
+                        countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
+                        break;
+                    case 'wikipedia':
+                        countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
+                        break;
+                    default:
+                        console.warn(`Unknown field: ${field}`);
+                        break;
+                }
+            });
+        } else {
+            console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
+        }
+
+        exportData.push(countyData);
+    }
 
     const jsonString = JSON.stringify(exportData, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
