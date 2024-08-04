@@ -235,6 +235,33 @@ body {
     margin-left: 5px;
 }
 
+.json-export-context-menu-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+.json-export-context-menu-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+}
+
+.json-export-context-menu-button:hover {
+    background-color: #e0e0e0;
+}
+
+.json-export-context-menu-button i {
+    margin-right: 5px;
+}
+
 /* Modal styles */
 .modal {
     display: none;

@@ -50,11 +50,11 @@
     </div>
     <div id="json-export-context-menu">
         <div>
-            <input type="checkbox" id="json-county-name" checked>
+            <input type="checkbox" id="json-county-name" checked disabled>
             <label for="json-county-name">County Name</label>
         </div>
         <div>
-            <input type="checkbox" id="json-state-name" checked>
+            <input type="checkbox" id="json-state-name" checked disabled>
             <label for="json-state-name">State Name</label>
         </div>
         <div>
@@ -92,6 +92,16 @@
         <div>
             <input type="checkbox" id="json-wikipedia">
             <label for="json-wikipedia">Wikipedia</label>
+        </div>
+
+        <!-- New options at the bottom -->
+        <div class="json-export-context-menu-actions">
+            <button id="select-all-fields" class="json-export-context-menu-button">
+                <i class="fas fa-check-square"></i> Select All
+            </button>
+            <button id="clear-all-fields" class="json-export-context-menu-button">
+                <i class="fas fa-square"></i> Clear All
+            </button>
         </div>
     </div>
 

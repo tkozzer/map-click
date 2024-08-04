@@ -38,6 +38,31 @@ export function initializeJsonExport() {
             }
         });
     });
+
+    // Add event listeners for "Select All" and "Clear" buttons
+    document.getElementById('select-all-fields').addEventListener('click', selectAllFields);
+    document.getElementById('clear-all-fields').addEventListener('click', clearAllFields);
+}
+
+function selectAllFields() {
+    jsonExportContextMenu.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = true;
+        const fieldName = checkbox.id.replace('json-', '').replace('-', '_');
+        selectedFields.add(fieldName);
+    });
+}
+
+function clearAllFields() {
+    jsonExportContextMenu.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        const fieldName = checkbox.id.replace('json-', '').replace('-', '_');
+        if (fieldName !== 'county_name' && fieldName !== 'state_name') {
+            checkbox.checked = false;
+            selectedFields.delete(fieldName);
+        } else {
+            checkbox.checked = true;
+            selectedFields.add(fieldName);
+        }
+    });
 }
 
 function showJsonExportContextMenu(event) {
