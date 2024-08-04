@@ -131,3 +131,6 @@ _site/
 # Visual Studio Code
 .vscode/
 .history/
+
+sandbox/
+*.zip
