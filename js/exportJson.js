@@ -83,51 +83,75 @@ async function exportJson() {
     console.debug("Starting JSON export");
 
     try {
-        toggleExportIcons(true);
-        initializeProgressBar();
+        if (exportIcon) exportIcon.style.display = 'none';
+        if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (progressBarContainer) progressBarContainer.style.display = 'block';
+        if (progressBar) progressBar.style.width = '0%';
 
         if (selectedCounties.length === 0) {
-            handleNoCountiesSelected();
+            console.warn("No counties selected for export");
+            showErrorAlert('No counties selected for export. Please select counties and try again.');
             return;
         }
 
-        const exportData = await processCounties();
-        const jsonString = prepareJsonString(exportData);
-        downloadJson(jsonString);
+        const exportData = await processCountiesConcurrently(selectedCounties);
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
 
-        logExportSuccess(startTime);
+        console.debug("Creating download link");
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000; // Convert to seconds
+        console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
         showSuccessAlert('Export completed successfully!');
     } catch (error) {
-        handleExportError(error);
+        console.error('Error during export:', error);
+        console.error('Error stack:', error.stack);
+        showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
     } finally {
-        resetExportIconsAndProgressBar();
+        if (spinnerIcon) spinnerIcon.style.display = 'none';
+        if (exportIcon) exportIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        if (progressBarContainer) progressBarContainer.style.display = 'none';
+        const finalProgressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (finalProgressBar) finalProgressBar.style.width = '0%';
     }
 }
 
-function toggleExportIcons(isExporting) {
-    if (exportIcon) exportIcon.style.display = isExporting ? 'none' : 'inline-block';
-    if (spinnerIcon) spinnerIcon.style.display = isExporting ? 'inline-block' : 'none';
-}
-
-function initializeProgressBar() {
-    const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
-    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
-    if (progressBarContainer) progressBarContainer.style.display = 'block';
-    if (progressBar) progressBar.style.width = '0%';
-}
-
-function handleNoCountiesSelected() {
-    console.warn("No counties selected for export");
-    showErrorAlert('No counties selected for export. Please select counties and try again.');
-}
-
-async function processCounties() {
+async function processCountiesConcurrently(counties) {
+    const MAX_CONCURRENT_REQUESTS = 10;
     const exportData = [];
-    for (let [index, county] of selectedCounties.entries()) {
-        const countyData = await processCounty(county);
-        exportData.push(countyData);
-        updateProgressBar(index + 1, selectedCounties.length);
+    let progressIndex = 0;
+
+    const updateProgressBar = (index, total) => {
+        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (progressBar) {
+            const progress = (index / total) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+    };
+
+    const processBatch = async (batch) => {
+        const results = await Promise.all(batch.map(county => processCounty(county)));
+        results.forEach(result => exportData.push(result));
+        progressIndex += batch.length;
+        updateProgressBar(progressIndex, counties.length);
+    };
+
+    for (let i = 0; i < counties.length; i += MAX_CONCURRENT_REQUESTS) {
+        const batch = counties.slice(i, i + MAX_CONCURRENT_REQUESTS);
+        await processBatch(batch);
     }
+
     return exportData;
 }
 
@@ -191,48 +215,4 @@ function populateCountyData(countyData, county, countyDetails) {
     } else {
         console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
     }
-}
-
-function updateProgressBar(currentIndex, totalCount) {
-    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
-    if (progressBar) {
-        const progress = (currentIndex / totalCount) * 100;
-        progressBar.style.width = `${progress}%`;
-    }
-}
-
-function prepareJsonString(exportData) {
-    console.debug("Preparing JSON string");
-    return JSON.stringify(exportData, null, 2);
-}
-
-function downloadJson(jsonString) {
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    console.debug("Creating download link");
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `selected-counties-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-}
-
-function logExportSuccess(startTime) {
-    const endTime = new Date().getTime();
-    const totalTime = (endTime - startTime) / 1000; // Convert to seconds
-    console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedCounties.length} counties.`);
-}
-
-function handleExportError(error) {
-    console.error('Error during export:', error);
-    console.error('Error stack:', error.stack);
-    showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
-}
-
-function resetExportIconsAndProgressBar() {
-    toggleExportIcons(false);
-    const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
-    if (progressBarContainer) progressBarContainer.style.display = 'none';
-    const progressBar = document.querySelector('#export-json .json-export-progress-bar');
-    if (progressBar) progressBar.style.width = '0%';
 }
