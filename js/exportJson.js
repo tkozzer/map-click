@@ -3,11 +3,13 @@ import { selectedCounties } from './countySelection.js';
 import { fetchAndDisplayCountyData } from './county.js';
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
+const exportJsonButton = document.getElementById('export-json');
+const exportIcon = exportJsonButton.querySelector('.fa-file-export');
+const spinnerIcon = exportJsonButton.querySelector('.fa-spinner');
+
 let selectedFields = new Set(['county_name', 'state_name', 'county_number']);
 
 export function initializeJsonExport() {
-    const exportJsonButton = document.getElementById('export-json');
-
     // Show context menu on right-click
     exportJsonButton.addEventListener('contextmenu', function(event) {
         event.preventDefault();
@@ -15,8 +17,8 @@ export function initializeJsonExport() {
     });
 
     // Export JSON on left-click
-    exportJsonButton.addEventListener('click', function() {
-        exportJson();
+    exportJsonButton.addEventListener('click', async function() {
+        await exportJson();
     });
 
     // Close menu when clicking outside
@@ -52,6 +54,10 @@ function showJsonExportContextMenu(event) {
 }
 
 async function exportJson() {
+    // Show the spinner and hide the export icon
+    exportIcon.style.display = 'none';
+    spinnerIcon.style.display = 'inline-block';
+
     const exportData = [];
 
     for (const county of selectedCounties) {
@@ -116,4 +122,8 @@ async function exportJson() {
     link.click();
 
     URL.revokeObjectURL(url);
+
+    // Hide the spinner and show the export icon
+    spinnerIcon.style.display = 'none';
+    exportIcon.style.display = 'inline-block';
 }
