@@ -1,4 +1,3 @@
-// colorPicker.js
 export let currentColor = "#ff0000";
 export const defaultCountyColor = "#f0f0f0";
 

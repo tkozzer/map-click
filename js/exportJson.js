@@ -1,6 +1,5 @@
-// exportJson.js
 import { selectedCounties } from './countySelection.js';
-import { fetchAndDisplayCountyData } from './county.js';
+import { getCountyData } from './county.js'; // Directly import the necessary function to get data
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 const exportJsonButton = document.getElementById('export-json');
@@ -62,7 +61,7 @@ async function exportJson() {
 
     for (const county of selectedCounties) {
         const countyData = {};
-        const countyDetails = await fetchAndDisplayCountyData(county.properties.name, county.properties.stateName);
+        const countyDetails = await getCountyData(county.properties.name, county.properties.stateName);
 
         if (countyDetails) {
             selectedFields.forEach(field => {

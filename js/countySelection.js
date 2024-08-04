@@ -1,4 +1,3 @@
-// countySelection.js
 import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
@@ -22,14 +21,19 @@ document.addEventListener("keyup", function(event) {
 
 function toggleCountySelection(element, d) {
     const currentFill = d3.select(element).style("fill");
-    if (currentFill === d3.rgb(currentColor).toString()) {
+    const currentColorHex = d3.rgb(currentColor).toString();
+    const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+
+    if (currentFill === defaultColorHex) {
+        // Change to the current color
+        d3.select(element).style("fill", currentColor);
+        selectedCounties.push({ ...d, color: currentColor });
+        updateKeyMap(d, currentColor);
+    } else {
+        // Change to the default color
         d3.select(element).style("fill", defaultCountyColor);
         selectedCounties = selectedCounties.filter(county => county.id !== d.id);
         removeFromKeyMap(d, currentFill);
-    } else {
-        d3.select(element).style("fill", currentColor);
-        selectedCounties.push(d);
-        updateKeyMap(d, currentColor);
     }
 }
 

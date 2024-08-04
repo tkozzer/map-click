@@ -1,5 +1,3 @@
-// county.js
-
 async function getPropertyValue(entityId, propertyId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${entityId}&property=${propertyId}&format=json&origin=*`;
     const response = await fetch(url);
@@ -57,7 +55,7 @@ async function searchWikidata(query) {
     return searchData.search;
 }
 
-async function getCountyData(countyName, stateName) {
+export async function getCountyData(countyName, stateName) {
     try {
         // Try searching with full "County, State" specification
         let searchResults = await searchWikidata(`${countyName} County, ${stateName}`);
@@ -117,22 +115,23 @@ async function getCountyData(countyName, stateName) {
     }
 }
 
+
 function displayCountyData(data) {
     const dataContainer = document.getElementById('countyData');
     if (data) {
-        const osmRelationUrl = data.osmRelationId ? 
+        const osmRelationUrl = data.osmRelationId !== 'N/A' ? 
             `https://www.openstreetmap.org/relation/${data.osmRelationId}` : null;
 
         dataContainer.innerHTML = `
             <h3>County Information</h3>
-            <p><strong>Population:</strong> ${data.population || 'N/A'}</p>
+            <p><strong>Population:</strong> ${data.population}</p>
             <p><strong>Coordinates:</strong> ${data.coordinates.latitude}, ${data.coordinates.longitude}</p>
-            <p><strong>Area:</strong> ${data.area ? `${data.area.value} ${data.area.unit}` : 'N/A'}</p>
-            <p><strong>Country:</strong> ${data.country || 'N/A'}</p>
-            <p><strong>Official Website:</strong> ${data.officialWebsite ? `<a href="${data.officialWebsite}" target="_blank">${data.officialWebsite}</a>` : 'N/A'}</p>
-            <p><strong>Capital:</strong> ${data.capital || 'N/A'}</p>
+            <p><strong>Area:</strong> ${data.area.value} ${data.area.unit}</p>
+            <p><strong>Country:</strong> ${data.country}</p>
+            <p><strong>Official Website:</strong> ${data.officialWebsite !== 'N/A' ? `<a href="${data.officialWebsite}" target="_blank">${data.officialWebsite}</a>` : 'N/A'}</p>
+            <p><strong>Capital:</strong> ${data.capital}</p>
             <p><strong>OSM Relation:</strong> ${osmRelationUrl ? `<a href="${osmRelationUrl}" target="_blank">${data.osmRelationId}</a>` : 'N/A'}</p>
-            <p><strong>Wikipedia:</strong> ${data.wikipediaLink ? `<a href="${data.wikipediaLink}" target="_blank">Link</a>` : 'N/A'}</p>
+            <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">Link</a>` : 'N/A'}</p>
         `;
     } else {
         dataContainer.innerHTML = '<p>No data available for this county.</p>';
@@ -148,9 +147,6 @@ export async function fetchAndDisplayCountyData(countyName, stateName) {
         dataContainer.innerHTML = '';
         
         const data = await getCountyData(countyName, stateName);
-        if (data) {
-            return data;
-        }
         displayCountyData(data);
     } catch (error) {
         console.error('Error fetching county data:', error);
