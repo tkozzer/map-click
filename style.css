@@ -175,6 +175,20 @@ body {
     width: 100%;
 }
 
+#random-color-btn {
+    margin-top: 5px;
+    width: 100%;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#random-color-btn:hover {
+    background-color: #e0e0e0;
+}
+
 /* Camera Context Menu
 -------------------------------------------------- */
 #camera-context-menu {

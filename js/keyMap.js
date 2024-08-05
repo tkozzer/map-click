@@ -1,6 +1,8 @@
-import { g } from './mapSetup.js';
+import { showInfoAlert, updateInfoAlert } from './customAlerts.js';
 
 let keyMapEntries = {};
+const MAX_KEYMAP_ENTRIES = 20;
+let isKeyMapVisible = false;
 
 export function initializeKeyMap() {
     const keyButton = document.getElementById('key-button');
@@ -14,28 +16,38 @@ function toggleKeyMap() {
     if (keyMap.classList.contains('hidden')) {
         generateKeyMap();
         keyMap.classList.remove('hidden');
+        isKeyMapVisible = true;
     } else {
         keyMap.classList.add('hidden');
+        isKeyMapVisible = false;
     }
 }
 
 export function updateKeyMap(county, color) {
-    if (!keyMapEntries[color]) {
-        keyMapEntries[color] = new Set();
+    if (Object.keys(keyMapEntries).length >= MAX_KEYMAP_ENTRIES && !keyMapEntries[color]) {
+        console.warn('Maximum number of keymap entries reached. Cannot add new color.');
+        if (isKeyMapVisible) {
+            updateInfoAlert(`Maximum of ${MAX_KEYMAP_ENTRIES} properties allowed in the keymap. New colors cannot be added.`, 5000);
+        }
+        return;
     }
-    keyMapEntries[color].add(county);
-    if (!document.getElementById('key-map').classList.contains('hidden')) {
+
+    if (!keyMapEntries[color]) {
+        keyMapEntries[color] = { counties: new Set(), label: '' };
+    }
+    keyMapEntries[color].counties.add(county);
+    if (isKeyMapVisible) {
         generateKeyMap();
     }
 }
 
 export function removeFromKeyMap(county, color) {
     if (keyMapEntries[color]) {
-        keyMapEntries[color].delete(county);
-        if (keyMapEntries[color].size === 0) {
+        keyMapEntries[color].counties.delete(county);
+        if (keyMapEntries[color].counties.size === 0) {
             delete keyMapEntries[color];
         }
-        if (!document.getElementById('key-map').classList.contains('hidden')) {
+        if (isKeyMapVisible) {
             generateKeyMap();
         }
     }
@@ -50,7 +62,12 @@ export function clearKeyMap() {
     const keyMap = document.getElementById('key-map');
     if (keyMap && !keyMap.classList.contains('hidden')) {
         keyMap.classList.add('hidden');
+        isKeyMapVisible = false;
     }
+}
+
+export function getKeyMapEntries() {
+    return keyMapEntries;
 }
 
 function generateKeyMap() {
@@ -62,9 +79,9 @@ function generateKeyMap() {
         return;
     }
 
-    Object.entries(keyMapEntries).forEach(([color, counties], index) => {
-        const entry = document.createElement('div');
-        entry.className = 'key-map-entry';
+    Object.entries(keyMapEntries).forEach(([color, entry], index) => {
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'key-map-entry';
 
         const colorBox = document.createElement('div');
         colorBox.className = 'key-color';
@@ -72,24 +89,34 @@ function generateKeyMap() {
 
         const nameInput = document.createElement('input');
         nameInput.className = 'key-name';
-        nameInput.value = `Label ${index + 1}`;
+        nameInput.value = entry.label || `Label ${index + 1}`;
+        nameInput.maxLength = 50;
 
         const countiesCount = document.createElement('span');
         countiesCount.className = 'counties-count';
-        countiesCount.textContent = `(${counties.size} counties)`;
+        countiesCount.textContent = `(${entry.counties.size} counties)`;
+
+        nameInput.addEventListener('input', function () {
+            this.value = this.value.slice(0, 50);
+        });
 
         nameInput.addEventListener('change', function () {
             const newLabel = this.value.trim();
-            counties.forEach(county => {
+            entry.label = newLabel;
+            entry.counties.forEach(county => {
                 county.properties.label = newLabel;
                 g.select(`.county[data-id="${county.id}"]`)
                     .attr('title', `${county.properties.name}, ${county.properties.stateName} - ${newLabel}`);
             });
         });
 
-        entry.appendChild(colorBox);
-        entry.appendChild(nameInput);
-        entry.appendChild(countiesCount);
-        keyMapContainer.appendChild(entry);
+        entryDiv.appendChild(colorBox);
+        entryDiv.appendChild(nameInput);
+        entryDiv.appendChild(countiesCount);
+        keyMapContainer.appendChild(entryDiv);
     });
+}
+
+export function getKeyMapEntriesCount() {
+    return Object.keys(keyMapEntries).length;
 }

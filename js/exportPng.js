@@ -2,19 +2,28 @@
 import { g } from './mapSetup.js';
 import { defaultCountyColor } from './colorPicker.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
+import { addKeyMapEntries, calculateKeyMapWidth } from './keyMapUtils.js';
 
 export function exportPng() {
     console.debug("Exporting as PNG");
 
+    const baseWidth = 5200;
+    const baseHeight = 3200;
+    const mapWidth = 4300;  // Kept as is to maintain current map position
+    const keyMapWidth = calculateKeyMapWidth();
+    const totalWidth = mapWidth + keyMapWidth;
+
+    console.debug(`Total width: ${totalWidth}, Map width: ${mapWidth}, Keymap width: ${keyMapWidth}`);
+
     const offscreenSvg = d3.select("body")
         .append("svg")
-        .attr("width", 5200)  // Increased width for higher resolution
-        .attr("height", 3200)  // Increased height for higher resolution
+        .attr("width", totalWidth)
+        .attr("height", baseHeight)
         .style("display", "none");
 
     offscreenSvg.append("rect")
-        .attr("width", 5200)
-        .attr("height", 3200)
+        .attr("width", totalWidth)
+        .attr("height", baseHeight)
         .attr("fill", "white");
 
     const offscreenG = offscreenSvg.append("g");
@@ -38,10 +47,10 @@ export function exportPng() {
             county.properties.stateName = stateIdToName[stateId];
         });
 
-        // Correct the projection for the offscreen SVG
+        // Adjust the projection to fit the smaller map area
         const offscreenProjection = d3.geoAlbersUsa()
-            .scale(6250)  // Adjusted scale to match the zoom level
-            .translate([2600, 1600]);
+            .scale(5600)  // Kept as is to maintain current map scale
+            .translate([2300, 1600]);  // Kept as is to maintain current map position
 
         const offscreenPath = d3.geoPath().projection(offscreenProjection);
 
@@ -73,6 +82,12 @@ export function exportPng() {
             .style("stroke", "#000000")
             .style("stroke-width", "1px");
 
+        // Check if the key map is visible
+        const keyMap = document.getElementById('key-map');
+        if (keyMap && !keyMap.classList.contains('hidden')) {
+            addKeyMapEntries(offscreenSvg, mapWidth, baseHeight, keyMapWidth);
+        }
+
         const svgNode = offscreenSvg.node();
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(svgNode);
@@ -80,8 +95,8 @@ export function exportPng() {
         console.debug("Serialized SVG", svgString);
 
         const canvas = document.createElement("canvas");
-        canvas.width = 5200;  // Increased width for higher resolution
-        canvas.height = 3200;  // Increased height for higher resolution
+        canvas.width = totalWidth;
+        canvas.height = baseHeight;
         const context = canvas.getContext("2d");
 
         context.fillStyle = "white";

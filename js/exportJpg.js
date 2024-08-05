@@ -2,19 +2,28 @@
 import { g } from './mapSetup.js';
 import { defaultCountyColor } from './colorPicker.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
+import { addKeyMapEntries, calculateKeyMapWidth } from './keyMapUtils.js';
 
 export function exportJpg() {
     console.debug("Exporting as JPG");
 
+    const baseWidth = 5200;
+    const baseHeight = 3200;
+    const mapWidth = 4300;  // Reduced to move keymap more to the left
+    const keyMapWidth = calculateKeyMapWidth();
+    const totalWidth = mapWidth + keyMapWidth;
+
+    console.debug(`Total width: ${totalWidth}, Map width: ${mapWidth}, Keymap width: ${keyMapWidth}`);
+
     const offscreenSvg = d3.select("body")
         .append("svg")
-        .attr("width", 5200)
-        .attr("height", 3200)
+        .attr("width", totalWidth)
+        .attr("height", baseHeight)
         .style("display", "none");
 
     offscreenSvg.append("rect")
-        .attr("width", 5200)
-        .attr("height", 3200)
+        .attr("width", totalWidth)
+        .attr("height", baseHeight)
         .attr("fill", "white");
 
     const offscreenG = offscreenSvg.append("g");
@@ -38,9 +47,10 @@ export function exportJpg() {
             county.properties.stateName = stateIdToName[stateId];
         });
 
+        // Adjust the projection to fit the smaller map area
         const offscreenProjection = d3.geoAlbersUsa()
-            .scale(6250)
-            .translate([2600, 1600]);
+            .scale(5600)  // Reduced scale
+            .translate([2300, 1600]);  // Adjusted translation
 
         const offscreenPath = d3.geoPath().projection(offscreenProjection);
 
@@ -72,6 +82,12 @@ export function exportJpg() {
             .style("stroke", "#000000")
             .style("stroke-width", "1px");
 
+        // Check if the key map is visible
+        const keyMap = document.getElementById('key-map');
+        if (keyMap && !keyMap.classList.contains('hidden')) {
+            addKeyMapEntries(offscreenSvg, mapWidth, baseHeight, keyMapWidth);
+        }
+
         const svgNode = offscreenSvg.node();
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(svgNode);
@@ -79,8 +95,8 @@ export function exportJpg() {
         console.debug("Serialized SVG", svgString);
 
         const canvas = document.createElement("canvas");
-        canvas.width = 5200;
-        canvas.height = 3200;
+        canvas.width = totalWidth;
+        canvas.height = baseHeight;
         const context = canvas.getContext("2d");
 
         context.fillStyle = "white";
