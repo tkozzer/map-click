@@ -202,7 +202,7 @@ function populateCountyData(countyData, county, countyDetails) {
                     countyData.capital = countyDetails.capital || 'N/A';
                     break;
                 case 'osm_relation':
-                    countyData.osm_relation = countyDetails.osmRelationId || 'N/A';
+                    countyData.osm_relation = countyDetails.osmRelationUrl || 'N/A';
                     break;
                 case 'wikipedia':
                     countyData.wikipedia = countyDetails.wikipediaLink || 'N/A';
@@ -216,3 +216,4 @@ function populateCountyData(countyData, county, countyDetails) {
         console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
     }
 }
+

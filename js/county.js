@@ -1,3 +1,5 @@
+import { g } from './mapSetup.js';
+
 async function getPropertyValue(entityId, propertyId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${entityId}&property=${propertyId}&format=json&origin=*`;
     console.debug(`Fetching property ${propertyId} for entity ${entityId}: ${url}`);
@@ -66,13 +68,11 @@ async function searchWikidata(query) {
 async function searchWikidataForCounty(countyName, stateName, regionType) {
     let searchResults = await searchWikidata(`${countyName} ${regionType}, ${stateName}`);
 
-    // If no results, try searching without "Parish" or "County"
     if (!searchResults || searchResults.length === 0) {
         console.debug(`No results for ${countyName} ${regionType}, ${stateName}. Trying without ${regionType}.`);
         searchResults = await searchWikidata(`${countyName}, ${stateName}`);
     }
 
-    // If still no results, try searching just the county name
     if (!searchResults || searchResults.length === 0) {
         console.debug(`No results for ${countyName}, ${stateName}. Trying with just the county name.`);
         searchResults = await searchWikidata(countyName);
@@ -97,7 +97,6 @@ export async function getCountyData(countyName, stateName) {
         const wikidataId = searchResults[0].id;
         console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
 
-        // Fetch data from Wikidata using the ID
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
             getPropertyValue(wikidataId, 'P1082'),
             getPropertyValue(wikidataId, 'P625'),
@@ -109,7 +108,6 @@ export async function getCountyData(countyName, stateName) {
             getWikipediaLink(wikidataId)
         ]);
 
-        // Extract and format the data
         const latitude = coordinates ? coordinates.latitude : null;
         const longitude = coordinates ? coordinates.longitude : null;
 
@@ -119,7 +117,8 @@ export async function getCountyData(countyName, stateName) {
             formatArea(area)
         ]);
 
-        // Create and return the data object
+        const osmRelationUrl = osmRelationId ? `https://www.openstreetmap.org/relation/${osmRelationId}` : 'N/A';
+
         const data = {
             population: population ? cleanAmount(population.amount) : 'N/A',
             coordinates: { latitude, longitude },
@@ -128,6 +127,7 @@ export async function getCountyData(countyName, stateName) {
             officialWebsite: officialWebsite || 'N/A',
             capital: capitalLabel || 'N/A',
             osmRelationId: osmRelationId || 'N/A',
+            osmRelationUrl: osmRelationUrl,
             wikipediaLink: wikipediaLink || 'N/A'
         };
         console.debug(`Formatted data for ${countyName}:`, data);
@@ -141,9 +141,6 @@ export async function getCountyData(countyName, stateName) {
 function displayCountyData(data) {
     const dataContainer = document.getElementById('countyData');
     if (data) {
-        const osmRelationUrl = data.osmRelationId !== 'N/A' ?
-            `https://www.openstreetmap.org/relation/${data.osmRelationId}` : null;
-
         dataContainer.innerHTML = `
             <h3>County Information</h3>
             <p><strong>Population:</strong> ${data.population}</p>
@@ -152,8 +149,8 @@ function displayCountyData(data) {
             <p><strong>Country:</strong> ${data.country}</p>
             <p><strong>Official Website:</strong> ${data.officialWebsite !== 'N/A' ? `<a href="${data.officialWebsite}" target="_blank">${data.officialWebsite}</a>` : 'N/A'}</p>
             <p><strong>Capital:</strong> ${data.capital}</p>
-            <p><strong>OSM Relation:</strong> ${osmRelationUrl ? `<a href="${osmRelationUrl}" target="_blank">${data.osmRelationId}</a>` : 'N/A'}</p>
-            <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">Link</a>` : 'N/A'}</p>
+            <p><strong>OSM Relation:</strong> ${data.osmRelationUrl !== 'N/A' ? `<a href="${data.osmRelationUrl}" target="_blank">${data.osmRelationUrl}</a>` : 'N/A'}</p>
+            <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">${data.wikipediaLink}</a>` : 'N/A'}</p>
         `;
     } else {
         dataContainer.innerHTML = '<p>No data available for this county.</p>';
