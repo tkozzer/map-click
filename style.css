@@ -436,7 +436,7 @@ body {
 
 /* Key Map
 -------------------------------------------------- */
-#key-map {
+#map-key {
     position: absolute;
     bottom: 10px;
     right: 10px;
@@ -447,7 +447,7 @@ body {
     z-index: 1000;
 }
 
-.key-map-entry {
+.map-key-entry {
     display: flex;
     align-items: center;
     margin-bottom: 5px;

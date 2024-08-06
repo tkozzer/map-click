@@ -1,6 +1,6 @@
 import { svg, g, path } from './mapSetup.js';
 import { clearSelectedCounties } from './countySelection.js';
-import { clearKeyMap } from './keyMap.js';  // Import the new clearKeyMap function
+import { clearMapKey } from './mapKey/mapKey.js';  // Import the new clearKeyMap function
 
 export const zoom = d3.zoom()
     .scaleExtent([0.5, 8])  // Set minimum and maximum zoom levels
@@ -23,7 +23,7 @@ export function initializeZoom(nation) {
     initialTransform = d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale);
 
     svg.call(zoom)
-       .call(zoom.transform, initialTransform);
+        .call(zoom.transform, initialTransform);
 
     // Add window resize event listener
     window.addEventListener('resize', handleWindowResize);
@@ -32,12 +32,12 @@ export function initializeZoom(nation) {
 export function resetMap() {
     recenterMap();
     clearSelectedCounties();
-    clearKeyMap();  // Clear the key map when resetting the map
+    clearMapKey();  // Clear the key map when resetting the map
 }
 
 export function clearMap() {
     clearSelectedCounties();
-    clearKeyMap();  // Clear the key map when clearing the map
+    clearMapKey();  // Clear the key map when clearing the map
 }
 
 export function recenterMap() {
@@ -47,8 +47,8 @@ export function recenterMap() {
     const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
 
     svg.transition()
-       .duration(750)  // Smooth transition over 750ms
-       .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+        .duration(750)  // Smooth transition over 750ms
+        .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
 }
 
 export function zoomIn() {
@@ -82,8 +82,8 @@ function handleWindowResize() {
 
     // Apply the new transform with a smooth transition
     svg.transition()
-       .duration(300)
-       .call(zoom.transform, newTransform);
+        .duration(300)
+        .call(zoom.transform, newTransform);
 }
 
 function getSvgSize() {

@@ -5,7 +5,7 @@ import { initializeColorPicker } from './colorPicker.js';
 import { initializeCounties } from './countySelection.js';
 import { initializeCameraButton } from './cameraButton.js';
 import { initializeJsonExport } from './exportJson.js';
-import { initializeKeyMap } from './keyMap.js';
+import { initializeMapKey } from './mapKey/mapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';  // Import the new utility
 
 let nationData;
@@ -48,6 +48,6 @@ initializeTooltipAndContextMenu();
 initializeColorPicker();
 initializeCameraButton();
 initializeJsonExport();
-initializeKeyMap();
+initializeMapKey();
 initializeContextMenus();  // Initialize the new context menu utilities
 cleanupZoom();

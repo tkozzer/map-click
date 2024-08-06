@@ -2,7 +2,7 @@
 import { g } from './mapSetup.js';
 import { defaultCountyColor } from './colorPicker.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
-import { addKeyMapEntries, calculateKeyMapWidth } from './keyMapUtils.js';
+import { addMapKeyEntries, calculateMapKeyWidth } from './mapKey/mapKey.js';
 
 export function exportPng() {
     console.debug("Exporting as PNG");
@@ -10,7 +10,7 @@ export function exportPng() {
     const baseWidth = 5200;
     const baseHeight = 3200;
     const mapWidth = 4300;  // Kept as is to maintain current map position
-    const keyMapWidth = calculateKeyMapWidth();
+    const keyMapWidth = calculateMapKeyWidth();
     const totalWidth = mapWidth + keyMapWidth;
 
     console.debug(`Total width: ${totalWidth}, Map width: ${mapWidth}, Keymap width: ${keyMapWidth}`);
@@ -83,9 +83,9 @@ export function exportPng() {
             .style("stroke-width", "1px");
 
         // Check if the key map is visible
-        const keyMap = document.getElementById('key-map');
+        const keyMap = document.getElementById('map-key');
         if (keyMap && !keyMap.classList.contains('hidden')) {
-            addKeyMapEntries(offscreenSvg, mapWidth, baseHeight, keyMapWidth);
+            addMapKeyEntries(offscreenSvg, mapWidth, baseHeight, keyMapWidth);
         }
 
         const svgNode = offscreenSvg.node();

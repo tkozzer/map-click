@@ -2,7 +2,7 @@
 import { exportPng } from './exportPng.js';
 import { exportJpg } from './exportJpg.js';
 import { showCameraContextMenu } from './contextMenuUtils.js';
-import { generatePreview } from './imagePreview.js';
+import { generatePreview } from './image/imagePreview.js';
 
 const cameraContextMenu = document.getElementById('camera-context-menu');
 let selectedFormat = 'png'; // Default format
