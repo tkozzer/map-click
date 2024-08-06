@@ -523,3 +523,53 @@ body {
         width: 100%;
     }
 }
+
+/* Image Preview Modal Styles
+-------------------------------------------------- */
+/* Image Preview Modal Styles */
+#imagePreviewModal .modal-dialog {
+    max-width: 90vw;
+    /* Increase this value to accommodate the wider image */
+    max-height: 90vh;
+    margin: 1.75rem auto;
+}
+
+#imagePreviewContainer {
+    width: 100%;
+    height: calc(90vh - 200px);
+    /* Adjust based on your needs */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#imagePreviewContainer img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border: 2px solid black;
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 768px) {
+    #imagePreviewModal .modal-dialog {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    #imagePreviewContainer {
+        height: calc(95vh - 200px);
+    }
+}
+
+@media (min-width: 1200px) {
+    #imagePreviewModal .modal-dialog {
+        max-width: 98vw;
+        max-height: 98vh;
+    }
+
+    #imagePreviewContainer {
+        height: calc(98vh - 200px);
+    }
+}
