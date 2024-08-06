@@ -48,19 +48,41 @@ export function calculateKeyMapWidth() {
         const fontSize = 50;
         const colorBoxSize = fontSize * 1.5;
         const labelPadding = fontSize * 0.5;
-        const charWidth = fontSize * 0.6; // Approximate width of a character
         const rightPadding = fontSize * 2;
 
-        // Find the longest label
-        const longestLabel = Object.values(keyMapEntries).reduce((longest, entry) => {
-            const label = entry.label || '';
-            return label.length > longest.length ? label : longest;
-        }, '');
+        // Create a temporary SVG to measure text width accurately
+        const svg = d3.select('body').append('svg').style('visibility', 'hidden');
 
-        const labelWidth = longestLabel.length * charWidth;
+        // Measure the width of the widest default label
+        const widestDefaultLabel = `Label ${numEntries}`; // e.g., "Label 20" for 20 entries
+        const defaultLabelWidth = svg.append('text')
+            .attr('font-size', `${fontSize}px`)
+            .attr('font-family', 'Arial, sans-serif')
+            .text(widestDefaultLabel)
+            .node()
+            .getComputedTextLength();
+
+        // Find the widest custom label
+        const widestCustomLabelWidth = Object.values(keyMapEntries).reduce((maxWidth, entry) => {
+            if (entry.label) {
+                const textWidth = svg.append('text')
+                    .attr('font-size', `${fontSize}px`)
+                    .attr('font-family', 'Arial, sans-serif')
+                    .text(entry.label)
+                    .node()
+                    .getComputedTextLength();
+                return Math.max(maxWidth, textWidth);
+            }
+            return maxWidth;
+        }, 0);
+
+        svg.remove(); // Remove the temporary SVG
+
+        // Use the wider of default label width or custom label width
+        const labelWidth = Math.max(defaultLabelWidth, widestCustomLabelWidth);
 
         const totalWidth = colorBoxSize + labelPadding + labelWidth + rightPadding;
-        console.debug(`Calculated Keymap Width: ${totalWidth}, Longest label: "${longestLabel}" (${longestLabel.length} chars)`);
+        console.debug(`Calculated Keymap Width: ${totalWidth}, Default Label: "${widestDefaultLabel}", Width: ${defaultLabelWidth}`);
         return totalWidth;
     }
     return 0; // Return 0 if there are no entries
