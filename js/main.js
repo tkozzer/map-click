@@ -6,6 +6,7 @@ import { initializeCounties } from './countySelection.js';
 import { initializeCameraButton } from './cameraButton.js';
 import { initializeJsonExport } from './exportJson.js';
 import { initializeKeyMap } from './keyMap.js';
+import { initializeContextMenus } from './contextMenuUtils.js';  // Import the new utility
 
 let nationData;
 
@@ -48,4 +49,5 @@ initializeColorPicker();
 initializeCameraButton();
 initializeJsonExport();
 initializeKeyMap();
+initializeContextMenus();  // Initialize the new context menu utilities
 cleanupZoom();

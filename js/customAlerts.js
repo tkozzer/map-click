@@ -6,10 +6,10 @@ let currentInfoAlert;
 function createAlertContainer() {
     alertContainer = document.createElement('div');
     alertContainer.style.position = 'fixed';
-    alertContainer.style.top = '20px';
+    alertContainer.style.top = '70px'; // Adjust this value based on your toolbar's height
     alertContainer.style.left = '50%';
     alertContainer.style.transform = 'translateX(-50%)';
-    alertContainer.style.zIndex = '9999';
+    alertContainer.style.zIndex = '999'; // Make sure this is below the toolbar's z-index
     alertContainer.style.width = '80%';
     alertContainer.style.maxWidth = '500px';
     document.body.appendChild(alertContainer);

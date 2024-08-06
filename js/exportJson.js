@@ -1,6 +1,8 @@
+// exportJson.js
 import { selectedCounties } from './countySelection.js';
 import { getCountyData } from './county.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
+import { showJsonExportContextMenu } from './contextMenuUtils.js';
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 const exportJsonButton = document.getElementById('export-json');
@@ -11,22 +13,10 @@ let selectedFields = new Set(['county_name', 'state_name', 'county_number']);
 
 export function initializeJsonExport() {
     // Show context menu on right-click
-    exportJsonButton.addEventListener('contextmenu', function (event) {
-        event.preventDefault();
-        showJsonExportContextMenu(event);
-    });
+    exportJsonButton.addEventListener('contextmenu', showJsonExportContextMenu);
 
     // Export JSON on left-click
-    exportJsonButton.addEventListener('click', async function () {
-        await exportJson();
-    });
-
-    // Close menu when clicking outside
-    document.addEventListener('click', function (event) {
-        if (!jsonExportContextMenu.contains(event.target) && event.target !== exportJsonButton) {
-            jsonExportContextMenu.style.display = 'none';
-        }
-    });
+    exportJsonButton.addEventListener('click', exportJson);
 
     // Add event listeners for checkboxes
     jsonExportContextMenu.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
@@ -64,18 +54,6 @@ function clearAllFields() {
             selectedFields.add(fieldName);
         }
     });
-}
-
-function showJsonExportContextMenu(event) {
-    const buttonRect = event.target.getBoundingClientRect();
-    const menuWidth = 200; // Adjust as needed
-
-    jsonExportContextMenu.style.display = 'block';
-    jsonExportContextMenu.style.left = (buttonRect.right - menuWidth) + 'px';
-    jsonExportContextMenu.style.top = buttonRect.bottom + 'px';
-
-    // Stop propagation to prevent immediate closing
-    event.stopPropagation();
 }
 
 async function exportJson() {
@@ -216,4 +194,3 @@ function populateCountyData(countyData, county, countyDetails) {
         console.warn(`No details found for county: ${county.properties.name}, ${county.properties.stateName}`);
     }
 }
-

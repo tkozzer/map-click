@@ -37,16 +37,18 @@ body {
 /* Toolbar Styles
 -------------------------------------------------- */
 #toolbar {
-    position: absolute;
+    position: fixed;
     top: 10px;
-    right: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
     background: white;
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+    z-index: 1000;
 }
 
 .toolbar-button {
@@ -69,9 +71,9 @@ body {
 .toolbar-button::after {
     content: attr(title);
     position: absolute;
-    top: 50%;
+    top: 100%;
     left: 50%;
-    transform: translate(-50%, -150%);
+    transform: translateX(-50%);
     background-color: #000;
     color: #fff;
     padding: 2px 5px;
@@ -91,7 +93,7 @@ body {
 -------------------------------------------------- */
 .zoom-controls {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
 }
 
@@ -115,9 +117,9 @@ body {
 .zoom-button::after {
     content: attr(title);
     position: absolute;
-    top: 50%;
+    top: 100%;
     left: 50%;
-    transform: translate(-50%, -150%);
+    transform: translateX(-50%);
     background-color: #000;
     color: #fff;
     padding: 2px 5px;
@@ -474,6 +476,7 @@ body {
     margin-bottom: 10px;
     position: relative;
     overflow: hidden;
+    border-radius: 5px;
 }
 
 .alert-success {
