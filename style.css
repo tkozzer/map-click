@@ -191,37 +191,6 @@ body {
     background-color: #e0e0e0;
 }
 
-/* Camera Context Menu
--------------------------------------------------- */
-#camera-context-menu {
-    display: none;
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 5px;
-    cursor: pointer;
-    z-index: 1000;
-    width: 16x0px;
-}
-
-#camera-context-menu div {
-    padding: 5px;
-    display: flex;
-    align-items: center;
-}
-
-#camera-context-menu div:hover {
-    background: #f0f0f0;
-}
-
-.checkmark {
-    width: 20px;
-    display: inline-block;
-    text-align: center;
-    margin-right: 5px;
-}
-
 /* JSON Export Context Menu
 -------------------------------------------------- */
 #json-export-context-menu {
@@ -526,7 +495,6 @@ body {
 
 /* Image Preview Modal Styles
 -------------------------------------------------- */
-/* Image Preview Modal Styles */
 #imagePreviewModal .modal-dialog {
     max-width: 90vw;
     max-height: 90vh;
