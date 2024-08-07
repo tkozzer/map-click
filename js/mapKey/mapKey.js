@@ -42,9 +42,16 @@ export function updateMapKey(county, color) {
     }
 
     if (!mapKeyEntries[color]) {
-        mapKeyEntries[color] = { counties: new Set(), label: '' };
+        mapKeyEntries[color] = { counties: new Set(), label: `Label for ${color}` };
     }
     mapKeyEntries[color].counties.add(county);
+
+    // Add this debug log
+    console.debug('Updated mapKeyEntries:', JSON.stringify(mapKeyEntries, (key, value) => {
+        if (value instanceof Set) return Array.from(value);
+        return value;
+    }, 2));
+
     if (isMapKeyVisible) {
         generateMapKey();
     }
@@ -91,25 +98,12 @@ export function calculateMapKeyWidth(scale) {
         console.debug('Label padding:', labelPadding);
         console.debug('Right padding:', rightPadding);
 
-        const svg = d3.create("svg");
-        const widestLabelWidth = Object.values(mapKeyEntries).reduce((maxWidth, entry) => {
-            const label = (entry.label || 'Label').substring(0, 50); // Limit to 50 characters
-            console.debug('Calculating width for label:', label);
-            const textWidth = svg.append("text")
-                .attr("font-size", `${fontSize}px`)
-                .attr("font-family", mapKeyConfig.fontFamily)
-                .text(label)
-                .node()
-                .getComputedTextLength();
-            console.debug('Label width:', textWidth);
-            return Math.max(maxWidth, textWidth);
-        }, 0);
+        // Estimate the maximum width of labels
+        const maxLabelWidth = fontSize * 15; // Assume max 15 characters at full width
 
-        console.debug('Widest label width:', widestLabelWidth);
-
-        const totalWidth = colorBoxSize + labelPadding + widestLabelWidth + rightPadding;
+        const totalWidth = colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
         console.debug('Total calculated width:', totalWidth);
-        return totalWidth; // Remove the min check to allow for full width
+        return totalWidth;
     }
     console.debug('Returning 0 width');
     return 0;
@@ -145,15 +139,25 @@ export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
                 .attr("height", colorBoxSize)
                 .attr("fill", color);
 
-            const label = (entry.label || `Label ${index + 1}`).substring(0, 50);
+            const label = entry.label || `Label for ${color}`;
             console.debug('Adding label:', label);
-            entryGroup.append("text")
+
+            const foreignObject = entryGroup.append("foreignObject")
                 .attr("x", colorBoxSize + labelPadding)
-                .attr("y", colorBoxSize / 2)
-                .text(label)
-                .attr("font-size", `${fontSize}px`)
-                .attr("font-family", mapKeyConfig.fontFamily)
-                .attr("dominant-baseline", "central");
+                .attr("y", 0)
+                .attr("width", keyMapWidth - colorBoxSize - labelPadding)
+                .attr("height", entryHeight);
+
+            const div = foreignObject.append("xhtml:div")
+                .style("font-size", `${fontSize}px`)
+                .style("font-family", mapKeyConfig.fontFamily)
+                .style("line-height", `${entryHeight}px`)
+                .style("white-space", "nowrap")
+                .style("overflow", "hidden")
+                .style("text-overflow", "ellipsis")
+                .text(label);
+
+            console.debug(`Label "${label}" added`);
         });
     }
 }

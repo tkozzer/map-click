@@ -8,17 +8,15 @@ import { mapKeyConfig } from '../mapKey/mapKeyConfig.js';
 export async function generateBaseImage(scale) {
     console.debug(`Generating base image with scale ${scale}`);
 
-    const width = getScaledValue(config.baseWidth, scale);
     const height = getScaledValue(config.baseHeight, scale);
     const mapWidth = getScaledValue(config.baseMapWidth, scale);
     const leftBuffer = getScaledValue(config.baseLeftBuffer, scale);
-    const rightBuffer = getScaledValue(config.baseRightBuffer, scale);
+    let rightBuffer = getScaledValue(config.baseRightBuffer, scale);
 
-    console.debug('Width:', width);
     console.debug('Height:', height);
     console.debug('Map Width:', mapWidth);
     console.debug('Left Buffer:', leftBuffer);
-    console.debug('Right Buffer:', rightBuffer);
+    console.debug('Initial Right Buffer:', rightBuffer);
 
     const mapKeyEntries = getMapKeyEntries();
     const hasMapKey = Object.keys(mapKeyEntries).length > 0 && getMapKeyVisibility();
@@ -29,24 +27,13 @@ export async function generateBaseImage(scale) {
         mapKeyWidth = calculateMapKeyWidth(scale);
         console.debug('Calculated Map Key Width:', mapKeyWidth);
 
-        if (isNaN(mapKeyWidth)) {
-            console.error('Map Key Width is NaN. Using default width.');
-            mapKeyWidth = getScaledValue(mapKeyConfig.maxWidth, scale);
-        }
+        // Adjust right buffer to accommodate the map key
+        rightBuffer = Math.max(rightBuffer, mapKeyWidth + getScaledValue(30, scale)); // 30 is an additional padding
+        console.debug('Adjusted Right Buffer:', rightBuffer);
     }
-    console.debug('Final Map Key Width:', mapKeyWidth);
 
-    const totalWidth = leftBuffer + mapWidth + rightBuffer + mapKeyWidth;
+    const totalWidth = leftBuffer + mapWidth + rightBuffer;
     console.debug('Total Width:', totalWidth);
-
-    if (isNaN(totalWidth)) {
-        console.error('Total Width is NaN. Check the individual components:');
-        console.error('Left Buffer:', leftBuffer);
-        console.error('Map Width:', mapWidth);
-        console.error('Right Buffer:', rightBuffer);
-        console.error('Map Key Width:', mapKeyWidth);
-        throw new Error('Invalid total width calculation');
-    }
 
     const offscreenSvg = d3.create("svg")
         .attr("width", totalWidth)
@@ -98,7 +85,7 @@ export async function generateBaseImage(scale) {
         .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
 
     if (hasMapKey) {
-        const mapKeyStartX = leftBuffer + mapWidth + rightBuffer;
+        const mapKeyStartX = leftBuffer + mapWidth;
         console.debug('Map Key Start X:', mapKeyStartX);
         addMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
     }
