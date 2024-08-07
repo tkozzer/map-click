@@ -1,6 +1,6 @@
 // cameraButton.js
-import { exportPng } from './exportPng.js';
-import { exportJpg } from './exportJpg.js';
+import { exportPng } from './image/exportPng.js';
+import { exportJpg } from './image/exportJpg.js';
 import { showCameraContextMenu } from './contextMenuUtils.js';
 import { generatePreview } from './image/imagePreview.js';
 

@@ -94,6 +94,16 @@ export function calculateMapKeyWidth(scale) {
         const labelPadding = getScaledMapKeyValue(mapKeyConfig.baseLabelPadding, scale);
         const rightPadding = getScaledMapKeyValue(mapKeyConfig.baseRightPadding, scale);
 
+        if (isNaN(fontSize) || isNaN(colorBoxSize) || isNaN(labelPadding) || isNaN(rightPadding)) {
+            console.error('Invalid scaled value detected', {
+                fontSize,
+                colorBoxSize,
+                labelPadding,
+                rightPadding
+            });
+            return 0;
+        }
+
         console.debug('Font size:', fontSize);
         console.debug('Color box size:', colorBoxSize);
         console.debug('Label padding:', labelPadding);
@@ -118,62 +128,88 @@ export function calculateMapKeyWidth(scale) {
 
         const totalWidth = colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
         console.debug('Total calculated width:', totalWidth);
-        return totalWidth;
+        return isNaN(totalWidth) ? 0 : totalWidth;  // Ensure it returns a number
     }
     console.debug('Returning 0 width');
     return 0;
 }
 
 export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
-    const numEntries = Object.keys(mapKeyEntries).length;
+    console.debug('Adding map key entries. startX:', startX, 'svgHeight:', svgHeight, 'keyMapWidth:', keyMapWidth, 'scale:', scale);
 
-    if (numEntries > 0 && isMapKeyVisible) {
-        const fontSize = getScaledMapKeyValue(mapKeyConfig.baseFontSize, scale);
-        const entryHeight = getScaledMapKeyValue(mapKeyConfig.baseEntryHeight, scale);
-        const colorBoxSize = getScaledMapKeyValue(mapKeyConfig.baseColorBoxSize, scale);
-        const labelPadding = getScaledMapKeyValue(mapKeyConfig.baseLabelPadding, scale);
-        const keymapHeight = numEntries * entryHeight;
-        const startY = (svgHeight - keymapHeight) / 2;
+    try {
+        const numEntries = Object.keys(mapKeyEntries).length;
+        console.debug('Number of map key entries:', numEntries);
 
-        console.debug('Font size:', fontSize);
-        console.debug('Entry height:', entryHeight);
-        console.debug('Color box size:', colorBoxSize);
-        console.debug('Label padding:', labelPadding);
-        console.debug('Keymap height:', keymapHeight);
-        console.debug('Start Y:', startY);
+        if (numEntries > 0 && isMapKeyVisible) {
+            // Provide default values if scale is undefined
+            const safeScale = scale || 1;
+            const safeKeyMapWidth = keyMapWidth || 200; // Provide a default width if it's 0
 
-        const keyMapGroup = svg.append("g").attr("transform", `translate(${startX}, ${startY})`);
+            const fontSize = getScaledMapKeyValue(mapKeyConfig.baseFontSize, safeScale);
+            const entryHeight = getScaledMapKeyValue(mapKeyConfig.baseEntryHeight, safeScale);
+            const colorBoxSize = getScaledMapKeyValue(mapKeyConfig.baseColorBoxSize, safeScale);
+            const labelPadding = getScaledMapKeyValue(mapKeyConfig.baseLabelPadding, safeScale);
+            const keymapHeight = numEntries * entryHeight;
+            const startY = (svgHeight - keymapHeight) / 2;
 
-        Object.entries(mapKeyEntries).forEach(([color, entry], index) => {
-            const entryGroup = keyMapGroup.append("g").attr("transform", `translate(0, ${index * entryHeight})`);
+            console.debug('Calculated dimensions:', {
+                fontSize,
+                entryHeight,
+                colorBoxSize,
+                labelPadding,
+                keymapHeight,
+                startY,
+                safeScale,
+                safeKeyMapWidth
+            });
 
-            entryGroup.append("rect")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", colorBoxSize)
-                .attr("height", colorBoxSize)
-                .attr("fill", color);
+            if (isNaN(fontSize) || isNaN(entryHeight) || isNaN(colorBoxSize) || isNaN(labelPadding) || isNaN(startY)) {
+                throw new Error('Invalid calculated values');
+            }
 
-            const label = entry.label || `Label for ${color}`;
-            console.debug('Adding label:', label);
+            const keyMapGroup = svg.append("g")
+                .attr("class", "map-key-group")
+                .attr("transform", `translate(${startX}, ${startY})`);
 
-            const foreignObject = entryGroup.append("foreignObject")
-                .attr("x", colorBoxSize + labelPadding)
-                .attr("y", 0)
-                .attr("width", keyMapWidth - colorBoxSize - labelPadding)
-                .attr("height", entryHeight);
+            Object.entries(mapKeyEntries).forEach(([color, entry], index) => {
+                const entryGroup = keyMapGroup.append("g")
+                    .attr("transform", `translate(0, ${index * entryHeight})`);
 
-            const div = foreignObject.append("xhtml:div")
-                .style("font-size", `${fontSize}px`)
-                .style("font-family", mapKeyConfig.fontFamily)
-                .style("line-height", `${entryHeight}px`)
-                .style("white-space", "nowrap")
-                .style("overflow", "hidden")
-                .style("text-overflow", "ellipsis")
-                .text(label);
+                entryGroup.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", colorBoxSize)
+                    .attr("height", colorBoxSize)
+                    .attr("fill", color);
 
-            console.debug(`Label "${label}" added`);
-        });
+                const label = entry.label || `Label for ${color}`;
+                console.debug('Adding label:', label);
+
+                const foreignObject = entryGroup.append("foreignObject")
+                    .attr("x", colorBoxSize + labelPadding)
+                    .attr("y", 0)
+                    .attr("width", safeKeyMapWidth - colorBoxSize - labelPadding)
+                    .attr("height", entryHeight);
+
+                foreignObject.append("xhtml:div")
+                    .style("font-size", `${fontSize}px`)
+                    .style("font-family", mapKeyConfig.fontFamily)
+                    .style("line-height", `${entryHeight}px`)
+                    .style("white-space", "nowrap")
+                    .style("overflow", "hidden")
+                    .style("text-overflow", "ellipsis")
+                    .text(label);
+
+                console.debug(`Label "${label}" added`);
+            });
+
+            console.debug('Map key added successfully');
+        } else {
+            console.debug('Map key not added: either no entries or not visible');
+        }
+    } catch (error) {
+        console.error('Error in addMapKeyEntries:', error);
     }
 }
 
