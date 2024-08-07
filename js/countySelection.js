@@ -4,6 +4,7 @@ import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMe
 import { updateMapKey, removeFromMapKey } from './mapKey/mapKey.js';
 
 export let selectedCounties = [];
+export let countySelection;
 
 let cmdPressed = false;
 
@@ -24,11 +25,9 @@ function toggleCountySelection(element, d) {
     const defaultColorHex = d3.rgb(defaultCountyColor).toString();
     const currentColorHex = d3.rgb(currentColor).toString();
 
-    // Find the index of the county in the selectedCounties array
     const countyIndex = selectedCounties.findIndex(county => county.id === d.id);
 
     if (currentFill === defaultColorHex) {
-        // If the county is currently the default color, change it to the current color
         d3.select(element).style("fill", currentColorHex);
         if (countyIndex === -1) {
             selectedCounties.push({ ...d, color: currentColorHex });
@@ -37,14 +36,11 @@ function toggleCountySelection(element, d) {
         }
         updateMapKey(d, currentColorHex);
     } else {
-        // If the county is currently colored, toggle between current color and default color
         if (currentFill === currentColorHex) {
-            // Change to default color
             d3.select(element).style("fill", defaultCountyColor);
             selectedCounties.splice(countyIndex, 1);
             removeFromMapKey(d, currentColorHex);
         } else {
-            // Change to current color (from another color)
             d3.select(element).style("fill", currentColorHex);
             if (countyIndex === -1) {
                 selectedCounties.push({ ...d, color: currentColorHex });
@@ -63,7 +59,7 @@ export function initializeCounties(countyFeatures, stateIdToName) {
         county.properties.stateName = stateIdToName[stateId];
     });
 
-    const counties = g.append("g")
+    countySelection = g.append("g")
         .selectAll("path")
         .data(countyFeatures)
         .enter().append("path")
@@ -74,7 +70,7 @@ export function initializeCounties(countyFeatures, stateIdToName) {
         .style("stroke", "#7d7d7d")
         .style("stroke-width", "0.5px");
 
-    counties
+    countySelection
         .on("mouseover", function (event, d) {
             showTooltip(event, d);
             if (cmdPressed) {

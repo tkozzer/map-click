@@ -135,6 +135,25 @@ body {
     opacity: 1;
 }
 
+/* County/State Toggle Styles
+-------------------------------------------------- */
+#mode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#mode-toggle:hover {
+    background-color: #e0e0e0;
+}
+
 /* Tooltip Styles
 -------------------------------------------------- */
 .tooltip {
