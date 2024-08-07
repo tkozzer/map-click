@@ -529,15 +529,13 @@ body {
 /* Image Preview Modal Styles */
 #imagePreviewModal .modal-dialog {
     max-width: 90vw;
-    /* Increase this value to accommodate the wider image */
     max-height: 90vh;
     margin: 1.75rem auto;
 }
 
 #imagePreviewContainer {
     width: 100%;
-    height: calc(90vh - 200px);
-    /* Adjust based on your needs */
+    height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -546,7 +544,8 @@ body {
 
 #imagePreviewContainer img {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 70vh;
+    /* Set to a percentage of the viewport height */
     object-fit: contain;
     border: 2px solid black;
 }
@@ -558,8 +557,9 @@ body {
         max-height: 95vh;
     }
 
-    #imagePreviewContainer {
-        height: calc(95vh - 200px);
+    #imagePreviewContainer img {
+        max-height: 75vh;
+        /* Adjust based on your needs */
     }
 }
 
@@ -569,7 +569,8 @@ body {
         max-height: 98vh;
     }
 
-    #imagePreviewContainer {
-        height: calc(98vh - 200px);
+    #imagePreviewContainer img {
+        max-height: 80vh;
+        /* Adjust based on your needs */
     }
 }

@@ -175,7 +175,9 @@
                 </div>
                 <div class="modal-body">
                     <div id="imagePreviewContainer"></div>
-                    <div class="format-selection mt-3">
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="format-selection">
                         <label class="mr-2">Format:</label>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="exportFormat" id="formatPNG" value="png"
@@ -187,10 +189,10 @@
                             <label class="form-check-label" for="formatJPG">JPG</label>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="downloadButton">Download</button>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="downloadButton">Download</button>
+                    </div>
                 </div>
             </div>
         </div>
