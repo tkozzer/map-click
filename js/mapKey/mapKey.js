@@ -84,6 +84,7 @@ export function clearMapKey() {
 
 export function calculateMapKeyWidth(scale) {
     console.debug('Calculating map key width. Scale:', scale);
+
     const numEntries = Object.keys(mapKeyEntries).length;
     console.debug('Number of entries:', numEntries);
 
@@ -98,8 +99,22 @@ export function calculateMapKeyWidth(scale) {
         console.debug('Label padding:', labelPadding);
         console.debug('Right padding:', rightPadding);
 
-        // Estimate the maximum width of labels
-        const maxLabelWidth = fontSize * 15; // Assume max 15 characters at full width
+        // Create an offscreen canvas to measure text width
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = `${fontSize}px ${mapKeyConfig.fontFamily}`;
+
+        // Measure the width of the longest label (up to 50 characters)
+        const maxLabelLength = 50;
+        let maxLabelWidth = 0;
+        for (const entry of Object.values(mapKeyEntries)) {
+            const label = entry.label || `Label for ${entry.color}`;
+            const truncatedLabel = label.slice(0, maxLabelLength);
+            const labelWidth = context.measureText(truncatedLabel).width;
+            if (labelWidth > maxLabelWidth) {
+                maxLabelWidth = labelWidth;
+            }
+        }
 
         const totalWidth = colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
         console.debug('Total calculated width:', totalWidth);

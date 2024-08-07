@@ -1,9 +1,7 @@
-// js/image/baseImage.js
 import { config, getScaledValue } from './imageConfig.js';
 import { g } from '../mapSetup.js';
 import { defaultCountyColor } from '../colorPicker.js';
 import { getMapKeyEntries, calculateMapKeyWidth, addMapKeyEntries, getMapKeyVisibility } from '../mapKey/mapKey.js';
-import { mapKeyConfig } from '../mapKey/mapKeyConfig.js';
 
 export async function generateBaseImage(scale) {
     console.debug(`Generating base image with scale ${scale}`);

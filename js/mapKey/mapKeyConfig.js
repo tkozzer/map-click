@@ -3,10 +3,10 @@
 export const mapKeyConfig = {
     maxEntries: 20,
     fontFamily: 'Arial, sans-serif',
-    baseFontSize: 20,
-    baseColorBoxSize: 30,
+    baseFontSize: 16,
+    baseColorBoxSize: 20,
     baseLabelPadding: 10,
-    baseEntryHeight: 40,
+    baseEntryHeight: 23,
     baseRightPadding: 40,
     maxWidth: 200,
 };
