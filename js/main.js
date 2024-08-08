@@ -2,16 +2,18 @@ import { g, path } from './mapSetup.js';
 import { initializeZoom, resetMap, clearMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
 import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
 import { initializeColorPicker } from './colorPicker.js';
-import { initializeCounties } from './countySelection.js';
+import { initializeCounties, clearSelectedCounties } from './countySelection.js';
+import { initializeStates, clearSelectedStates } from './stateSelection.js';
 import { initializeCameraButton } from './cameraButton.js';
 import { initializeJsonExport } from './exportJson.js';
 import { initializeMapKey } from './mapKey/mapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';
 
+export let isCountyMode = true; // Ensure this export is added
+
 let nationData;
 let stateFeatures;
 let countyFeatures;
-let isCountyMode = true;
 
 Promise.all([
     d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json"),
@@ -27,13 +29,13 @@ Promise.all([
     });
 
     initializeCounties(countyFeatures, stateIdToName);
-    initializeStates();
+    initializeStates(stateFeatures);
 
     g.append("g")
         .selectAll("path")
         .data(stateFeatures)
         .enter().append("path")
-        .attr("class", "state")
+        .attr("class", "state-border")
         .attr("d", path)
         .style("fill", "none")
         .style("stroke", "#000000")
@@ -42,19 +44,6 @@ Promise.all([
     initializeZoom(nationData);
 });
 
-function initializeStates() {
-    g.append("g")
-        .attr("class", "states")
-        .selectAll("path")
-        .data(stateFeatures)
-        .enter().append("path")
-        .attr("d", path)
-        .style("fill", "#f0f0f0")
-        .style("stroke", "#000000")
-        .style("stroke-width", "1px")
-        .style("display", "none");
-}
-
 function toggleMode() {
     isCountyMode = !isCountyMode;
     d3.select("#mode-text").text(isCountyMode ? "County" : "State");
@@ -62,8 +51,23 @@ function toggleMode() {
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
 }
 
-d3.select("#reset-button").on("click", resetMap);
-d3.select("#clear-button").on("click", clearMap);
+d3.select("#reset-button").on("click", () => {
+    resetMap();
+    if (isCountyMode) {
+        clearSelectedCounties();
+    } else {
+        clearSelectedStates();
+    }
+});
+
+d3.select("#clear-button").on("click", () => {
+    clearMap();
+    if (isCountyMode) {
+        clearSelectedCounties();
+    } else {
+        clearSelectedStates();
+    }
+});
 d3.select("#recenter-button").on("click", recenterMap);
 d3.select("#zoom-in").on("click", zoomIn);
 d3.select("#zoom-out").on("click", zoomOut);

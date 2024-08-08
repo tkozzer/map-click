@@ -1,5 +1,6 @@
-export let currentColor = "#ff0000";
-export const defaultCountyColor = "#f0f0f0";
+export let currentColor = '#ff0000';
+export let defaultCountyColor = '#f0f0f0';
+export let defaultStateColor = '#f0f0f0'; // Add this line
 
 export function initializeColorPicker() {
     d3.selectAll(".color-btn").on("click", function () {

@@ -2,6 +2,7 @@ import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
 import { updateMapKey, removeFromMapKey } from './mapKey/mapKey.js';
+import { isCountyMode } from './main.js'; // Ensure this import path is correct
 
 export let selectedCounties = [];
 export let countySelection;
@@ -73,13 +74,13 @@ export function initializeCounties(countyFeatures, stateIdToName) {
     countySelection
         .on("mouseover", function (event, d) {
             showTooltip(event, d);
-            if (cmdPressed) {
+            if (cmdPressed && isCountyMode) {
                 toggleCountySelection(this, d);
             }
         })
         .on("mouseout", hideTooltip)
         .on("click", function (event, d) {
-            if (!cmdPressed) {
+            if (!cmdPressed && isCountyMode) {
                 toggleCountySelection(this, d);
             }
         })
