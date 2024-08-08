@@ -2,7 +2,7 @@ import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
 import { updateMapKey, removeFromMapKey } from './mapKey/mapKey.js';
-import { isCountyMode } from './main.js'; // Ensure this import path is correct
+import { isCountyMode } from './main.js';
 
 export let selectedCounties = [];
 export let countySelection;

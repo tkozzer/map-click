@@ -1,6 +1,4 @@
 import { svg, g, path } from './mapSetup.js';
-import { clearSelectedCounties } from './countySelection.js';
-import { clearMapKey } from './mapKey/mapKey.js';  // Import the new clearKeyMap function
 
 export const zoom = d3.zoom()
     .scaleExtent([0.5, 8])  // Set minimum and maximum zoom levels
@@ -31,13 +29,6 @@ export function initializeZoom(nation) {
 
 export function resetMap() {
     recenterMap();
-    clearSelectedCounties();
-    clearMapKey();  // Clear the key map when resetting the map
-}
-
-export function clearMap() {
-    clearSelectedCounties();
-    clearMapKey();  // Clear the key map when clearing the map
 }
 
 export function recenterMap() {
