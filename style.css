@@ -424,7 +424,7 @@ body {
 
 /* Key Map
 -------------------------------------------------- */
-#map-key {
+.map-key {
     position: absolute;
     bottom: 10px;
     right: 10px;
@@ -433,6 +433,10 @@ body {
     border-radius: 5px;
     padding: 10px;
     z-index: 1000;
+}
+
+.map-key.hidden {
+    display: none;
 }
 
 .map-key-entry {

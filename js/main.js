@@ -1,3 +1,5 @@
+// main.js
+
 import { g, path } from './mapSetup.js';
 import { initializeZoom, resetMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
 import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
@@ -6,7 +8,8 @@ import { initializeCounties, clearSelectedCounties } from './countySelection.js'
 import { initializeStates, clearSelectedStates } from './stateSelection.js';
 import { initializeCameraButton } from './cameraButton.js';
 import { initializeJsonExport } from './exportJson.js';
-import { initializeMapKey, clearMapKey } from './mapKey/mapKey.js';
+import { initializeCountyMapKey, clearCountyMapKey, toggleCountyMapKey } from './mapKey/countyMapKey.js';
+import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './mapKey/stateMapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';
 
 export let isCountyMode = true;
@@ -49,35 +52,65 @@ function toggleMode() {
     d3.select("#switchTrack").attr("transform", isCountyMode ? "translateX(0)" : "translateX(-50%)");
     g.selectAll(".county").style("display", isCountyMode ? null : "none");
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
+    updateMapKeyVisibility();
+}
+
+function updateMapKeyVisibility() {
+    const countyMapKey = document.getElementById('county-map-key');
+    const stateMapKey = document.getElementById('state-map-key');
+    if (isCountyMode) {
+        countyMapKey.style.display = '';
+        stateMapKey.style.display = 'none';
+    } else {
+        countyMapKey.style.display = 'none';
+        stateMapKey.style.display = '';
+    }
+}
+
+function toggleMapKey() {
+    console.log("toggleMapKey called");
+    console.log("Current mode:", isCountyMode ? "County" : "State");
+    if (isCountyMode) {
+        console.log("Toggling county map key");
+        toggleCountyMapKey();
+    } else {
+        console.log("Toggling state map key");
+        toggleStateMapKey();
+    }
 }
 
 d3.select("#reset-button").on("click", () => {
     resetMap();
-    clearMapKey();
     if (isCountyMode) {
+        clearCountyMapKey();
         clearSelectedCounties();
     } else {
+        clearStateMapKey();
         clearSelectedStates();
     }
 });
 
 d3.select("#clear-button").on("click", () => {
-    clearMapKey();
     if (isCountyMode) {
+        clearCountyMapKey();
         clearSelectedCounties();
     } else {
+        clearStateMapKey();
         clearSelectedStates();
     }
 });
+
 d3.select("#recenter-button").on("click", recenterMap);
 d3.select("#zoom-in").on("click", zoomIn);
 d3.select("#zoom-out").on("click", zoomOut);
 d3.select("#switchContainer").on("click", toggleMode);
+document.getElementById('map-key-button').addEventListener('click', toggleMapKey);
 
 initializeTooltipAndContextMenu();
 initializeColorPicker();
 initializeCameraButton();
 initializeJsonExport();
-initializeMapKey();
+initializeCountyMapKey();
+initializeStateMapKey();
 initializeContextMenus();
 cleanupZoom();

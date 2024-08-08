@@ -1,8 +1,10 @@
+// stateSelection.js
+
 import { g, path } from './mapSetup.js';
-import { currentColor, defaultStateColor } from './colorPicker.js'; // Ensure defaultStateColor is defined similarly to defaultCountyColor
+import { currentColor, defaultStateColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
-import { updateMapKey, removeFromMapKey } from './mapKey/mapKey.js';
-import { isCountyMode } from './main.js'; // Ensure this import path is correct
+import { updateStateMapKey, removeFromStateMapKey } from './mapKey/stateMapKey.js';
+import { isCountyMode } from './main.js';
 
 export let selectedStates = [];
 export let stateSelection;
@@ -35,12 +37,12 @@ function toggleStateSelection(element, d) {
         } else {
             selectedStates[stateIndex] = { ...d, color: currentColorHex };
         }
-        updateMapKey(d, currentColorHex);
+        updateStateMapKey(d, currentColorHex);
     } else {
         if (currentFill === currentColorHex) {
             d3.select(element).style("fill", defaultStateColor);
             selectedStates.splice(stateIndex, 1);
-            removeFromMapKey(d, currentColorHex);
+            removeFromStateMapKey(d, currentColorHex);
         } else {
             d3.select(element).style("fill", currentColorHex);
             if (stateIndex === -1) {
@@ -48,8 +50,8 @@ function toggleStateSelection(element, d) {
             } else {
                 selectedStates[stateIndex] = { ...d, color: currentColorHex };
             }
-            removeFromMapKey(d, currentFill);
-            updateMapKey(d, currentColorHex);
+            removeFromStateMapKey(d, currentFill);
+            updateStateMapKey(d, currentColorHex);
         }
     }
 }

@@ -1,7 +1,9 @@
+// countySelection.js
+
 import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
 import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
-import { updateMapKey, removeFromMapKey } from './mapKey/mapKey.js';
+import { updateCountyMapKey, removeFromCountyMapKey } from './mapKey/countyMapKey.js';
 import { isCountyMode } from './main.js';
 
 export let selectedCounties = [];
@@ -35,12 +37,12 @@ function toggleCountySelection(element, d) {
         } else {
             selectedCounties[countyIndex] = { ...d, color: currentColorHex };
         }
-        updateMapKey(d, currentColorHex);
+        updateCountyMapKey(d, currentColorHex);
     } else {
         if (currentFill === currentColorHex) {
             d3.select(element).style("fill", defaultCountyColor);
             selectedCounties.splice(countyIndex, 1);
-            removeFromMapKey(d, currentColorHex);
+            removeFromCountyMapKey(d, currentColorHex);
         } else {
             d3.select(element).style("fill", currentColorHex);
             if (countyIndex === -1) {
@@ -48,8 +50,8 @@ function toggleCountySelection(element, d) {
             } else {
                 selectedCounties[countyIndex] = { ...d, color: currentColorHex };
             }
-            removeFromMapKey(d, currentFill);
-            updateMapKey(d, currentColorHex);
+            removeFromCountyMapKey(d, currentFill);
+            updateCountyMapKey(d, currentColorHex);
         }
     }
 }
