@@ -61,7 +61,6 @@ d3.select("#reset-button").on("click", () => {
 });
 
 d3.select("#clear-button").on("click", () => {
-    clearMap();
     if (isCountyMode) {
         clearSelectedCounties();
     } else {
