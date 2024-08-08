@@ -1,12 +1,15 @@
+// tooltipAndContextMenu.js
+
 import { fetchAndDisplayCountyData } from './county.js';
+import { isCountyMode } from './main.js';
 
 export const tooltip = d3.select("#map")
     .append("div")
     .attr("class", "tooltip");
 
-let activeCounty = null;
+let activeItem = null;
 let map;
-let countyBorder;
+let itemBorder;
 
 export function initializeTooltipAndContextMenu() {
     d3.select("body").on("click", function () {
@@ -33,8 +36,15 @@ export function initializeTooltipAndContextMenu() {
 }
 
 export function showTooltip(event, d) {
+    let content;
+    if (isCountyMode) {
+        content = `${d.properties.name}, ${d.properties.stateName}`;
+    } else {
+        content = d.properties.name;
+    }
+
     tooltip.style("opacity", 1)
-        .html(`${d.properties.name}, ${d.properties.stateName}`)
+        .html(content)
         .style("left", (event.pageX + 10) + "px")
         .style("top", (event.pageY - 28) + "px");
 }
@@ -45,14 +55,21 @@ export function hideTooltip() {
 
 export function showContextMenu(event, d) {
     event.preventDefault();
-    activeCounty = d;
+    activeItem = d;
 
-    // Check if the state is Louisiana and adjust the label accordingly
-    const stateName = d.properties.stateName.toLowerCase();
-    const regionType = stateName === 'louisiana' ? 'Parish' : 'County';
-    console.debug(`Showing context menu for ${d.properties.name} ${regionType}`);
+    let regionType, itemName;
+    if (isCountyMode) {
+        const stateName = d.properties.stateName.toLowerCase();
+        regionType = stateName === 'louisiana' ? 'Parish' : 'County';
+        itemName = `${d.properties.name} ${regionType}`;
+    } else {
+        regionType = 'State';
+        itemName = d.properties.name;
+    }
 
-    $('#mapModalLabel').text(`${d.properties.name} ${regionType} Border`);
+    console.debug(`Showing context menu for ${itemName}`);
+
+    $('#mapModalLabel').text(`${itemName} Border`);
     $('#mapModal').modal('show');
 }
 
@@ -64,13 +81,19 @@ function handleModalShow() {
     }
 
     $('.spinner-container').show();
-    const selectedCounty = activeCounty.properties.name;
-    const selectedState = activeCounty.properties.stateName;
-    fetchCountyBorder(selectedCounty, selectedState);
+    const selectedItem = activeItem.properties.name;
+    const selectedState = isCountyMode ? activeItem.properties.stateName : selectedItem;
+    fetchItemBorder(selectedItem, selectedState);
     document.getElementById('countyData').innerHTML = '';  // Clear previous data
-    const isLouisiana = selectedState.toLowerCase() === 'louisiana';
-    const regionType = isLouisiana ? 'Parish' : 'County';
-    fetchAndDisplayCountyData(selectedCounty + ` ${regionType}`, selectedState);
+    if (isCountyMode) {
+        const isLouisiana = selectedState.toLowerCase() === 'louisiana';
+        const regionType = isLouisiana ? 'Parish' : 'County';
+        fetchAndDisplayCountyData(selectedItem + ` ${regionType}`, selectedState);
+    } else {
+        // Handle state data display here if needed
+        // For now, we'll just clear the data
+        document.getElementById('countyData').innerHTML = 'State data not available';
+    }
 }
 
 function initializeMap() {
@@ -82,54 +105,60 @@ function initializeMap() {
     }).addTo(map);
 }
 
-function fetchCountyBorder(county, state) {
-    console.debug(`Fetching border for ${county} County, ${state}`);
+function fetchItemBorder(item, state) {
+    console.debug(`Fetching border for ${item}, ${state}`);
 
-    // Remove the previous county border if it exists
-    if (countyBorder) {
-        map.removeLayer(countyBorder);
-        countyBorder = null; // Ensure the reference is cleared
+    // Remove the previous item border if it exists
+    if (itemBorder) {
+        map.removeLayer(itemBorder);
+        itemBorder = null; // Ensure the reference is cleared
     }
 
-    const isLouisiana = state.toLowerCase() === 'louisiana';
-    const encodedCounty = encodeURIComponent(county);
-    const encodedState = encodeURIComponent(state);
+    let query;
+    if (isCountyMode) {
+        const isLouisiana = state.toLowerCase() === 'louisiana';
+        const regionType = isLouisiana ? 'Parish' : 'County';
+        const encodedCounty = encodeURIComponent(item);
+        const encodedState = encodeURIComponent(state);
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedCounty}+${regionType},+${encodedState}&format=json&polygon_geojson=1`;
+    } else {
+        const encodedState = encodeURIComponent(state);
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedState}&format=json&polygon_geojson=1`;
+    }
 
-    const regionType = isLouisiana ? 'Parish' : 'County';
-    const query = `https://nominatim.openstreetmap.org/search?q=${encodedCounty}+${regionType},+${encodedState}&format=json&polygon_geojson=1`;
-    console.debug(`Querying OSM for ${regionType.toLowerCase()}: ${query}`);
+    console.debug(`Querying OSM: ${query}`);
 
     fetch(query)
         .then(response => response.json())
         .then(data => {
-            console.debug(`OSM response for ${regionType.toLowerCase()}:`, data);
+            console.debug(`OSM response:`, data);
             if (data.length > 0 && data[0].geojson) {
-                addCountyBorderToMap(data[0].geojson);
+                addItemBorderToMap(data[0].geojson);
             } else {
-                console.error(`No valid GeoJSON data found for ${county} ${regionType}`);
+                console.error(`No valid GeoJSON data found for ${item}`);
             }
         })
         .catch(error => {
-            console.error(`Error fetching ${regionType.toLowerCase()} border: ${error}`);
+            console.error(`Error fetching border: ${error}`);
         })
         .finally(() => {
             $('.spinner-container').hide();
         });
 }
 
-function addCountyBorderToMap(geojson) {
-    countyBorder = L.geoJSON(geojson, {
+function addItemBorderToMap(geojson) {
+    itemBorder = L.geoJSON(geojson, {
         style: {
             color: 'blue',
             weight: 2,
             fillOpacity: 0.2
         }
     }).addTo(map);
-    map.fitBounds(countyBorder.getBounds());
+    map.fitBounds(itemBorder.getBounds());
     $('.spinner-container').hide();
 }
 
-export function applyCountyInteractions(selection) {
+export function applyItemInteractions(selection) {
     selection
         .on("mouseover", showTooltip)
         .on("mouseout", hideTooltip)
