@@ -1,4 +1,4 @@
-// county.js
+// state.js
 
 import {
     getPropertyValue,
@@ -9,37 +9,30 @@ import {
     searchWikidata
 } from './data/wikiData.js';
 
-async function searchWikidataForCounty(countyName, stateName, regionType) {
-    let searchResults = await searchWikidata(`${countyName} ${regionType}, ${stateName}`);
+async function searchWikidataForState(stateName) {
+    let searchResults = await searchWikidata(`${stateName} state, United States`);
 
     if (!searchResults || searchResults.length === 0) {
-        console.debug(`No results for ${countyName} ${regionType}, ${stateName}. Trying without ${regionType}.`);
-        searchResults = await searchWikidata(`${countyName}, ${stateName}`);
-    }
-
-    if (!searchResults || searchResults.length === 0) {
-        console.debug(`No results for ${countyName}, ${stateName}. Trying with just the county name.`);
-        searchResults = await searchWikidata(countyName);
+        console.debug(`No results for ${stateName} state, United States. Trying without 'state'.`);
+        searchResults = await searchWikidata(`${stateName}, United States`);
     }
 
     return searchResults;
 }
 
-export async function getCountyData(countyName, stateName) {
+export async function getStateData(stateName) {
     try {
-        const isLouisiana = stateName.toLowerCase() === 'louisiana';
-        const regionType = isLouisiana ? 'Parish' : 'County';
-        console.debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
+        console.debug(`Fetching data for ${stateName}`);
 
-        const searchResults = await searchWikidataForCounty(countyName, stateName, regionType);
+        const searchResults = await searchWikidataForState(stateName);
 
         if (!searchResults || searchResults.length === 0) {
-            console.debug(`No results found for ${countyName}.`);
+            console.debug(`No results found for ${stateName}.`);
             return null;
         }
 
         const wikidataId = searchResults[0].id;
-        console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
+        console.debug(`Found Wikidata ID for ${stateName}: ${wikidataId}`);
 
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
             getPropertyValue(wikidataId, 'P1082'),
@@ -74,19 +67,19 @@ export async function getCountyData(countyName, stateName) {
             osmRelationUrl: osmRelationUrl,
             wikipediaLink: wikipediaLink || 'N/A'
         };
-        console.debug(`Formatted data for ${countyName}:`, data);
+        console.debug(`Formatted data for ${stateName}:`, data);
         return data;
     } catch (error) {
-        console.error('Error in getCountyData:', error);
+        console.error('Error in getStateData:', error);
         return null;
     }
 }
 
-function displayCountyData(data) {
+function displayStateData(data) {
     const dataContainer = document.getElementById('geoEntityData');
     if (data) {
         dataContainer.innerHTML = `
-            <h3>County Information</h3>
+            <h3>State Information</h3>
             <p><strong>Population:</strong> ${data.population}</p>
             <p><strong>Coordinates:</strong> ${data.coordinates.latitude}, ${data.coordinates.longitude}</p>
             <p><strong>Area:</strong> ${data.area.value} ${data.area.unit}</p>
@@ -97,11 +90,11 @@ function displayCountyData(data) {
             <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">${data.wikipediaLink}</a>` : 'N/A'}</p>
         `;
     } else {
-        dataContainer.innerHTML = '<p>No data available for this county.</p>';
+        dataContainer.innerHTML = '<p>No data available for this state.</p>';
     }
 }
 
-export async function fetchAndDisplayCountyData(countyName, stateName) {
+export async function fetchAndDisplayStateData(stateName) {
     const spinner = document.getElementById('geoEntityDataSpinner');
     const dataContainer = document.getElementById('geoEntityData');
 
@@ -109,11 +102,11 @@ export async function fetchAndDisplayCountyData(countyName, stateName) {
         spinner.style.display = 'flex';
         dataContainer.innerHTML = '';
 
-        const data = await getCountyData(countyName, stateName);
-        displayCountyData(data);
+        const data = await getStateData(stateName);
+        displayStateData(data);
     } catch (error) {
-        console.error('Error fetching county data:', error);
-        dataContainer.innerHTML = '<p>Error fetching county data.</p>';
+        console.error('Error fetching state data:', error);
+        dataContainer.innerHTML = '<p>Error fetching state data.</p>';
     } finally {
         spinner.style.display = 'none';
     }

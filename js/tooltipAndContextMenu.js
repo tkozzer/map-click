@@ -1,6 +1,7 @@
 // tooltipAndContextMenu.js
 
 import { fetchAndDisplayCountyData } from './county.js';
+import { fetchAndDisplayStateData } from './state.js';
 import { isCountyMode } from './main.js';
 
 export const tooltip = d3.select("#map")
@@ -77,22 +78,20 @@ function handleModalShow() {
     if (!map) {
         initializeMap();
     } else {
-        map.invalidateSize(); // This makes sure the map container is properly sized
+        map.invalidateSize();
     }
 
     $('.spinner-container').show();
     const selectedItem = activeItem.properties.name;
     const selectedState = isCountyMode ? activeItem.properties.stateName : selectedItem;
     fetchItemBorder(selectedItem, selectedState);
-    document.getElementById('countyData').innerHTML = '';  // Clear previous data
+    document.getElementById('geoEntityData').innerHTML = '';  // Clear previous data
     if (isCountyMode) {
         const isLouisiana = selectedState.toLowerCase() === 'louisiana';
         const regionType = isLouisiana ? 'Parish' : 'County';
         fetchAndDisplayCountyData(selectedItem + ` ${regionType}`, selectedState);
     } else {
-        // Handle state data display here if needed
-        // For now, we'll just clear the data
-        document.getElementById('countyData').innerHTML = 'State data not available';
+        fetchAndDisplayStateData(selectedItem);
     }
 }
 
@@ -123,7 +122,7 @@ function fetchItemBorder(item, state) {
         query = `https://nominatim.openstreetmap.org/search?q=${encodedCounty}+${regionType},+${encodedState}&format=json&polygon_geojson=1`;
     } else {
         const encodedState = encodeURIComponent(state);
-        query = `https://nominatim.openstreetmap.org/search?q=${encodedState}&format=json&polygon_geojson=1`;
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedState},+United+States&format=json&polygon_geojson=1`;
     }
 
     console.debug(`Querying OSM: ${query}`);

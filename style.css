@@ -16,19 +16,19 @@ body {
     background-color: white;
 }
 
-/* County and State Styles
+/* Geographic Entity Styles
 -------------------------------------------------- */
-.county {
+.geo-entity {
     fill: #f0f0f0;
     stroke: #7d7d7d;
     stroke-width: 0.5;
 }
 
-.county:hover {
+.geo-entity:hover {
     fill: #e0e0e0;
 }
 
-.state {
+.geo-entity-border {
     fill: none;
     stroke: #000000;
     stroke-width: 1;
@@ -135,7 +135,7 @@ body {
     opacity: 1;
 }
 
-/* County/State Toggle Styles
+/* Mode Toggle Styles
 -------------------------------------------------- */
 #mode-toggle {
     display: flex;
@@ -399,9 +399,9 @@ body {
     transition: width 0.3s ease;
 }
 
-/* County Data Spinner
+/* Geographic Entity Data Spinner
 -------------------------------------------------- */
-#countyDataSpinner {
+#geoEntityDataSpinner {
     min-height: 100px;
     display: flex;
     justify-content: center;
@@ -420,6 +420,28 @@ body {
     display: flex;
     align-items: center;
     min-height: calc(100% - 3.5rem);
+}
+
+/* Geographic Entity Data Container
+-------------------------------------------------- */
+#geoEntityDataContainer {
+    margin-top: 20px;
+}
+
+#geoEntityData {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+#geoEntityData h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#geoEntityData p {
+    margin-bottom: 10px;
 }
 
 /* Key Map
@@ -536,7 +558,6 @@ body {
 #imagePreviewContainer img {
     max-width: 100%;
     max-height: 70vh;
-    /* Set to a percentage of the viewport height */
     object-fit: contain;
     border: 2px solid black;
 }
@@ -550,7 +571,6 @@ body {
 
     #imagePreviewContainer img {
         max-height: 75vh;
-        /* Adjust based on your needs */
     }
 }
 
@@ -562,6 +582,5 @@ body {
 
     #imagePreviewContainer img {
         max-height: 80vh;
-        /* Adjust based on your needs */
     }
 }
