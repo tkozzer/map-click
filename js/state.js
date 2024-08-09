@@ -35,14 +35,14 @@ export async function getStateData(stateName) {
         console.debug(`Found Wikidata ID for ${stateName}: ${wikidataId}`);
 
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
-            getPropertyValue(wikidataId, 'P1082'),
-            getPropertyValue(wikidataId, 'P625'),
-            getPropertyValue(wikidataId, 'P2046'),
-            getPropertyValue(wikidataId, 'P17'),
-            getPropertyValue(wikidataId, 'P856'),
-            getPropertyValue(wikidataId, 'P36'),
-            getPropertyValue(wikidataId, 'P402'),
-            getWikipediaLink(wikidataId)
+            getPropertyValue(wikidataId, 'P1082'), // population
+            getPropertyValue(wikidataId, 'P625'), // coordinates
+            getPropertyValue(wikidataId, 'P2046'), // area
+            getPropertyValue(wikidataId, 'P17'), // country
+            getPropertyValue(wikidataId, 'P856'), // official website
+            getPropertyValue(wikidataId, 'P36'), // capital
+            getPropertyValue(wikidataId, 'P402'), // OSM relation ID
+            getWikipediaLink(wikidataId) // Wikipedia link
         ]);
 
         const latitude = coordinates ? coordinates.latitude : null;
