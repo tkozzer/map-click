@@ -1,7 +1,11 @@
+// baseImage.js
+
 import { config, getScaledValue } from './imageConfig.js';
 import { g } from '../mapSetup.js';
-import { defaultCountyColor } from '../colorPicker.js';
-import { getMapKeyEntries, calculateMapKeyWidth, addMapKeyEntries, getMapKeyVisibility } from '../mapKey/mapKey.js';
+import { defaultCountyColor, defaultStateColor } from '../colorPicker.js';
+import { getCountyMapKeyEntries, calculateCountyMapKeyWidth, addCountyMapKeyEntries, getCountyMapKeyVisibility } from '../mapKey/countyMapKey.js';
+import { getStateMapKeyEntries, calculateStateMapKeyWidth, addStateMapKeyEntries, getStateMapKeyVisibility } from '../mapKey/stateMapKey.js';
+import { getIsCountyMode } from '../main.js';
 
 export async function generateBaseImage(scale) {
     console.debug(`Generating base image with scale ${scale}`);
@@ -21,14 +25,15 @@ export async function generateBaseImage(scale) {
         throw new Error('Invalid dimensions');
     }
 
-    const mapKeyEntries = getMapKeyEntries();
-    const hasMapKey = Object.keys(mapKeyEntries).length > 0 && getMapKeyVisibility();
+    const isCountyMode = getIsCountyMode();
+    const mapKeyEntries = isCountyMode ? getCountyMapKeyEntries() : getStateMapKeyEntries();
+    const hasMapKey = Object.keys(mapKeyEntries).length > 0 && (isCountyMode ? getCountyMapKeyVisibility() : getStateMapKeyVisibility());
     console.debug('Has Map Key:', hasMapKey);
     console.debug('Map Key Entries:', mapKeyEntries);
 
     let mapKeyWidth = 0;
     if (hasMapKey) {
-        mapKeyWidth = calculateMapKeyWidth(scale);
+        mapKeyWidth = isCountyMode ? calculateCountyMapKeyWidth(scale) : calculateStateMapKeyWidth(scale);
         console.debug('Calculated Map Key Width:', mapKeyWidth);
 
         if (isNaN(mapKeyWidth)) {
@@ -82,27 +87,44 @@ export async function generateBaseImage(scale) {
 
         const offscreenPath = d3.geoPath().projection(offscreenProjection);
 
-        offscreenG.selectAll("path")
-            .data(countyFeatures)
-            .join("path")
-            .attr("class", "county")
-            .attr("d", offscreenPath)
-            .style("fill", d => {
-                const county = g.selectAll("path.county")
-                    .filter(function (data) { return data.id === d.id; });
-                return !county.empty() ? county.style("fill") : defaultCountyColor;
-            })
-            .style("stroke", "#7d7d7d")
-            .style("stroke-width", `${getScaledValue(config.baseStrokeWidth, scale)}px`);
+        if (isCountyMode) {
+            offscreenG.selectAll("path")
+                .data(countyFeatures)
+                .join("path")
+                .attr("class", "county")
+                .attr("d", offscreenPath)
+                .style("fill", d => {
+                    const county = g.selectAll("path.county")
+                        .filter(function (data) { return data.id === d.id; });
+                    return !county.empty() ? county.style("fill") : defaultCountyColor;
+                })
+                .style("stroke", "#7d7d7d")
+                .style("stroke-width", `${getScaledValue(config.baseStrokeWidth, scale)}px`);
+        } else {
+            offscreenG.selectAll("path")
+                .data(stateFeatures)
+                .join("path")
+                .attr("class", "state")
+                .attr("d", offscreenPath)
+                .style("fill", d => {
+                    const state = g.selectAll(".states path")
+                        .filter(function (data) { return data.id === d.id; });
+                    return !state.empty() ? state.style("fill") : defaultStateColor;
+                })
+                .style("stroke", "#000000")
+                .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
+        }
 
-        offscreenG.selectAll("path.state")
+        // Always draw state borders
+        offscreenG.append("g")
+            .selectAll("path")
             .data(stateFeatures)
             .join("path")
-            .attr("class", "state")
+            .attr("class", "state-border")
             .attr("d", offscreenPath)
             .style("fill", "none")
             .style("stroke", "#000000")
-            .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
+            .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * (isCountyMode ? 1 : 2), scale)}px`);
 
         if (hasMapKey) {
             const mapKeyStartX = leftBuffer + mapWidth;
@@ -113,7 +135,11 @@ export async function generateBaseImage(scale) {
                 mapKeyWidth,
                 scale
             });
-            addMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
+            if (isCountyMode) {
+                addCountyMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
+            } else {
+                addStateMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
+            }
         }
 
         console.debug('Base image generation completed successfully');

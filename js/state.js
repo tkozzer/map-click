@@ -5,34 +5,26 @@ import {
     getLabel,
     getWikipediaLink,
     cleanAmount,
-    formatArea,
-    searchWikidata
+    formatArea
 } from './data/wikiData.js';
 
-async function searchWikidataForState(stateName) {
-    let searchResults = await searchWikidata(`${stateName} state, United States`);
+import { usStateEntityIds } from './usStates.js';
 
-    if (!searchResults || searchResults.length === 0) {
-        console.debug(`No results for ${stateName} state, United States. Trying without 'state'.`);
-        searchResults = await searchWikidata(`${stateName}, United States`);
-    }
-
-    return searchResults;
+function normalizeStateName(stateName) {
+    return stateName.replace(/\s+/g, '_');
 }
 
-export async function getStateData(stateName) {
+async function getStateData(stateName) {
     try {
         console.debug(`Fetching data for ${stateName}`);
 
-        const searchResults = await searchWikidataForState(stateName);
-
-        if (!searchResults || searchResults.length === 0) {
-            console.debug(`No results found for ${stateName}.`);
+        const normalizedStateName = normalizeStateName(stateName);
+        const wikidataId = usStateEntityIds[normalizedStateName];
+        if (!wikidataId) {
+            console.warn(`No Wikidata ID found for ${stateName}. Normalized name: ${normalizedStateName}`);
             return null;
         }
-
-        const wikidataId = searchResults[0].id;
-        console.debug(`Found Wikidata ID for ${stateName}: ${wikidataId}`);
+        console.debug(`Using Wikidata ID for ${stateName}: ${wikidataId}`);
 
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
             getPropertyValue(wikidataId, 'P1082'), // population
@@ -111,3 +103,6 @@ export async function fetchAndDisplayStateData(stateName) {
         spinner.style.display = 'none';
     }
 }
+
+// Export getStateData if it's used in other files
+export { getStateData };

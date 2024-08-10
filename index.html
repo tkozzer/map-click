@@ -55,60 +55,13 @@
         <div id="state-map-key-entries"></div>
     </div>
 
-    <div id="json-export-context-menu">
-        <div>
-            <input type="checkbox" id="json-county-name" checked disabled>
-            <label for="json-county-name">County Name</label>
+    <div id="json-export-context-menu" class="context-menu">
+        <div id="json-export-fields-container">
+            <!-- This container will be dynamically filled by JavaScript -->
         </div>
-        <div>
-            <input type="checkbox" id="json-state-name" checked disabled>
-            <label for="json-state-name">State Name</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-county-number" checked>
-            <label for="json-county-number">County Number</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-population">
-            <label for="json-population">Population</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-coordinates">
-            <label for="json-coordinates">Coordinates</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-area">
-            <label for="json-area">Area</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-country">
-            <label for="json-country">Country</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-official-website">
-            <label for="json-official-website">Official Website</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-capital">
-            <label for="json-capital">Capital</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-osm-relation">
-            <label for="json-osm-relation">OSM Relation</label>
-        </div>
-        <div>
-            <input type="checkbox" id="json-wikipedia">
-            <label for="json-wikipedia">Wikipedia</label>
-        </div>
-
-        <!-- New options at the bottom -->
         <div class="json-export-context-menu-actions">
-            <button id="select-all-fields" class="json-export-context-menu-button">
-                <i class="fas fa-check-square"></i> Select All
-            </button>
-            <button id="clear-all-fields" class="json-export-context-menu-button">
-                <i class="fas fa-square"></i> Clear All
-            </button>
+            <button id="select-all-fields">Select All</button>
+            <button id="clear-all-fields">Clear</button>
         </div>
     </div>
 

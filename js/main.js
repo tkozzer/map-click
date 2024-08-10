@@ -7,12 +7,17 @@ import { initializeColorPicker } from './colorPicker.js';
 import { initializeCounties, clearSelectedCounties } from './countySelection.js';
 import { initializeStates, clearSelectedStates } from './stateSelection.js';
 import { initializeCameraButton } from './cameraButton.js';
-import { initializeJsonExport } from './exportJson.js';
+import { initializeJsonExport, updateContextMenu } from './exportJson.js';
 import { initializeCountyMapKey, clearCountyMapKey, toggleCountyMapKey } from './mapKey/countyMapKey.js';
 import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './mapKey/stateMapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';
 
 export let isCountyMode = true;
+
+// Export the function to get the current mode
+export function getIsCountyMode() {
+    return isCountyMode;
+}
 
 let nationData;
 let stateFeatures;
@@ -53,6 +58,8 @@ function toggleMode() {
     g.selectAll(".county").style("display", isCountyMode ? null : "none");
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
     updateMapKeyVisibility();
+    updateContextMenu(); // This line ensures the context menu is updated when mode changes
+    console.log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 
 function updateMapKeyVisibility() {

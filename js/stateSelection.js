@@ -90,3 +90,8 @@ export function clearSelectedStates() {
         .duration(750)
         .style("fill", defaultStateColor);
 }
+
+// Add this function to get the selected states
+export function getSelectedStates() {
+    return selectedStates;
+}
