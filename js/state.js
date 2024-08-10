@@ -1,7 +1,7 @@
 // state.js
 
 import {
-    getPropertyValue,
+    getPropertyValueBatch,
     getLabel,
     getWikipediaLink,
     cleanAmount,

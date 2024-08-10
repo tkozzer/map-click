@@ -1,7 +1,7 @@
 // county.js
 
 import {
-    getPropertyValue,
+    getPropertyValueBatch,
     getLabel,
     getWikipediaLink,
     cleanAmount,
@@ -41,36 +41,29 @@ export async function getCountyData(countyName, stateName) {
         const wikidataId = searchResults[0].id;
         console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
 
-        const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
-            getPropertyValue(wikidataId, 'P1082'),
-            getPropertyValue(wikidataId, 'P625'),
-            getPropertyValue(wikidataId, 'P2046'),
-            getPropertyValue(wikidataId, 'P17'),
-            getPropertyValue(wikidataId, 'P856'),
-            getPropertyValue(wikidataId, 'P36'),
-            getPropertyValue(wikidataId, 'P402'),
+        const propertyIds = ['P1082', 'P625', 'P2046', 'P17', 'P856', 'P36', 'P402'];
+        const propertyValues = await getPropertyValueBatch(wikidataId, propertyIds);
+
+        const latitude = propertyValues.P625 ? propertyValues.P625.latitude : null;
+        const longitude = propertyValues.P625 ? propertyValues.P625.longitude : null;
+
+        const [countryLabel, capitalLabel, areaFormatted, wikipediaLink] = await Promise.all([
+            getLabel(propertyValues.P17),
+            getLabel(propertyValues.P36),
+            formatArea(propertyValues.P2046),
             getWikipediaLink(wikidataId)
         ]);
 
-        const latitude = coordinates ? coordinates.latitude : null;
-        const longitude = coordinates ? coordinates.longitude : null;
-
-        const [countryLabel, capitalLabel, areaFormatted] = await Promise.all([
-            getLabel(country),
-            getLabel(capital),
-            formatArea(area)
-        ]);
-
-        const osmRelationUrl = osmRelationId ? `https://www.openstreetmap.org/relation/${osmRelationId}` : 'N/A';
+        const osmRelationUrl = propertyValues.P402 ? `https://www.openstreetmap.org/relation/${propertyValues.P402}` : 'N/A';
 
         const data = {
-            population: population ? cleanAmount(population.amount) : 'N/A',
+            population: propertyValues.P1082 ? cleanAmount(propertyValues.P1082.amount) : 'N/A',
             coordinates: { latitude, longitude },
             area: areaFormatted || 'N/A',
             country: countryLabel || 'N/A',
-            officialWebsite: officialWebsite || 'N/A',
+            officialWebsite: propertyValues.P856 || 'N/A',
             capital: capitalLabel || 'N/A',
-            osmRelationId: osmRelationId || 'N/A',
+            osmRelationId: propertyValues.P402 || 'N/A',
             osmRelationUrl: osmRelationUrl,
             wikipediaLink: wikipediaLink || 'N/A'
         };
