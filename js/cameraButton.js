@@ -1,4 +1,4 @@
-// cameraButton.js
+// js/cameraButton.js
 import { exportPng } from './image/exportPng.js';
 import { exportJpg } from './image/exportJpg.js';
 import { generatePreview } from './image/imagePreview.js';

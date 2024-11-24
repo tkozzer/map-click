@@ -1,4 +1,5 @@
-// exportJson.js
+// js/exportJson.js
+
 import { selectedCounties } from './countySelection.js';
 import { getSelectedStates } from './stateSelection.js';
 import { getCountyData } from './county.js';
@@ -6,6 +7,7 @@ import { getStateData } from './state.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
 import { showJsonExportContextMenu } from './contextMenuUtils.js';
 import { getIsCountyMode } from './main.js';
+import { getErrorLog, clearErrorLog } from './county.js'; // Add this import
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 const jsonExportFieldsContainer = document.getElementById('json-export-fields-container');
@@ -158,6 +160,20 @@ async function exportJson() {
         const totalTime = (endTime - startTime) / 1000; // Convert to seconds
         console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedItems.length} ${isCountyMode ? 'counties' : 'states'}.`);
         showSuccessAlert('Export completed successfully!');
+
+        // Print error log to console
+        const errorLog = getErrorLog();
+        if (errorLog.length > 0) {
+            console.error("Errors encountered during export:");
+            errorLog.forEach((error, index) => {
+                console.error(`${index + 1}. ${error.countyName}, ${error.stateName}`);
+                console.error(`   Error: ${error.error}`);
+                console.error(`   Wikidata URL: ${error.wikidataUrl}`);
+            });
+        } else {
+            console.log("No errors encountered during export.");
+        }
+        clearErrorLog(); // Clear the error log after printing
     } catch (error) {
         console.error('Error during export:', error);
         console.error('Error stack:', error.stack);
@@ -272,7 +288,7 @@ function populateData(data, item, details, isCounty) {
             }
         });
     } else {
-        console.warn(`No details found for ${isCounty ? 'county' : 'state'}: ${item.properties.name}`);
+        console.warn(`No details found for ${isCounty ? `county: ${item.properties.name}, state: ${item.properties.stateName}` : `state: ${item.properties.name}`}`);
     }
 }
 

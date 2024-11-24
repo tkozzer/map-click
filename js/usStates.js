@@ -1,3 +1,5 @@
+// js/usStates.js
+
 export const usStateEntityIds = {
     Alabama: "Q173",
     Alaska: "Q797",

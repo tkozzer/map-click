@@ -1,4 +1,4 @@
-// stateSelection.js
+// js/stateSelection.js
 
 import { g, path } from './mapSetup.js';
 import { currentColor, defaultStateColor } from './colorPicker.js';
@@ -89,6 +89,22 @@ export function clearSelectedStates() {
         .transition()
         .duration(750)
         .style("fill", defaultStateColor);
+}
+
+export function selectAllStates() {
+    g.selectAll(".states path")
+        .each(function (d) {
+            const element = this;
+            const currentFill = d3.select(element).style("fill");
+            const defaultColorHex = d3.rgb(defaultStateColor).toString();
+            const currentColorHex = d3.rgb(currentColor).toString();
+
+            if (currentFill === defaultColorHex) {
+                d3.select(element).style("fill", currentColorHex);
+                selectedStates.push({ ...d, color: currentColorHex });
+                updateStateMapKey(d, currentColorHex);
+            }
+        });
 }
 
 // Add this function to get the selected states

@@ -1,3 +1,5 @@
+// js/mapKey/mapKey.js
+
 import { mapKeyConfig, getScaledMapKeyValue } from './mapKeyConfig.js';
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
 

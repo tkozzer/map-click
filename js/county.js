@@ -1,4 +1,4 @@
-// county.js
+// js/county.js
 
 import {
     getPropertyValueBatch,
@@ -9,68 +9,95 @@ import {
     searchWikidata
 } from './data/wikiData.js';
 
+import { alaskaData } from './data/alaska.js';
+
+let errorLog = [];
+
+function getRegionType(stateName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        return 'Borough/Census Area/Municipality';
+    }
+    return 'County';
+}
+
 async function searchWikidataForCounty(countyName, stateName, regionType) {
-    let searchResults = await searchWikidata(`${countyName} ${regionType}, ${stateName}`);
+    let searchQueries = [
+        `${countyName} ${regionType}, ${stateName}`,
+        `${countyName}, ${stateName}`,
+        countyName
+    ];
 
-    if (!searchResults || searchResults.length === 0) {
-        console.debug(`No results for ${countyName} ${regionType}, ${stateName}. Trying without ${regionType}.`);
-        searchResults = await searchWikidata(`${countyName}, ${stateName}`);
+    for (let query of searchQueries) {
+        let searchResults = await searchWikidata(query);
+        if (searchResults && searchResults.length > 0) {
+            console.debug(`Found results for query: ${query}`);
+            return searchResults;
+        }
     }
 
-    if (!searchResults || searchResults.length === 0) {
-        console.debug(`No results for ${countyName}, ${stateName}. Trying with just the county name.`);
-        searchResults = await searchWikidata(countyName);
-    }
-
-    return searchResults;
+    console.debug(`No results found for ${countyName}`);
+    return null;
 }
 
 export async function getCountyData(countyName, stateName) {
     try {
-        const isLouisiana = stateName.toLowerCase() === 'louisiana';
-        const regionType = isLouisiana ? 'Parish' : 'County';
+        const regionType = getRegionType(stateName);
         console.debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
 
-        const searchResults = await searchWikidataForCounty(countyName, stateName, regionType);
+        let wikidataId;
+        let wikipediaLink;
 
-        if (!searchResults || searchResults.length === 0) {
-            console.debug(`No results found for ${countyName}.`);
-            return null;
+        if (stateName.toLowerCase() === 'alaska') {
+            const alaskaCounty = alaskaData.find(county =>
+                county.name.toLowerCase().includes(countyName.toLowerCase()) ||
+                countyName.toLowerCase().includes(county.name.toLowerCase())
+            );
+            if (alaskaCounty) {
+                wikidataId = alaskaCounty.entity_id;
+                wikipediaLink = alaskaCounty.wikipedia_link;
+                countyName = alaskaCounty.name; // Use the full name from the data
+            } else {
+                throw new Error(`No data found for ${countyName} in Alaska`);
+            }
+        } else {
+            const searchResults = await searchWikidataForCounty(countyName, stateName, regionType);
+            if (!searchResults) {
+                throw new Error(`No results found for ${countyName}`);
+            }
+            wikidataId = searchResults[0].id;
+            wikipediaLink = await getWikipediaLink(wikidataId);
         }
 
-        const wikidataId = searchResults[0].id;
         console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
 
         const propertyIds = ['P1082', 'P625', 'P2046', 'P17', 'P856', 'P36', 'P402'];
         const propertyValues = await getPropertyValueBatch(wikidataId, propertyIds);
 
-        const latitude = propertyValues.P625 ? propertyValues.P625.latitude : null;
-        const longitude = propertyValues.P625 ? propertyValues.P625.longitude : null;
-
-        const [countryLabel, capitalLabel, areaFormatted, wikipediaLink] = await Promise.all([
-            getLabel(propertyValues.P17),
-            getLabel(propertyValues.P36),
-            formatArea(propertyValues.P2046),
-            getWikipediaLink(wikidataId)
-        ]);
-
-        const osmRelationUrl = propertyValues.P402 ? `https://www.openstreetmap.org/relation/${propertyValues.P402}` : 'N/A';
-
         const data = {
+            name: countyName,
             population: propertyValues.P1082 ? cleanAmount(propertyValues.P1082.amount) : 'N/A',
-            coordinates: { latitude, longitude },
-            area: areaFormatted || 'N/A',
-            country: countryLabel || 'N/A',
+            coordinates: propertyValues.P625 ? { latitude: propertyValues.P625.latitude, longitude: propertyValues.P625.longitude } : { latitude: 'N/A', longitude: 'N/A' },
+            area: await formatArea(propertyValues.P2046) || 'N/A',
+            country: propertyValues.P17 ? await getLabel(propertyValues.P17) : 'N/A',
             officialWebsite: propertyValues.P856 || 'N/A',
-            capital: capitalLabel || 'N/A',
+            capital: propertyValues.P36 ? await getLabel(propertyValues.P36) : 'N/A',
             osmRelationId: propertyValues.P402 || 'N/A',
-            osmRelationUrl: osmRelationUrl,
+            osmRelationUrl: propertyValues.P402 ? `https://www.openstreetmap.org/relation/${propertyValues.P402}` : 'N/A',
             wikipediaLink: wikipediaLink || 'N/A'
         };
+
         console.debug(`Formatted data for ${countyName}:`, data);
         return data;
     } catch (error) {
         console.error('Error in getCountyData:', error);
+        errorLog.push({
+            countyName: countyName,
+            stateName: stateName,
+            error: error.message,
+            wikidataUrl: `https://www.wikidata.org/wiki/Special:Search?search=${encodeURIComponent(countyName + ' ' + stateName)}&go=Go`
+        });
         return null;
     }
 }
@@ -110,4 +137,12 @@ export async function fetchAndDisplayCountyData(countyName, stateName) {
     } finally {
         spinner.style.display = 'none';
     }
+}
+
+export function getErrorLog() {
+    return errorLog;
+}
+
+export function clearErrorLog() {
+    errorLog = [];
 }

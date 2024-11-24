@@ -1,4 +1,4 @@
-// countyMapKey.js
+// js/mapKey/countyMapKey.js
 
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
 

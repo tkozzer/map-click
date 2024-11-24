@@ -1,4 +1,4 @@
-// state.js
+// js/state.js
 
 import {
     getPropertyValueBatch,

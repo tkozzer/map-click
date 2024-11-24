@@ -1,4 +1,4 @@
-// wikiData.js
+// js/data/wikiData.js
 
 const cache = new Map();
 
@@ -36,6 +36,11 @@ export async function getPropertyValueBatch(entityId, propertyIds) {
 }
 
 export async function getLabel(entityId) {
+    if (!entityId) {
+        console.warn('Attempted to get label for null entityId');
+        return 'N/A';
+    }
+
     if (typeof entityId === 'object' && entityId.id) {
         entityId = entityId.id;
     }
@@ -48,13 +53,18 @@ export async function getLabel(entityId) {
 
     await rateLimit(1000);  // Ensure we don't exceed the rate limit
 
-    const response = await fetch(url);
-    const data = await response.json();
-    console.debug(`Response for label of entity ${entityId}:`, data);
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.debug(`Response for label of entity ${entityId}:`, data);
 
-    const label = data.entities?.[entityId]?.labels?.en?.value || null;
-    cache.set(`label_${entityId}`, label);
-    return label;
+        const label = data.entities?.[entityId]?.labels?.en?.value || null;
+        cache.set(`label_${entityId}`, label);
+        return label || 'N/A';
+    } catch (error) {
+        console.error(`Error fetching label for entity ${entityId}:`, error);
+        return 'N/A';
+    }
 }
 
 export async function getWikipediaLink(entityId) {

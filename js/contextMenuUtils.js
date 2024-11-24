@@ -1,4 +1,4 @@
-// contextMenuUtils.js
+// js/contextMenuUtils.js
 
 // Store reference to the JSON export context menu
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');

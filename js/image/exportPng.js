@@ -1,3 +1,5 @@
+// js/image/exportPng.js
+
 import { generateBaseImage } from './baseImage.js';
 import { showSuccessAlert, showErrorAlert } from '../customAlerts.js';
 

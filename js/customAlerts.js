@@ -1,4 +1,4 @@
-// customAlerts.js
+// js/customAlerts.js
 
 let alertContainer;
 let currentInfoAlert;

@@ -1,4 +1,4 @@
-// countySelection.js
+// js/countySelection.js
 
 import { g, path } from './mapSetup.js';
 import { currentColor, defaultCountyColor } from './colorPicker.js';
@@ -8,6 +8,15 @@ import { isCountyMode } from './main.js';
 
 export let selectedCounties = [];
 export let countySelection;
+
+function getRegionType(stateName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        return 'Borough/Census Area/Municipality';
+    }
+    return 'County';
+}
 
 let cmdPressed = false;
 
@@ -95,4 +104,58 @@ export function clearSelectedCounties() {
         .transition()
         .duration(750)
         .style("fill", defaultCountyColor);
+}
+
+export function selectAllCounties() {
+    g.selectAll(".county")
+        .each(function (d) {
+            const element = this;
+            const currentFill = d3.select(element).style("fill");
+            const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+            const currentColorHex = d3.rgb(currentColor).toString();
+
+            if (currentFill === defaultColorHex) {
+                d3.select(element).style("fill", currentColorHex);
+                selectedCounties.push({ ...d, color: currentColorHex });
+                updateCountyMapKey(d, currentColorHex);
+            }
+        });
+}
+
+export function selectCountiesInStates(stateNames) {
+    g.selectAll(".county")
+        .each(function (d) {
+            if (stateNames.includes(d.properties.stateName.replace(/ /g, '_'))) {
+                const element = this;
+                const currentFill = d3.select(element).style("fill");
+                const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+                const currentColorHex = d3.rgb(currentColor).toString();
+
+                if (currentFill === defaultColorHex) {
+                    d3.select(element).style("fill", currentColorHex);
+                    selectedCounties.push({ ...d, color: currentColorHex });
+                    updateCountyMapKey(d, currentColorHex);
+                }
+            }
+        });
+}
+
+export function deselectCountiesInStates(stateNames) {
+    g.selectAll(".county")
+        .each(function (d) {
+            if (stateNames.includes(d.properties.stateName.replace(/ /g, '_'))) {
+                const element = this;
+                const currentFill = d3.select(element).style("fill");
+                const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+
+                if (currentFill !== defaultColorHex) {
+                    d3.select(element).style("fill", defaultCountyColor);
+                    const index = selectedCounties.findIndex(county => county.id === d.id);
+                    if (index > -1) {
+                        selectedCounties.splice(index, 1);
+                    }
+                    removeFromCountyMapKey(d, currentFill);
+                }
+            }
+        });
 }

@@ -1,4 +1,4 @@
-// baseImage.js
+// js/image/baseImage.js
 
 import { config, getScaledValue } from './imageConfig.js';
 import { g } from '../mapSetup.js';

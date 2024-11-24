@@ -1,3 +1,5 @@
+// js/zoomAndReset.js
+
 import { svg, g, path } from './mapSetup.js';
 
 export const zoom = d3.zoom()

@@ -1,4 +1,4 @@
-// main.js
+// js/main.js
 
 import { g, path } from './mapSetup.js';
 import { initializeZoom, resetMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
@@ -11,6 +11,7 @@ import { initializeJsonExport, updateContextMenu } from './exportJson.js';
 import { initializeCountyMapKey, clearCountyMapKey, toggleCountyMapKey } from './mapKey/countyMapKey.js';
 import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './mapKey/stateMapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';
+import { initializeDebugToolbar, updateToolbarVisibility } from './debugToolbar.js';
 
 export let isCountyMode = true;
 
@@ -50,6 +51,7 @@ Promise.all([
         .style("stroke-width", "1px");
 
     initializeZoom(nationData);
+    initializeDebugToolbar(); // Add this line
 });
 
 function toggleMode() {
@@ -58,7 +60,8 @@ function toggleMode() {
     g.selectAll(".county").style("display", isCountyMode ? null : "none");
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
     updateMapKeyVisibility();
-    updateContextMenu(); // This line ensures the context menu is updated when mode changes
+    updateContextMenu();
+    updateToolbarVisibility(); // Add this line
     console.log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 

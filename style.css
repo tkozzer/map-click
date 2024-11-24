@@ -89,6 +89,50 @@ body {
     opacity: 1;
 }
 
+/* Debug Toolbar Styles
+-------------------------------------------------- */
+.debug-toolbar {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.debug-toolbar-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.debug-toolbar-button {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    margin-bottom: 5px;
+}
+
+.debug-toolbar-button:hover {
+    background: #f0f0f0;
+}
+
+.debug-toolbar-dropdown {
+    width: 100%;
+    margin-bottom: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+
 /* Zoom Controls
 -------------------------------------------------- */
 .zoom-controls {

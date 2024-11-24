@@ -1,4 +1,4 @@
-// tooltipAndContextMenu.js
+// js/tooltipAndContextMenu.js
 
 import { fetchAndDisplayCountyData } from './county.js';
 import { fetchAndDisplayStateData } from './state.js';
@@ -11,6 +11,21 @@ export const tooltip = d3.select("#map")
 let activeItem = null;
 let map;
 let itemBorder;
+
+function getRegionType(stateName, countyName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        if (countyName.toLowerCase().includes('borough')) {
+            return 'Borough';
+        } else if (countyName.toLowerCase().includes('census area')) {
+            return 'Census Area';
+        } else {
+            return 'Municipality';
+        }
+    }
+    return 'County';
+}
 
 export function initializeTooltipAndContextMenu() {
     d3.select("body").on("click", function () {
@@ -39,7 +54,8 @@ export function initializeTooltipAndContextMenu() {
 export function showTooltip(event, d) {
     let content;
     if (isCountyMode) {
-        content = `${d.properties.name}, ${d.properties.stateName}`;
+        const regionType = getRegionType(d.properties.stateName, d.properties.name);
+        content = `${d.properties.name}${regionType !== 'Municipality' ? ' ' + regionType : ''}, ${d.properties.stateName}`;
     } else {
         content = d.properties.name;
     }
@@ -60,9 +76,8 @@ export function showContextMenu(event, d) {
 
     let regionType, itemName;
     if (isCountyMode) {
-        const stateName = d.properties.stateName.toLowerCase();
-        regionType = stateName === 'louisiana' ? 'Parish' : 'County';
-        itemName = `${d.properties.name} ${regionType}`;
+        regionType = getRegionType(d.properties.stateName, d.properties.name);
+        itemName = `${d.properties.name}${regionType !== 'Municipality' ? ' ' + regionType : ''}`;
     } else {
         regionType = 'State';
         itemName = d.properties.name;
@@ -87,9 +102,8 @@ function handleModalShow() {
     fetchItemBorder(selectedItem, selectedState);
     document.getElementById('geoEntityData').innerHTML = '';  // Clear previous data
     if (isCountyMode) {
-        const isLouisiana = selectedState.toLowerCase() === 'louisiana';
-        const regionType = isLouisiana ? 'Parish' : 'County';
-        fetchAndDisplayCountyData(selectedItem + ` ${regionType}`, selectedState);
+        const regionType = getRegionType(selectedState, selectedItem);
+        fetchAndDisplayCountyData(selectedItem, selectedState);
     } else {
         fetchAndDisplayStateData(selectedItem);
     }
@@ -115,11 +129,10 @@ function fetchItemBorder(item, state) {
 
     let query;
     if (isCountyMode) {
-        const isLouisiana = state.toLowerCase() === 'louisiana';
-        const regionType = isLouisiana ? 'Parish' : 'County';
-        const encodedCounty = encodeURIComponent(item);
+        const regionType = getRegionType(state, item);
+        const encodedItem = encodeURIComponent(item);
         const encodedState = encodeURIComponent(state);
-        query = `https://nominatim.openstreetmap.org/search?q=${encodedCounty}+${regionType},+${encodedState}&format=json&polygon_geojson=1`;
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedItem}${regionType !== 'Municipality' ? '+' + encodeURIComponent(regionType) : ''},+${encodedState}&format=json&polygon_geojson=1`;
     } else {
         const encodedState = encodeURIComponent(state);
         query = `https://nominatim.openstreetmap.org/search?q=${encodedState},+United+States&format=json&polygon_geojson=1`;
@@ -131,14 +144,32 @@ function fetchItemBorder(item, state) {
         .then(response => response.json())
         .then(data => {
             console.debug(`OSM response:`, data);
-            if (data.length > 0 && data[0].geojson) {
-                addItemBorderToMap(data[0].geojson);
+            if (data.length > 0) {
+                // Try to find the best match
+                const bestMatch = data.find(result => result.geojson && result.geojson.type !== 'Point') || data[0];
+
+                if (bestMatch.geojson && bestMatch.geojson.type !== 'Point') {
+                    addItemBorderToMap(bestMatch.geojson);
+                } else if (bestMatch.boundingbox) {
+                    // If we only have a bounding box, create a rectangle
+                    const bbox = bestMatch.boundingbox.map(Number);
+                    const rectangle = [
+                        [bbox[0], bbox[2]],
+                        [bbox[1], bbox[3]]
+                    ];
+                    addItemBorderToMap({ type: 'Polygon', coordinates: [rectangle] });
+                } else {
+                    console.error(`No valid GeoJSON or bounding box data found for ${item}`);
+                    alert(`Unable to display border for ${item}. Only point data available.`);
+                }
             } else {
-                console.error(`No valid GeoJSON data found for ${item}`);
+                console.error(`No data found for ${item}`);
+                alert(`No geographic data found for ${item}.`);
             }
         })
         .catch(error => {
             console.error(`Error fetching border: ${error}`);
+            alert(`Error fetching border data: ${error.message}`);
         })
         .finally(() => {
             $('.spinner-container').hide();

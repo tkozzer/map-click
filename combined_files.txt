@@ -1,0 +1,3855 @@
+// js/data/alaska.js
+
+export const alaskaData = [
+    {
+        "name": "Aleutians East Borough",
+        "entity_id": "Q1110240",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Aleutians_East_Borough,_Alaska"
+    },
+    {
+        "name": "Aleutians West Census Area",
+        "entity_id": "Q1123450",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Aleutians_West_Census_Area,_Alaska"
+    },
+    {
+        "name": "Anchorage",
+        "entity_id": "Q780462",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Anchorage,_Alaska"
+    },
+    {
+        "name": "Bethel Census Area",
+        "entity_id": "Q498413",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Bethel_Census_Area,_Alaska"
+    },
+    {
+        "name": "Bristol Bay Borough",
+        "entity_id": "Q153143",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Bristol_Bay_Borough,_Alaska"
+    },
+    {
+        "name": "Denali Borough",
+        "entity_id": "Q1054972",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Denali_Borough,_Alaska"
+    },
+    {
+        "name": "Dillingham Census Area",
+        "entity_id": "Q2291811",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Dillingham_Census_Area,_Alaska"
+    },
+    {
+        "name": "Fairbanks North Star Borough",
+        "entity_id": "Q789193",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Fairbanks_North_Star_Borough,_Alaska"
+    },
+    {
+        "name": "Haines Borough",
+        "entity_id": "Q1100227",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Haines_Borough,_Alaska"
+    },
+    {
+        "name": "Hoonah-Angoon Census Area",
+        "entity_id": "Q2292125",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Hoonah-Angoon_Census_Area,_Alaska"
+    },
+    {
+        "name": "Juneau",
+        "entity_id": "Q473",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Juneau,_Alaska"
+    },
+    {
+        "name": "Kenai Peninsula Borough",
+        "entity_id": "Q499637",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Kenai_Peninsula_Borough,_Alaska"
+    },
+    {
+        "name": "Ketchikan Gateway Borough",
+        "entity_id": "Q2300640",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Ketchikan_Gateway_Borough,_Alaska"
+    },
+    {
+        "name": "Kodiak Island Borough",
+        "entity_id": "Q178828",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Kodiak_Island_Borough,_Alaska"
+    },
+    {
+        "name": "Kusilvak Census Area",
+        "entity_id": "Q2179168",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Kusilvak_Census_Area,_Alaska"
+    },
+    {
+        "name": "Lake and Peninsula Borough",
+        "entity_id": "Q510727",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Lake_and_Peninsula_Borough,_Alaska"
+    },
+    {
+        "name": "Matanuska-Susitna Borough",
+        "entity_id": "Q1282571",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Matanuska-Susitna_Borough,_Alaska"
+    },
+    {
+        "name": "Nome Census Area",
+        "entity_id": "Q704718",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Nome_Census_Area,_Alaska"
+    },
+    {
+        "name": "North Slope Borough",
+        "entity_id": "Q789146",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/North_Slope_Borough,_Alaska"
+    },
+    {
+        "name": "Northwest Arctic Borough",
+        "entity_id": "Q179015",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Northwest_Arctic_Borough,_Alaska"
+    },
+    {
+        "name": "Petersburg Borough",
+        "entity_id": "Q2292122",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Petersburg_Borough,_Alaska"
+    },
+    {
+        "name": "Prince of Wales-Hyder Census Area",
+        "entity_id": "Q2292127",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Prince_of_Wales-Hyder_Census_Area,_Alaska"
+    },
+    {
+        "name": "Sitka",
+        "entity_id": "Q212698",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Sitka,_Alaska"
+    },
+    {
+        "name": "Skagway",
+        "entity_id": "Q2498783",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Skagway,_Alaska"
+    },
+    {
+        "name": "Southeast Fairbanks Census Area",
+        "entity_id": "Q2292124",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Southeast_Fairbanks_Census_Area,_Alaska"
+    },
+    {
+        "name": "Valdez-Cordova Census Area",
+        "entity_id": "Q2292126",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Valdez-Cordova_Census_Area,_Alaska"
+    },
+    {
+        "name": "Wrangell",
+        "entity_id": "Q43983",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Wrangell,_Alaska"
+    },
+    {
+        "name": "Yakutat",
+        "entity_id": "Q684874",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Yakutat,_Alaska"
+    },
+    {
+        "name": "Yukon-Koyukuk Census Area",
+        "entity_id": "Q177318",
+        "wikipedia_link": "https://en.wikipedia.org/wiki/Yukon-Koyukuk_Census_Area,_Alaska"
+    }
+];
+
+// js/data/wikiData.js
+
+const cache = new Map();
+
+function rateLimit(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function getPropertyValueBatch(entityId, propertyIds) {
+    const cacheKey = `${entityId}_${propertyIds.join('_')}`;
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=claims&format=json&origin=*`;
+    console.debug(`Fetching properties ${propertyIds.join(', ')} for entity ${entityId}: ${url}`);
+
+    await rateLimit(1000);  // Ensure we don't exceed the rate limit
+
+    const response = await fetch(url);
+    const data = await response.json();
+    console.debug(`Response for properties ${propertyIds.join(', ')} of entity ${entityId}:`, data);
+
+    const results = {};
+    if (data.entities?.[entityId]?.claims) {
+        propertyIds.forEach(propertyId => {
+            if (data.entities[entityId].claims[propertyId]) {
+                results[propertyId] = data.entities[entityId].claims[propertyId][0].mainsnak.datavalue.value;
+            } else {
+                results[propertyId] = null;
+            }
+        });
+    }
+    cache.set(cacheKey, results);
+    return results;
+}
+
+export async function getLabel(entityId) {
+    if (!entityId) {
+        console.warn('Attempted to get label for null entityId');
+        return 'N/A';
+    }
+
+    if (typeof entityId === 'object' && entityId.id) {
+        entityId = entityId.id;
+    }
+    if (cache.has(`label_${entityId}`)) {
+        return cache.get(`label_${entityId}`);
+    }
+
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=labels&languages=en&format=json&origin=*`;
+    console.debug(`Fetching label for entity ${entityId}: ${url}`);
+
+    await rateLimit(1000);  // Ensure we don't exceed the rate limit
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.debug(`Response for label of entity ${entityId}:`, data);
+
+        const label = data.entities?.[entityId]?.labels?.en?.value || null;
+        cache.set(`label_${entityId}`, label);
+        return label || 'N/A';
+    } catch (error) {
+        console.error(`Error fetching label for entity ${entityId}:`, error);
+        return 'N/A';
+    }
+}
+
+export async function getWikipediaLink(entityId) {
+    if (cache.has(`wikipediaLink_${entityId}`)) {
+        return cache.get(`wikipediaLink_${entityId}`);
+    }
+
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&props=sitelinks/urls&sitefilter=enwiki&format=json&origin=*`;
+    console.debug(`Fetching Wikipedia link for entity ${entityId}: ${url}`);
+
+    await rateLimit(1000);  // Ensure we don't exceed the rate limit
+
+    const response = await fetch(url);
+    const data = await response.json();
+    console.debug(`Response for Wikipedia link of entity ${entityId}:`, data);
+
+    const link = data.entities?.[entityId]?.sitelinks?.enwiki?.url || null;
+    cache.set(`wikipediaLink_${entityId}`, link);
+    return link;
+}
+
+export function cleanAmount(amount) {
+    return amount ? amount.replace(/^\+/, '') : null;
+}
+
+export async function formatArea(area) {
+    if (area?.amount && area?.unit) {
+        const amount = cleanAmount(area.amount);
+        const unitEntity = area.unit.split('/').pop();
+        const unitLabel = await getLabel(unitEntity);
+        return { value: amount, unit: unitLabel };
+    }
+    return null;
+}
+
+export async function searchWikidata(query) {
+    const cacheKey = `search_${query}`;
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+
+    const searchUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
+    console.debug(`Searching Wikidata with query: ${searchUrl}`);
+
+    await rateLimit(1000);  // Ensure we don't exceed the rate limit
+
+    const searchResponse = await fetch(searchUrl);
+    const searchData = await searchResponse.json();
+    console.debug(`Search results for query "${query}":`, searchData);
+
+    cache.set(cacheKey, searchData.search);
+    return searchData.search;
+}
+
+// js/image/baseImage.js
+
+import { config, getScaledValue } from './imageConfig.js';
+import { g } from '../mapSetup.js';
+import { defaultCountyColor, defaultStateColor } from '../colorPicker.js';
+import { getCountyMapKeyEntries, calculateCountyMapKeyWidth, addCountyMapKeyEntries, getCountyMapKeyVisibility } from '../mapKey/countyMapKey.js';
+import { getStateMapKeyEntries, calculateStateMapKeyWidth, addStateMapKeyEntries, getStateMapKeyVisibility } from '../mapKey/stateMapKey.js';
+import { getIsCountyMode } from '../main.js';
+
+export async function generateBaseImage(scale) {
+    console.debug(`Generating base image with scale ${scale}`);
+
+    const height = getScaledValue(config.baseHeight, scale);
+    const mapWidth = getScaledValue(config.baseMapWidth, scale);
+    const leftBuffer = getScaledValue(config.baseLeftBuffer, scale);
+    let rightBuffer = getScaledValue(config.baseRightBuffer, scale);
+
+    console.debug('Height:', height);
+    console.debug('Map Width:', mapWidth);
+    console.debug('Left Buffer:', leftBuffer);
+    console.debug('Initial Right Buffer:', rightBuffer);
+
+    if (isNaN(height) || isNaN(mapWidth) || isNaN(leftBuffer) || isNaN(rightBuffer)) {
+        console.error('Invalid dimensions:', { height, mapWidth, leftBuffer, rightBuffer });
+        throw new Error('Invalid dimensions');
+    }
+
+    const isCountyMode = getIsCountyMode();
+    const mapKeyEntries = isCountyMode ? getCountyMapKeyEntries() : getStateMapKeyEntries();
+    const hasMapKey = Object.keys(mapKeyEntries).length > 0 && (isCountyMode ? getCountyMapKeyVisibility() : getStateMapKeyVisibility());
+    console.debug('Has Map Key:', hasMapKey);
+    console.debug('Map Key Entries:', mapKeyEntries);
+
+    let mapKeyWidth = 0;
+    if (hasMapKey) {
+        mapKeyWidth = isCountyMode ? calculateCountyMapKeyWidth(scale) : calculateStateMapKeyWidth(scale);
+        console.debug('Calculated Map Key Width:', mapKeyWidth);
+
+        if (isNaN(mapKeyWidth)) {
+            console.error('Invalid map key width:', mapKeyWidth);
+            mapKeyWidth = 0;
+        }
+
+        // Adjust right buffer to accommodate the map key
+        rightBuffer = Math.max(rightBuffer, mapKeyWidth + getScaledValue(30, scale)); // 30 is an additional padding
+        console.debug('Adjusted Right Buffer:', rightBuffer);
+
+        if (isNaN(rightBuffer)) {
+            console.error('Invalid right buffer:', rightBuffer);
+            throw new Error('Invalid right buffer');
+        }
+    }
+
+    const totalWidth = leftBuffer + mapWidth + rightBuffer;
+    console.debug('Total Width:', totalWidth);
+
+    if (isNaN(totalWidth)) {
+        console.error('Invalid total width:', totalWidth);
+        throw new Error('Invalid total width');
+    }
+
+    const offscreenSvg = d3.create("svg")
+        .attr("width", totalWidth)
+        .attr("height", height)
+        .attr("xmlns", "http://www.w3.org/2000/svg");
+
+    offscreenSvg.append("rect")
+        .attr("width", totalWidth)
+        .attr("height", height)
+        .attr("fill", "white");
+
+    const offscreenG = offscreenSvg.append("g")
+        .attr("transform", `translate(${leftBuffer}, 0)`);
+
+    try {
+        const [us, states] = await Promise.all([
+            d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json"),
+            d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
+        ]);
+
+        const countyFeatures = topojson.feature(us, us.objects.counties).features;
+        const stateFeatures = topojson.feature(states, states.objects.states).features;
+
+        const offscreenProjection = d3.geoAlbersUsa()
+            .scale(getScaledValue(1500, scale))
+            .translate([mapWidth / 2, height / 2]);
+
+        const offscreenPath = d3.geoPath().projection(offscreenProjection);
+
+        if (isCountyMode) {
+            offscreenG.selectAll("path")
+                .data(countyFeatures)
+                .join("path")
+                .attr("class", "county")
+                .attr("d", offscreenPath)
+                .style("fill", d => {
+                    const county = g.selectAll("path.county")
+                        .filter(function (data) { return data.id === d.id; });
+                    return !county.empty() ? county.style("fill") : defaultCountyColor;
+                })
+                .style("stroke", "#7d7d7d")
+                .style("stroke-width", `${getScaledValue(config.baseStrokeWidth, scale)}px`);
+        } else {
+            offscreenG.selectAll("path")
+                .data(stateFeatures)
+                .join("path")
+                .attr("class", "state")
+                .attr("d", offscreenPath)
+                .style("fill", d => {
+                    const state = g.selectAll(".states path")
+                        .filter(function (data) { return data.id === d.id; });
+                    return !state.empty() ? state.style("fill") : defaultStateColor;
+                })
+                .style("stroke", "#000000")
+                .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
+        }
+
+        // Always draw state borders
+        offscreenG.append("g")
+            .selectAll("path")
+            .data(stateFeatures)
+            .join("path")
+            .attr("class", "state-border")
+            .attr("d", offscreenPath)
+            .style("fill", "none")
+            .style("stroke", "#000000")
+            .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * (isCountyMode ? 1 : 2), scale)}px`);
+
+        if (hasMapKey) {
+            const mapKeyStartX = leftBuffer + mapWidth;
+            console.debug('Map Key Start X:', mapKeyStartX);
+            console.debug('Adding map key with parameters:', {
+                startX: mapKeyStartX,
+                height,
+                mapKeyWidth,
+                scale
+            });
+            if (isCountyMode) {
+                addCountyMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
+            } else {
+                addStateMapKeyEntries(offscreenSvg, mapKeyStartX, height, mapKeyWidth, scale);
+            }
+        }
+
+        console.debug('Base image generation completed successfully');
+        return { svg: offscreenSvg, width: totalWidth, height };
+    } catch (error) {
+        console.error('Error generating base image:', error);
+        throw error;
+    }
+}
+
+// js/image/exportJpg.js
+
+import { generateBaseImage } from './baseImage.js';
+import { showSuccessAlert, showErrorAlert } from '../customAlerts.js';
+
+export async function exportJpg() {
+    console.debug("Exporting as JPG");
+
+    const scale = 2; // Adjust the scale as needed for the export
+    try {
+        const { svg, width, height } = await generateBaseImage(scale);
+
+        const svgNode = svg.node();
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgNode);
+
+        console.debug("Serialized SVG", svgString);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d");
+
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        const image = new Image();
+        image.onload = function () {
+            context.drawImage(image, 0, 0);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+            const filename = `us-county-map-${timestamp}.jpg`;
+
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL("image/jpeg", 0.9); // Use JPEG format with 90% quality
+
+            console.debug("Image ready for download");
+
+            link.click();
+            svg.remove();
+
+            // Add success alert
+            showSuccessAlert(`Successfully exported as JPG: ${filename}`);
+        };
+        image.onerror = function (error) {
+            console.error("Image loading error", error);
+            showErrorAlert("Error exporting as JPG. See console for details.");
+        };
+        image.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgString)));
+        console.debug("Image source set", image.src);
+    } catch (error) {
+        console.error("Error generating base image", error);
+        showErrorAlert("Error exporting as JPG. See console for details.");
+    }
+}
+
+// js/image/exportPng.js
+
+import { generateBaseImage } from './baseImage.js';
+import { showSuccessAlert, showErrorAlert } from '../customAlerts.js';
+
+export async function exportPng() {
+    console.debug("Exporting as PNG");
+
+    const scale = 2; // Adjust the scale as needed for the export
+    const { svg, width, height } = await generateBaseImage(scale);
+
+    const svgNode = svg.node();
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(svgNode);
+
+    console.debug("Serialized SVG", svgString);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext("2d");
+
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    const image = new Image();
+    image.onload = function () {
+        context.drawImage(image, 0, 0);
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+        const filename = `us-county-map-${timestamp}.png`;
+
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL("image/png");
+
+        console.debug("Image ready for download");
+
+        link.click();
+        svg.remove();
+
+        // Add success alert
+        showSuccessAlert(`Successfully exported as PNG: ${filename}`);
+    };
+    image.onerror = function (error) {
+        console.error("Image loading error", error);
+        showErrorAlert("Error exporting as PNG. See console for details.");
+    };
+    image.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgString)));
+    console.debug("Image source set", image.src);
+}
+
+// js/image/imageConfig.js
+
+export const config = {
+    baseWidth: 1400,  // Increased from 1200
+    baseHeight: 900,  // Increased from 800
+    baseMapWidth: 1200, // Increased from 1000
+    baseLeftBuffer: 100, // Left buffer space
+    baseRightBuffer: 0, // Right buffer space
+    baseFontSize: 20, // Base font size for text elements
+    baseStrokeWidth: 0.5, // Base stroke width for paths
+
+    previewScale: 1, // Scale factor for preview (adjust as needed)
+
+    keyMapMaxWidth: 200, // Maximum width for the key map
+};
+
+// Helper function to get scaled value
+export function getScaledValue(baseValue, scale) {
+    return baseValue * scale;
+}
+
+// js/image/imagePreview.js
+
+import { generateBaseImage } from './baseImage.js';
+import { config } from './imageConfig.js';
+
+export async function generatePreview(format) {
+    console.debug(`Generating preview for ${format}`);
+
+    try {
+        const { svg, width, height } = await generateBaseImage(config.previewScale);
+
+        const svgNode = svg.node();
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgNode);
+
+        const image = new Image();
+        image.onload = function () {
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+
+            context.fillStyle = "white";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0);
+
+            const dataUrl = canvas.toDataURL(`image/${format}`);
+            document.getElementById('imagePreviewContainer').innerHTML = `<img src="${dataUrl}" alt="Map Preview">`;
+
+            svg.remove();
+        };
+        image.onerror = function (error) {
+            console.error("Image loading error", error);
+            document.getElementById('imagePreviewContainer').innerHTML = 'Error generating preview';
+        };
+        image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+    } catch (error) {
+        console.error("Error generating preview", error);
+        document.getElementById('imagePreviewContainer').innerHTML = 'Error generating preview';
+    }
+}
+
+// js/mapKey/countyMapKey.js
+
+import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+
+let countyMapKeyEntries = {};
+let isCountyMapKeyVisible = false;
+
+export function initializeCountyMapKey() {
+    const countyMapKeyButton = document.getElementById('county-map-key-button');
+    if (countyMapKeyButton) {
+        countyMapKeyButton.addEventListener('click', toggleCountyMapKey);
+    }
+}
+
+export function getCountyMapKeyEntries() {
+    return countyMapKeyEntries;
+}
+
+export function getCountyMapKeyVisibility() {
+    return isCountyMapKeyVisible;
+}
+
+export function toggleCountyMapKey() {
+    console.log("toggleCountyMapKey called");
+    isCountyMapKeyVisible = !isCountyMapKeyVisible;
+    console.log("County map key visibility:", isCountyMapKeyVisible);
+    updateCountyMapKeyVisibility();
+}
+
+function updateCountyMapKeyVisibility() {
+    console.log("updateCountyMapKeyVisibility called");
+    const mapKey = document.getElementById('county-map-key');
+    if (mapKey) {
+        console.log("County map key element found");
+        if (isCountyMapKeyVisible) {
+            console.log("Showing county map key");
+            generateCountyMapKey();
+            mapKey.classList.remove('hidden');
+        } else {
+            console.log("Hiding county map key");
+            mapKey.classList.add('hidden');
+        }
+    } else {
+        console.log("County map key element not found");
+    }
+}
+
+export function updateCountyMapKey(county, color) {
+    const maxEntries = 20; // You can adjust this value as needed
+
+    if (Object.keys(countyMapKeyEntries).length >= maxEntries && !countyMapKeyEntries[color]) {
+        console.warn(`Maximum number of county map key entries (${maxEntries}) reached. Cannot add new color.`);
+        if (isCountyMapKeyVisible) {
+            updateInfoAlert(`Maximum of ${maxEntries} properties allowed in the county map key. New colors cannot be added.`, 5000);
+        }
+        return;
+    }
+
+    if (!countyMapKeyEntries[color]) {
+        countyMapKeyEntries[color] = { counties: new Set(), label: `Label for ${color}` };
+    }
+    countyMapKeyEntries[color].counties.add(county);
+
+    if (isCountyMapKeyVisible) {
+        generateCountyMapKey();
+    }
+}
+
+export function removeFromCountyMapKey(county, color) {
+    if (countyMapKeyEntries[color]) {
+        countyMapKeyEntries[color].counties.delete(county);
+        if (countyMapKeyEntries[color].counties.size === 0) {
+            delete countyMapKeyEntries[color];
+        }
+        if (isCountyMapKeyVisible) {
+            generateCountyMapKey();
+        }
+    }
+}
+
+export function clearCountyMapKey() {
+    countyMapKeyEntries = {};
+    const mapKeyContainer = document.getElementById('county-map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+    }
+    const mapKey = document.getElementById('county-map-key');
+    if (mapKey && !mapKey.classList.contains('hidden')) {
+        mapKey.classList.add('hidden');
+        isCountyMapKeyVisible = false;
+    }
+}
+
+function generateCountyMapKey() {
+    const mapKeyContainer = document.getElementById('county-map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+
+        if (Object.keys(countyMapKeyEntries).length === 0) {
+            console.debug('No counties selected');
+            return;
+        }
+
+        Object.entries(countyMapKeyEntries).forEach(([color, entry], index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'map-key-entry';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'key-color';
+            colorBox.style.backgroundColor = color;
+
+            const nameInput = document.createElement('input');
+            nameInput.className = 'key-name';
+            nameInput.value = entry.label || `Label ${index + 1}`;
+            nameInput.maxLength = 50;
+
+            const countiesCount = document.createElement('span');
+            countiesCount.className = 'counties-count';
+            countiesCount.textContent = `(${entry.counties.size} counties)`;
+
+            nameInput.addEventListener('input', function () {
+                this.value = this.value.slice(0, 50);
+            });
+
+            nameInput.addEventListener('change', function () {
+                const newLabel = this.value.trim();
+                entry.label = newLabel;
+                entry.counties.forEach(county => {
+                    county.properties.label = newLabel;
+                    d3.select(`.county[data-id="${county.id}"]`)
+                        .attr('title', `${county.properties.name}, ${county.properties.stateName} - ${newLabel}`);
+                });
+            });
+
+            entryDiv.appendChild(colorBox);
+            entryDiv.appendChild(nameInput);
+            entryDiv.appendChild(countiesCount);
+            mapKeyContainer.appendChild(entryDiv);
+        });
+    }
+}
+
+export function calculateCountyMapKeyWidth(scale) {
+    if (Object.keys(countyMapKeyEntries).length > 0 && isCountyMapKeyVisible) {
+        const fontSize = 16 * scale;
+        const colorBoxSize = 20 * scale;
+        const labelPadding = 10 * scale;
+        const rightPadding = 40 * scale;
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = `${fontSize}px Arial, sans-serif`;
+
+        let maxLabelWidth = 0;
+        for (const entry of Object.values(countyMapKeyEntries)) {
+            const label = entry.label || `Label for ${entry.color}`;
+            const truncatedLabel = label.slice(0, 50);
+            const labelWidth = context.measureText(truncatedLabel).width;
+            if (labelWidth > maxLabelWidth) {
+                maxLabelWidth = labelWidth;
+            }
+        }
+
+        return colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
+    }
+    return 0;
+}
+
+export function addCountyMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
+    if (Object.keys(countyMapKeyEntries).length > 0 && isCountyMapKeyVisible) {
+        const fontSize = 16 * scale;
+        const entryHeight = 23 * scale;
+        const colorBoxSize = 20 * scale;
+        const labelPadding = 10 * scale;
+        const keymapHeight = Object.keys(countyMapKeyEntries).length * entryHeight;
+        const startY = (svgHeight - keymapHeight) / 2;
+
+        const keyMapGroup = svg.append("g")
+            .attr("class", "county-map-key-group")
+            .attr("transform", `translate(${startX}, ${startY})`);
+
+        Object.entries(countyMapKeyEntries).forEach(([color, entry], index) => {
+            const entryGroup = keyMapGroup.append("g")
+                .attr("transform", `translate(0, ${index * entryHeight})`);
+
+            entryGroup.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", colorBoxSize)
+                .attr("height", colorBoxSize)
+                .attr("fill", color);
+
+            const label = entry.label || `Label for ${color}`;
+
+            const foreignObject = entryGroup.append("foreignObject")
+                .attr("x", colorBoxSize + labelPadding)
+                .attr("y", 0)
+                .attr("width", keyMapWidth - colorBoxSize - labelPadding)
+                .attr("height", entryHeight);
+
+            foreignObject.append("xhtml:div")
+                .style("font-size", `${fontSize}px`)
+                .style("font-family", 'Arial, sans-serif')
+                .style("line-height", `${entryHeight}px`)
+                .style("white-space", "nowrap")
+                .style("overflow", "hidden")
+                .style("text-overflow", "ellipsis")
+                .text(label);
+        });
+    }
+}
+
+export function getCountyMapKeyEntriesCount() {
+    return Object.keys(countyMapKeyEntries).length;
+}
+
+console.log("countyMapKey.js loaded");
+
+// js/mapKey/mapKey.js
+
+import { mapKeyConfig, getScaledMapKeyValue } from './mapKeyConfig.js';
+import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+
+let mapKeyEntries = {};
+let isMapKeyVisible = false;
+
+export function initializeMapKey() {
+    const mapKeyButton = document.getElementById('map-key-button');
+    if (mapKeyButton) {
+        mapKeyButton.addEventListener('click', toggleMapKey);
+    }
+}
+
+export function getMapKeyEntries() {
+    return mapKeyEntries;
+}
+
+export function getMapKeyVisibility() {
+    return isMapKeyVisible;
+}
+
+export function toggleMapKey() {
+    isMapKeyVisible = !isMapKeyVisible;
+    const mapKey = document.getElementById('map-key');
+    if (mapKey) {
+        if (isMapKeyVisible) {
+            generateMapKey();
+            mapKey.classList.remove('hidden');
+        } else {
+            mapKey.classList.add('hidden');
+        }
+    }
+}
+
+export function updateMapKey(county, color) {
+    if (Object.keys(mapKeyEntries).length >= mapKeyConfig.maxEntries && !mapKeyEntries[color]) {
+        console.warn(`Maximum number of map key entries (${mapKeyConfig.maxEntries}) reached. Cannot add new color.`);
+        if (isMapKeyVisible) {
+            updateInfoAlert(`Maximum of ${mapKeyConfig.maxEntries} properties allowed in the map key. New colors cannot be added.`, 5000);
+        }
+        return;
+    }
+
+    if (!mapKeyEntries[color]) {
+        mapKeyEntries[color] = { counties: new Set(), label: `Label for ${color}` };
+    }
+    mapKeyEntries[color].counties.add(county);
+
+    // Add this debug log
+    console.debug('Updated mapKeyEntries:', JSON.stringify(mapKeyEntries, (key, value) => {
+        if (value instanceof Set) return Array.from(value);
+        return value;
+    }, 2));
+
+    if (isMapKeyVisible) {
+        generateMapKey();
+    }
+}
+
+export function removeFromMapKey(county, color) {
+    if (mapKeyEntries[color]) {
+        mapKeyEntries[color].counties.delete(county);
+        if (mapKeyEntries[color].counties.size === 0) {
+            delete mapKeyEntries[color];
+        }
+        if (isMapKeyVisible) {
+            generateMapKey();
+        }
+    }
+}
+
+export function clearMapKey() {
+    mapKeyEntries = {};
+    const mapKeyContainer = document.getElementById('map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+    }
+    const mapKey = document.getElementById('map-key');
+    if (mapKey && !mapKey.classList.contains('hidden')) {
+        mapKey.classList.add('hidden');
+        isMapKeyVisible = false;
+    }
+}
+
+export function calculateMapKeyWidth(scale) {
+    console.debug('Calculating map key width. Scale:', scale);
+
+    const numEntries = Object.keys(mapKeyEntries).length;
+    console.debug('Number of entries:', numEntries);
+
+    if (numEntries > 0 && isMapKeyVisible) {
+        const fontSize = getScaledMapKeyValue(mapKeyConfig.baseFontSize, scale);
+        const colorBoxSize = getScaledMapKeyValue(mapKeyConfig.baseColorBoxSize, scale);
+        const labelPadding = getScaledMapKeyValue(mapKeyConfig.baseLabelPadding, scale);
+        const rightPadding = getScaledMapKeyValue(mapKeyConfig.baseRightPadding, scale);
+
+        if (isNaN(fontSize) || isNaN(colorBoxSize) || isNaN(labelPadding) || isNaN(rightPadding)) {
+            console.error('Invalid scaled value detected', {
+                fontSize,
+                colorBoxSize,
+                labelPadding,
+                rightPadding
+            });
+            return 0;
+        }
+
+        console.debug('Font size:', fontSize);
+        console.debug('Color box size:', colorBoxSize);
+        console.debug('Label padding:', labelPadding);
+        console.debug('Right padding:', rightPadding);
+
+        // Create an offscreen canvas to measure text width
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = `${fontSize}px ${mapKeyConfig.fontFamily}`;
+
+        // Measure the width of the longest label (up to 50 characters)
+        const maxLabelLength = 50;
+        let maxLabelWidth = 0;
+        for (const entry of Object.values(mapKeyEntries)) {
+            const label = entry.label || `Label for ${entry.color}`;
+            const truncatedLabel = label.slice(0, maxLabelLength);
+            const labelWidth = context.measureText(truncatedLabel).width;
+            if (labelWidth > maxLabelWidth) {
+                maxLabelWidth = labelWidth;
+            }
+        }
+
+        const totalWidth = colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
+        console.debug('Total calculated width:', totalWidth);
+        return isNaN(totalWidth) ? 0 : totalWidth;  // Ensure it returns a number
+    }
+    console.debug('Returning 0 width');
+    return 0;
+}
+
+export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
+    console.debug('Adding map key entries. startX:', startX, 'svgHeight:', svgHeight, 'keyMapWidth:', keyMapWidth, 'scale:', scale);
+
+    try {
+        const numEntries = Object.keys(mapKeyEntries).length;
+        console.debug('Number of map key entries:', numEntries);
+
+        if (numEntries > 0 && isMapKeyVisible) {
+            // Provide default values if scale is undefined
+            const safeScale = scale || 1;
+            const safeKeyMapWidth = keyMapWidth || 200; // Provide a default width if it's 0
+
+            const fontSize = getScaledMapKeyValue(mapKeyConfig.baseFontSize, safeScale);
+            const entryHeight = getScaledMapKeyValue(mapKeyConfig.baseEntryHeight, safeScale);
+            const colorBoxSize = getScaledMapKeyValue(mapKeyConfig.baseColorBoxSize, safeScale);
+            const labelPadding = getScaledMapKeyValue(mapKeyConfig.baseLabelPadding, safeScale);
+            const keymapHeight = numEntries * entryHeight;
+            const startY = (svgHeight - keymapHeight) / 2;
+
+            console.debug('Calculated dimensions:', {
+                fontSize,
+                entryHeight,
+                colorBoxSize,
+                labelPadding,
+                keymapHeight,
+                startY,
+                safeScale,
+                safeKeyMapWidth
+            });
+
+            if (isNaN(fontSize) || isNaN(entryHeight) || isNaN(colorBoxSize) || isNaN(labelPadding) || isNaN(startY)) {
+                throw new Error('Invalid calculated values');
+            }
+
+            const keyMapGroup = svg.append("g")
+                .attr("class", "map-key-group")
+                .attr("transform", `translate(${startX}, ${startY})`);
+
+            Object.entries(mapKeyEntries).forEach(([color, entry], index) => {
+                const entryGroup = keyMapGroup.append("g")
+                    .attr("transform", `translate(0, ${index * entryHeight})`);
+
+                entryGroup.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", colorBoxSize)
+                    .attr("height", colorBoxSize)
+                    .attr("fill", color);
+
+                const label = entry.label || `Label for ${color}`;
+                console.debug('Adding label:', label);
+
+                const foreignObject = entryGroup.append("foreignObject")
+                    .attr("x", colorBoxSize + labelPadding)
+                    .attr("y", 0)
+                    .attr("width", safeKeyMapWidth - colorBoxSize - labelPadding)
+                    .attr("height", entryHeight);
+
+                foreignObject.append("xhtml:div")
+                    .style("font-size", `${fontSize}px`)
+                    .style("font-family", mapKeyConfig.fontFamily)
+                    .style("line-height", `${entryHeight}px`)
+                    .style("white-space", "nowrap")
+                    .style("overflow", "hidden")
+                    .style("text-overflow", "ellipsis")
+                    .text(label);
+
+                console.debug(`Label "${label}" added`);
+            });
+
+            console.debug('Map key added successfully');
+        } else {
+            console.debug('Map key not added: either no entries or not visible');
+        }
+    } catch (error) {
+        console.error('Error in addMapKeyEntries:', error);
+    }
+}
+
+function generateMapKey() {
+    const mapKeyContainer = document.getElementById('map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+
+        if (Object.keys(mapKeyEntries).length === 0) {
+            console.debug('No counties selected');
+            return;
+        }
+
+        Object.entries(mapKeyEntries).forEach(([color, entry], index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'map-key-entry';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'key-color';
+            colorBox.style.backgroundColor = color;
+
+            const nameInput = document.createElement('input');
+            nameInput.className = 'key-name';
+            nameInput.value = entry.label || `Label ${index + 1}`;
+            nameInput.maxLength = 50;
+
+            const countiesCount = document.createElement('span');
+            countiesCount.className = 'counties-count';
+            countiesCount.textContent = `(${entry.counties.size} counties)`;
+
+            nameInput.addEventListener('input', function () {
+                this.value = this.value.slice(0, 50);
+            });
+
+            nameInput.addEventListener('change', function () {
+                const newLabel = this.value.trim();
+                entry.label = newLabel;
+                entry.counties.forEach(county => {
+                    county.properties.label = newLabel;
+                    d3.select(`.county[data-id="${county.id}"]`)
+                        .attr('title', `${county.properties.name}, ${county.properties.stateName} - ${newLabel}`);
+                });
+            });
+
+            entryDiv.appendChild(colorBox);
+            entryDiv.appendChild(nameInput);
+            entryDiv.appendChild(countiesCount);
+            mapKeyContainer.appendChild(entryDiv);
+        });
+    }
+}
+
+export function getMapKeyEntriesCount() {
+    return Object.keys(mapKeyEntries).length;
+}
+
+// js/mapKey/mapKeyConfig.js
+
+export const mapKeyConfig = {
+    maxEntries: 20,
+    fontFamily: 'Arial, sans-serif',
+    baseFontSize: 16,
+    baseColorBoxSize: 20,
+    baseLabelPadding: 10,
+    baseEntryHeight: 23,
+    baseRightPadding: 40,
+    maxWidth: 200,
+};
+
+export function getScaledMapKeyValue(baseValue, scale) {
+    return baseValue * scale;
+}
+
+// js/mapKey/stateMapKey.js
+
+import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+
+let stateMapKeyEntries = {};
+let isStateMapKeyVisible = false;
+
+export function initializeStateMapKey() {
+    const stateMapKeyButton = document.getElementById('state-map-key-button');
+    if (stateMapKeyButton) {
+        stateMapKeyButton.addEventListener('click', toggleStateMapKey);
+    }
+}
+
+export function getStateMapKeyEntries() {
+    return stateMapKeyEntries;
+}
+
+export function getStateMapKeyVisibility() {
+    return isStateMapKeyVisible;
+}
+
+export function toggleStateMapKey() {
+    console.log("toggleStateMapKey called");
+    isStateMapKeyVisible = !isStateMapKeyVisible;
+    console.log("State map key visibility:", isStateMapKeyVisible);
+    updateStateMapKeyVisibility();
+}
+
+function updateStateMapKeyVisibility() {
+    console.log("updateStateMapKeyVisibility called");
+    const mapKey = document.getElementById('state-map-key');
+    if (mapKey) {
+        console.log("State map key element found");
+        if (isStateMapKeyVisible) {
+            console.log("Showing state map key");
+            generateStateMapKey();
+            mapKey.classList.remove('hidden');
+        } else {
+            console.log("Hiding state map key");
+            mapKey.classList.add('hidden');
+        }
+    } else {
+        console.log("State map key element not found");
+    }
+}
+
+export function updateStateMapKey(state, color) {
+    const maxEntries = 20; // You can adjust this value as needed
+
+    if (Object.keys(stateMapKeyEntries).length >= maxEntries && !stateMapKeyEntries[color]) {
+        console.warn(`Maximum number of state map key entries (${maxEntries}) reached. Cannot add new color.`);
+        if (isStateMapKeyVisible) {
+            updateInfoAlert(`Maximum of ${maxEntries} properties allowed in the state map key. New colors cannot be added.`, 5000);
+        }
+        return;
+    }
+
+    if (!stateMapKeyEntries[color]) {
+        stateMapKeyEntries[color] = { states: new Set(), label: `Label for ${color}` };
+    }
+    stateMapKeyEntries[color].states.add(state);
+
+    if (isStateMapKeyVisible) {
+        generateStateMapKey();
+    }
+}
+
+export function removeFromStateMapKey(state, color) {
+    if (stateMapKeyEntries[color]) {
+        stateMapKeyEntries[color].states.delete(state);
+        if (stateMapKeyEntries[color].states.size === 0) {
+            delete stateMapKeyEntries[color];
+        }
+        if (isStateMapKeyVisible) {
+            generateStateMapKey();
+        }
+    }
+}
+
+export function clearStateMapKey() {
+    stateMapKeyEntries = {};
+    const mapKeyContainer = document.getElementById('state-map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+    }
+    const mapKey = document.getElementById('state-map-key');
+    if (mapKey && !mapKey.classList.contains('hidden')) {
+        mapKey.classList.add('hidden');
+        isStateMapKeyVisible = false;
+    }
+}
+
+function generateStateMapKey() {
+    const mapKeyContainer = document.getElementById('state-map-key-entries');
+    if (mapKeyContainer) {
+        mapKeyContainer.innerHTML = '';
+
+        if (Object.keys(stateMapKeyEntries).length === 0) {
+            console.debug('No states selected');
+            return;
+        }
+
+        Object.entries(stateMapKeyEntries).forEach(([color, entry], index) => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'map-key-entry';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'key-color';
+            colorBox.style.backgroundColor = color;
+
+            const nameInput = document.createElement('input');
+            nameInput.className = 'key-name';
+            nameInput.value = entry.label || `Label ${index + 1}`;
+            nameInput.maxLength = 50;
+
+            const statesCount = document.createElement('span');
+            statesCount.className = 'states-count';
+            statesCount.textContent = `(${entry.states.size} states)`;
+
+            nameInput.addEventListener('input', function () {
+                this.value = this.value.slice(0, 50);
+            });
+
+            nameInput.addEventListener('change', function () {
+                const newLabel = this.value.trim();
+                entry.label = newLabel;
+                entry.states.forEach(state => {
+                    state.properties.label = newLabel;
+                    d3.select(`.state[data-id="${state.id}"]`)
+                        .attr('title', `${state.properties.name} - ${newLabel}`);
+                });
+            });
+
+            entryDiv.appendChild(colorBox);
+            entryDiv.appendChild(nameInput);
+            entryDiv.appendChild(statesCount);
+            mapKeyContainer.appendChild(entryDiv);
+        });
+    }
+}
+
+export function calculateStateMapKeyWidth(scale) {
+    if (Object.keys(stateMapKeyEntries).length > 0 && isStateMapKeyVisible) {
+        const fontSize = 16 * scale;
+        const colorBoxSize = 20 * scale;
+        const labelPadding = 10 * scale;
+        const rightPadding = 40 * scale;
+
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        context.font = `${fontSize}px Arial, sans-serif`;
+
+        let maxLabelWidth = 0;
+        for (const entry of Object.values(stateMapKeyEntries)) {
+            const label = entry.label || `Label for ${entry.color}`;
+            const truncatedLabel = label.slice(0, 50);
+            const labelWidth = context.measureText(truncatedLabel).width;
+            if (labelWidth > maxLabelWidth) {
+                maxLabelWidth = labelWidth;
+            }
+        }
+
+        return colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
+    }
+    return 0;
+}
+
+export function addStateMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
+    if (Object.keys(stateMapKeyEntries).length > 0 && isStateMapKeyVisible) {
+        const fontSize = 16 * scale;
+        const entryHeight = 23 * scale;
+        const colorBoxSize = 20 * scale;
+        const labelPadding = 10 * scale;
+        const keymapHeight = Object.keys(stateMapKeyEntries).length * entryHeight;
+        const startY = (svgHeight - keymapHeight) / 2;
+
+        const keyMapGroup = svg.append("g")
+            .attr("class", "state-map-key-group")
+            .attr("transform", `translate(${startX}, ${startY})`);
+
+        Object.entries(stateMapKeyEntries).forEach(([color, entry], index) => {
+            const entryGroup = keyMapGroup.append("g")
+                .attr("transform", `translate(0, ${index * entryHeight})`);
+
+            entryGroup.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", colorBoxSize)
+                .attr("height", colorBoxSize)
+                .attr("fill", color);
+
+            const label = entry.label || `Label for ${color}`;
+
+            const foreignObject = entryGroup.append("foreignObject")
+                .attr("x", colorBoxSize + labelPadding)
+                .attr("y", 0)
+                .attr("width", keyMapWidth - colorBoxSize - labelPadding)
+                .attr("height", entryHeight);
+
+            foreignObject.append("xhtml:div")
+                .style("font-size", `${fontSize}px`)
+                .style("font-family", 'Arial, sans-serif')
+                .style("line-height", `${entryHeight}px`)
+                .style("white-space", "nowrap")
+                .style("overflow", "hidden")
+                .style("text-overflow", "ellipsis")
+                .text(label);
+        });
+    }
+}
+
+export function getStateMapKeyEntriesCount() {
+    return Object.keys(stateMapKeyEntries).length;
+}
+
+console.log("stateMapKey.js loaded");
+
+// js/cameraButton.js
+import { exportPng } from './image/exportPng.js';
+import { exportJpg } from './image/exportJpg.js';
+import { generatePreview } from './image/imagePreview.js';
+
+let selectedFormat = 'png'; // Default format
+
+export function initializeCameraButton() {
+    const cameraButton = document.getElementById('camera-button');
+
+    cameraButton.addEventListener("click", function () {
+        showImagePreviewModal();
+    });
+
+    // Initialize preview modal events
+    initializePreviewModalEvents();
+}
+
+function showImagePreviewModal() {
+    generatePreview(selectedFormat);
+    $('#imagePreviewModal').modal('show');
+}
+
+function initializePreviewModalEvents() {
+    // Handle format change
+    $('input[name="exportFormat"]').on('change', function () {
+        selectedFormat = $(this).val();
+        generatePreview(selectedFormat);
+    });
+
+    // Handle download button click
+    $('#downloadButton').on('click', function () {
+        if (selectedFormat === 'png') {
+            exportPng();
+        } else if (selectedFormat === 'jpg') {
+            exportJpg();
+        }
+        $('#imagePreviewModal').modal('hide');
+    });
+
+    // Handle modal close button click
+    $('.modal-header .close, .modal-footer .btn-secondary').on('click', function () {
+        $('#imagePreviewModal').modal('hide');
+    });
+
+    // Handle modal backdrop click
+    $('#imagePreviewModal').on('click', function (event) {
+        if (event.target === this) {
+            $(this).modal('hide');
+        }
+    });
+}
+
+// js/colorPicker.js
+
+export let currentColor = '#ff0000';
+export let defaultCountyColor = '#f0f0f0';
+export let defaultStateColor = '#f0f0f0'; // Add this line
+
+export function initializeColorPicker() {
+    d3.selectAll(".color-btn").on("click", function () {
+        currentColor = this.style.backgroundColor;
+        d3.select("#color-picker").property("value", d3.rgb(currentColor).formatHex());
+    });
+
+    d3.select("#color-picker").on("input", function () {
+        currentColor = this.value;
+    });
+
+    // Add event listener for the random color button
+    d3.select("#random-color-btn").on("click", function () {
+        const randomColor = generateRandomColor();
+        currentColor = randomColor;
+        d3.select("#color-picker").property("value", randomColor);
+    });
+}
+
+function generateRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+// js/contextMenuUtils.js
+
+// Store reference to the JSON export context menu
+const jsonExportContextMenu = document.getElementById('json-export-context-menu');
+
+// Function to close all context menus
+export function closeAllContextMenus() {
+    if (jsonExportContextMenu) jsonExportContextMenu.style.display = 'none';
+}
+
+// Function to show the JSON export context menu
+export function showJsonExportContextMenu(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeAllContextMenus();
+
+    const buttonRect = event.target.getBoundingClientRect();
+    const menuWidth = 200; // Adjust as needed
+
+    jsonExportContextMenu.style.display = 'block';
+    jsonExportContextMenu.style.left = (buttonRect.right - menuWidth) + 'px';
+    jsonExportContextMenu.style.top = buttonRect.bottom + 'px';
+}
+
+// Function to initialize context menus
+export function initializeContextMenus() {
+    // Event listener for clicks on the document
+    document.addEventListener('click', function (event) {
+        // Close all menus if the click is outside any menu
+        if (!event.target.closest('#json-export-context-menu') &&
+            !event.target.closest('#export-json')) {
+            closeAllContextMenus();
+        }
+    });
+
+    // Event listener for right-clicks (context menu) on the document
+    document.addEventListener('contextmenu', function (event) {
+        // Close all menus if the right-click is outside any menu or button
+        if (!event.target.closest('#json-export-context-menu') &&
+            !event.target.closest('#export-json')) {
+            closeAllContextMenus();
+        }
+    });
+
+    // Update the event listener for the JSON export button
+    document.getElementById('export-json').addEventListener('contextmenu', showJsonExportContextMenu);
+}
+
+// js/county.js
+
+import {
+    getPropertyValueBatch,
+    getLabel,
+    getWikipediaLink,
+    cleanAmount,
+    formatArea,
+    searchWikidata
+} from './data/wikiData.js';
+
+import { alaskaData } from './data/alaska.js';
+
+let errorLog = [];
+
+function getRegionType(stateName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        return 'Borough/Census Area/Municipality';
+    }
+    return 'County';
+}
+
+async function searchWikidataForCounty(countyName, stateName, regionType) {
+    let searchQueries = [
+        `${countyName} ${regionType}, ${stateName}`,
+        `${countyName}, ${stateName}`,
+        countyName
+    ];
+
+    for (let query of searchQueries) {
+        let searchResults = await searchWikidata(query);
+        if (searchResults && searchResults.length > 0) {
+            console.debug(`Found results for query: ${query}`);
+            return searchResults;
+        }
+    }
+
+    console.debug(`No results found for ${countyName}`);
+    return null;
+}
+
+export async function getCountyData(countyName, stateName) {
+    try {
+        const regionType = getRegionType(stateName);
+        console.debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
+
+        let wikidataId;
+        let wikipediaLink;
+
+        if (stateName.toLowerCase() === 'alaska') {
+            const alaskaCounty = alaskaData.find(county =>
+                county.name.toLowerCase().includes(countyName.toLowerCase()) ||
+                countyName.toLowerCase().includes(county.name.toLowerCase())
+            );
+            if (alaskaCounty) {
+                wikidataId = alaskaCounty.entity_id;
+                wikipediaLink = alaskaCounty.wikipedia_link;
+                countyName = alaskaCounty.name; // Use the full name from the data
+            } else {
+                throw new Error(`No data found for ${countyName} in Alaska`);
+            }
+        } else {
+            const searchResults = await searchWikidataForCounty(countyName, stateName, regionType);
+            if (!searchResults) {
+                throw new Error(`No results found for ${countyName}`);
+            }
+            wikidataId = searchResults[0].id;
+            wikipediaLink = await getWikipediaLink(wikidataId);
+        }
+
+        console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
+
+        const propertyIds = ['P1082', 'P625', 'P2046', 'P17', 'P856', 'P36', 'P402'];
+        const propertyValues = await getPropertyValueBatch(wikidataId, propertyIds);
+
+        const data = {
+            name: countyName,
+            population: propertyValues.P1082 ? cleanAmount(propertyValues.P1082.amount) : 'N/A',
+            coordinates: propertyValues.P625 ? { latitude: propertyValues.P625.latitude, longitude: propertyValues.P625.longitude } : { latitude: 'N/A', longitude: 'N/A' },
+            area: await formatArea(propertyValues.P2046) || 'N/A',
+            country: propertyValues.P17 ? await getLabel(propertyValues.P17) : 'N/A',
+            officialWebsite: propertyValues.P856 || 'N/A',
+            capital: propertyValues.P36 ? await getLabel(propertyValues.P36) : 'N/A',
+            osmRelationId: propertyValues.P402 || 'N/A',
+            osmRelationUrl: propertyValues.P402 ? `https://www.openstreetmap.org/relation/${propertyValues.P402}` : 'N/A',
+            wikipediaLink: wikipediaLink || 'N/A'
+        };
+
+        console.debug(`Formatted data for ${countyName}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Error in getCountyData:', error);
+        errorLog.push({
+            countyName: countyName,
+            stateName: stateName,
+            error: error.message,
+            wikidataUrl: `https://www.wikidata.org/wiki/Special:Search?search=${encodeURIComponent(countyName + ' ' + stateName)}&go=Go`
+        });
+        return null;
+    }
+}
+
+function displayCountyData(data) {
+    const dataContainer = document.getElementById('geoEntityData');
+    if (data) {
+        dataContainer.innerHTML = `
+            <h3>County Information</h3>
+            <p><strong>Population:</strong> ${data.population}</p>
+            <p><strong>Coordinates:</strong> ${data.coordinates.latitude}, ${data.coordinates.longitude}</p>
+            <p><strong>Area:</strong> ${data.area.value} ${data.area.unit}</p>
+            <p><strong>Country:</strong> ${data.country}</p>
+            <p><strong>Official Website:</strong> ${data.officialWebsite !== 'N/A' ? `<a href="${data.officialWebsite}" target="_blank">${data.officialWebsite}</a>` : 'N/A'}</p>
+            <p><strong>Capital:</strong> ${data.capital}</p>
+            <p><strong>OSM Relation:</strong> ${data.osmRelationUrl !== 'N/A' ? `<a href="${data.osmRelationUrl}" target="_blank">${data.osmRelationUrl}</a>` : 'N/A'}</p>
+            <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">${data.wikipediaLink}</a>` : 'N/A'}</p>
+        `;
+    } else {
+        dataContainer.innerHTML = '<p>No data available for this county.</p>';
+    }
+}
+
+export async function fetchAndDisplayCountyData(countyName, stateName) {
+    const spinner = document.getElementById('geoEntityDataSpinner');
+    const dataContainer = document.getElementById('geoEntityData');
+
+    try {
+        spinner.style.display = 'flex';
+        dataContainer.innerHTML = '';
+
+        const data = await getCountyData(countyName, stateName);
+        displayCountyData(data);
+    } catch (error) {
+        console.error('Error fetching county data:', error);
+        dataContainer.innerHTML = '<p>Error fetching county data.</p>';
+    } finally {
+        spinner.style.display = 'none';
+    }
+}
+
+export function getErrorLog() {
+    return errorLog;
+}
+
+export function clearErrorLog() {
+    errorLog = [];
+}
+
+// js/countySelection.js
+
+import { g, path } from './mapSetup.js';
+import { currentColor, defaultCountyColor } from './colorPicker.js';
+import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
+import { updateCountyMapKey, removeFromCountyMapKey } from './mapKey/countyMapKey.js';
+import { isCountyMode } from './main.js';
+
+export let selectedCounties = [];
+export let countySelection;
+
+function getRegionType(stateName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        return 'Borough/Census Area/Municipality';
+    }
+    return 'County';
+}
+
+let cmdPressed = false;
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Meta") {
+        cmdPressed = true;
+    }
+});
+
+document.addEventListener("keyup", function (event) {
+    if (event.key === "Meta") {
+        cmdPressed = false;
+    }
+});
+
+function toggleCountySelection(element, d) {
+    const currentFill = d3.select(element).style("fill");
+    const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+    const currentColorHex = d3.rgb(currentColor).toString();
+
+    const countyIndex = selectedCounties.findIndex(county => county.id === d.id);
+
+    if (currentFill === defaultColorHex) {
+        d3.select(element).style("fill", currentColorHex);
+        if (countyIndex === -1) {
+            selectedCounties.push({ ...d, color: currentColorHex });
+        } else {
+            selectedCounties[countyIndex] = { ...d, color: currentColorHex };
+        }
+        updateCountyMapKey(d, currentColorHex);
+    } else {
+        if (currentFill === currentColorHex) {
+            d3.select(element).style("fill", defaultCountyColor);
+            selectedCounties.splice(countyIndex, 1);
+            removeFromCountyMapKey(d, currentColorHex);
+        } else {
+            d3.select(element).style("fill", currentColorHex);
+            if (countyIndex === -1) {
+                selectedCounties.push({ ...d, color: currentColorHex });
+            } else {
+                selectedCounties[countyIndex] = { ...d, color: currentColorHex };
+            }
+            removeFromCountyMapKey(d, currentFill);
+            updateCountyMapKey(d, currentColorHex);
+        }
+    }
+}
+
+export function initializeCounties(countyFeatures, stateIdToName) {
+    countyFeatures.forEach(county => {
+        const stateId = county.id.slice(0, 2);
+        county.properties.stateName = stateIdToName[stateId];
+    });
+
+    countySelection = g.append("g")
+        .selectAll("path")
+        .data(countyFeatures)
+        .enter().append("path")
+        .attr("class", "county")
+        .attr("d", path)
+        .attr("data-id", d => d.id)
+        .style("fill", defaultCountyColor)
+        .style("stroke", "#7d7d7d")
+        .style("stroke-width", "0.5px");
+
+    countySelection
+        .on("mouseover", function (event, d) {
+            showTooltip(event, d);
+            if (cmdPressed && isCountyMode) {
+                toggleCountySelection(this, d);
+            }
+        })
+        .on("mouseout", hideTooltip)
+        .on("click", function (event, d) {
+            if (!cmdPressed && isCountyMode) {
+                toggleCountySelection(this, d);
+            }
+        })
+        .on("contextmenu", showContextMenu);
+}
+
+export function clearSelectedCounties() {
+    selectedCounties = [];
+    g.selectAll(".county")
+        .transition()
+        .duration(750)
+        .style("fill", defaultCountyColor);
+}
+
+export function selectAllCounties() {
+    g.selectAll(".county")
+        .each(function (d) {
+            const element = this;
+            const currentFill = d3.select(element).style("fill");
+            const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+            const currentColorHex = d3.rgb(currentColor).toString();
+
+            if (currentFill === defaultColorHex) {
+                d3.select(element).style("fill", currentColorHex);
+                selectedCounties.push({ ...d, color: currentColorHex });
+                updateCountyMapKey(d, currentColorHex);
+            }
+        });
+}
+
+export function selectCountiesInStates(stateNames) {
+    g.selectAll(".county")
+        .each(function (d) {
+            if (stateNames.includes(d.properties.stateName.replace(/ /g, '_'))) {
+                const element = this;
+                const currentFill = d3.select(element).style("fill");
+                const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+                const currentColorHex = d3.rgb(currentColor).toString();
+
+                if (currentFill === defaultColorHex) {
+                    d3.select(element).style("fill", currentColorHex);
+                    selectedCounties.push({ ...d, color: currentColorHex });
+                    updateCountyMapKey(d, currentColorHex);
+                }
+            }
+        });
+}
+
+export function deselectCountiesInStates(stateNames) {
+    g.selectAll(".county")
+        .each(function (d) {
+            if (stateNames.includes(d.properties.stateName.replace(/ /g, '_'))) {
+                const element = this;
+                const currentFill = d3.select(element).style("fill");
+                const defaultColorHex = d3.rgb(defaultCountyColor).toString();
+
+                if (currentFill !== defaultColorHex) {
+                    d3.select(element).style("fill", defaultCountyColor);
+                    const index = selectedCounties.findIndex(county => county.id === d.id);
+                    if (index > -1) {
+                        selectedCounties.splice(index, 1);
+                    }
+                    removeFromCountyMapKey(d, currentFill);
+                }
+            }
+        });
+}
+
+// js/customAlerts.js
+
+let alertContainer;
+let currentInfoAlert;
+
+function createAlertContainer() {
+    alertContainer = document.createElement('div');
+    alertContainer.style.position = 'fixed';
+    alertContainer.style.top = '70px'; // Adjust this value based on your toolbar's height
+    alertContainer.style.left = '50%';
+    alertContainer.style.transform = 'translateX(-50%)';
+    alertContainer.style.zIndex = '999'; // Make sure this is below the toolbar's z-index
+    alertContainer.style.width = '80%';
+    alertContainer.style.maxWidth = '500px';
+    document.body.appendChild(alertContainer);
+}
+
+function createAlert(type, message, duration = 5000) {
+    if (!alertContainer) {
+        createAlertContainer();
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.setAttribute('role', 'alert');
+
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="alert-progress-bar"></div>
+    `;
+
+    alertContainer.appendChild(alertDiv);
+
+    // Start the progress bar animation
+    const progressBar = alertDiv.querySelector('.alert-progress-bar');
+    progressBar.style.animation = `alertProgressBar ${duration}ms linear`;
+
+    // Auto-dismiss after the specified duration
+    const dismissTimeout = setTimeout(() => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => {
+            alertDiv.remove();
+            if (type === 'info') {
+                currentInfoAlert = null;
+            }
+        }, 150);
+    }, duration);
+
+    // Stop the animation when the alert is manually closed
+    const closeButton = alertDiv.querySelector('.btn-close');
+    closeButton.addEventListener('click', () => {
+        progressBar.style.animationPlayState = 'paused';
+        clearTimeout(dismissTimeout);
+        if (type === 'info') {
+            currentInfoAlert = null;
+        }
+    });
+
+    return { alertDiv, dismissTimeout, progressBar };
+}
+
+export function showSuccessAlert(message, duration = 5000) {
+    createAlert('success', message, duration);
+}
+
+export function showInfoAlert(message, duration = 5000) {
+    if (currentInfoAlert) {
+        updateInfoAlert(message, duration);
+    } else {
+        currentInfoAlert = createAlert('info', message, duration);
+    }
+}
+
+export function updateInfoAlert(message, duration = 5000) {
+    if (currentInfoAlert) {
+        clearTimeout(currentInfoAlert.dismissTimeout);
+        currentInfoAlert.alertDiv.querySelector('.alert-progress-bar').style.animation = 'none';
+        currentInfoAlert.alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert-progress-bar"></div>
+        `;
+        const newProgressBar = currentInfoAlert.alertDiv.querySelector('.alert-progress-bar');
+        setTimeout(() => {
+            newProgressBar.style.animation = `alertProgressBar ${duration}ms linear`;
+        }, 10);
+        currentInfoAlert.dismissTimeout = setTimeout(() => {
+            currentInfoAlert.alertDiv.classList.remove('show');
+            setTimeout(() => {
+                currentInfoAlert.alertDiv.remove();
+                currentInfoAlert = null;
+            }, 150);
+        }, duration);
+    } else {
+        showInfoAlert(message, duration);
+    }
+}
+
+export function showWarningAlert(message, duration = 5000) {
+    createAlert('warning', message, duration);
+}
+
+export function showErrorAlert(message, duration = 5000) {
+    createAlert('danger', message, duration);
+}
+
+// js/debugToolbar.js
+
+import { getIsCountyMode } from './main.js';
+import { selectAllCounties, selectCountiesInStates, deselectCountiesInStates } from './countySelection.js';
+import { selectAllStates } from './stateSelection.js';
+import { getErrorLog, clearErrorLog } from './county.js';
+import { usStateEntityIds } from './usStates.js';
+
+let stateDropdown;
+let selectCountiesButton;
+let deselectCountiesButton;
+
+
+export function initializeDebugToolbar() {
+    const selectAllButton = document.getElementById('select-all-button');
+    selectAllButton.addEventListener('click', handleSelectAll);
+
+    const showErrorLogButton = document.createElement('button');
+    showErrorLogButton.id = 'show-error-log-button';
+    showErrorLogButton.className = 'debug-toolbar-button';
+    showErrorLogButton.textContent = 'Show Error Log';
+    showErrorLogButton.addEventListener('click', handleShowErrorLog);
+
+    stateDropdown = document.createElement('select');
+    stateDropdown.id = 'state-dropdown';
+    stateDropdown.className = 'debug-toolbar-dropdown';
+    stateDropdown.multiple = true;
+    populateStateDropdown();
+
+    selectCountiesButton = document.createElement('button');
+    selectCountiesButton.id = 'select-counties-button';
+    selectCountiesButton.className = 'debug-toolbar-button';
+    selectCountiesButton.textContent = 'Select Counties';
+    selectCountiesButton.addEventListener('click', handleSelectCounties);
+
+    deselectCountiesButton = document.createElement('button');
+    deselectCountiesButton.id = 'deselect-counties-button';
+    deselectCountiesButton.className = 'debug-toolbar-button';
+    deselectCountiesButton.textContent = 'Deselect Counties';
+    deselectCountiesButton.addEventListener('click', handleDeselectCounties);
+
+    const debugToolbar = document.getElementById('debug-toolbar');
+    debugToolbar.appendChild(showErrorLogButton);
+    debugToolbar.appendChild(stateDropdown);
+    debugToolbar.appendChild(selectCountiesButton);
+    debugToolbar.appendChild(deselectCountiesButton);
+
+    updateToolbarVisibility();
+}
+
+function populateStateDropdown() {
+    Object.keys(usStateEntityIds).sort().forEach(stateName => {
+        const option = document.createElement('option');
+        option.value = stateName;
+        option.textContent = stateName.replace(/_/g, ' ');
+        stateDropdown.appendChild(option);
+    });
+}
+
+function handleSelectAll() {
+    const isCountyMode = getIsCountyMode();
+    if (isCountyMode) {
+        selectAllCounties();
+    } else {
+        selectAllStates();
+    }
+}
+
+function handleShowErrorLog() {
+    const errorLog = getErrorLog();
+    if (errorLog.length === 0) {
+        alert('No errors logged.');
+    } else {
+        let errorMessage = 'Errors encountered:\n\n';
+        errorLog.forEach((error, index) => {
+            errorMessage += `${index + 1}. ${error.countyName}, ${error.stateName}\n`;
+            errorMessage += `   Error: ${error.error}\n`;
+            errorMessage += `   Wikidata URL: ${error.wikidataUrl}\n\n`;
+        });
+        alert(errorMessage);
+        clearErrorLog();
+    }
+}
+
+function handleSelectCounties() {
+    const selectedStates = Array.from(stateDropdown.selectedOptions).map(option => option.value);
+    if (selectedStates.length > 0) {
+        selectCountiesInStates(selectedStates);
+    } else {
+        alert('Please select at least one state.');
+    }
+}
+
+function handleDeselectCounties() {
+    const selectedStates = Array.from(stateDropdown.selectedOptions).map(option => option.value);
+    if (selectedStates.length > 0) {
+        deselectCountiesInStates(selectedStates);
+    } else {
+        alert('Please select at least one state.');
+    }
+}
+
+export function updateToolbarVisibility() {
+    const isCountyMode = getIsCountyMode();
+    stateDropdown.style.display = isCountyMode ? 'block' : 'none';
+    selectCountiesButton.style.display = isCountyMode ? 'block' : 'none';
+    deselectCountiesButton.style.display = isCountyMode ? 'block' : 'none';
+}
+
+// js/exportJson.js
+
+import { selectedCounties } from './countySelection.js';
+import { getSelectedStates } from './stateSelection.js';
+import { getCountyData } from './county.js';
+import { getStateData } from './state.js';
+import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
+import { showJsonExportContextMenu } from './contextMenuUtils.js';
+import { getIsCountyMode } from './main.js';
+import { getErrorLog, clearErrorLog } from './county.js'; // Add this import
+
+const jsonExportContextMenu = document.getElementById('json-export-context-menu');
+const jsonExportFieldsContainer = document.getElementById('json-export-fields-container');
+const exportJsonButton = document.getElementById('export-json');
+const exportIcon = exportJsonButton?.querySelector('.fa-file-export');
+const spinnerIcon = exportJsonButton?.querySelector('.fa-spinner');
+
+let selectedFields = new Set();
+
+const countyFields = [
+    { id: 'county_name', label: 'County Name' },
+    { id: 'state_name', label: 'State Name' },
+    { id: 'county_number', label: 'County Number' },
+    { id: 'population', label: 'Population' },
+    { id: 'coordinates', label: 'Coordinates' },
+    { id: 'area', label: 'Area' },
+    { id: 'country', label: 'Country' },
+    { id: 'official_website', label: 'Official Website' },
+    { id: 'capital', label: 'Capital' },
+    { id: 'osm_relation', label: 'OSM Relation' },
+    { id: 'wikipedia', label: 'Wikipedia' }
+];
+
+const stateFields = [
+    { id: 'state_name', label: 'State Name' },
+    { id: 'population', label: 'Population' },
+    { id: 'coordinates', label: 'Coordinates' },
+    { id: 'area', label: 'Area' },
+    { id: 'country', label: 'Country' },
+    { id: 'official_website', label: 'Official Website' },
+    { id: 'capital', label: 'Capital' },
+    { id: 'osm_relation', label: 'OSM Relation' },
+    { id: 'wikipedia', label: 'Wikipedia' }
+];
+
+export function initializeJsonExport() {
+    exportJsonButton.addEventListener('contextmenu', showJsonExportContextMenu);
+    exportJsonButton.addEventListener('click', exportJson);
+
+    document.getElementById('select-all-fields').addEventListener('click', selectAllFields);
+    document.getElementById('clear-all-fields').addEventListener('click', clearAllFields);
+
+    createContextMenu(); // Initialize the context menu
+}
+
+function createContextMenu() {
+    const isCountyMode = getIsCountyMode();
+    const fields = isCountyMode ? countyFields : stateFields;
+
+    // Reset selected fields when switching modes
+    selectedFields = new Set(isCountyMode ? ['county_name', 'state_name', 'county_number'] : ['state_name']);
+
+    // Clear existing content
+    jsonExportFieldsContainer.innerHTML = '';
+
+    // Create and append new checkboxes
+    fields.forEach(field => {
+        const div = document.createElement('div');
+        const isDisabled = (isCountyMode && (field.id === 'county_name' || field.id === 'state_name')) ||
+            (!isCountyMode && field.id === 'state_name');
+        const isChecked = isDisabled || selectedFields.has(field.id);
+
+        div.innerHTML = `
+            <input type="checkbox" id="json-${field.id}" 
+                   ${isChecked ? 'checked' : ''} 
+                   ${isDisabled ? 'disabled' : ''}>
+            <label for="json-${field.id}">${field.label}</label>
+        `;
+        jsonExportFieldsContainer.appendChild(div);
+
+        const checkbox = div.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function () {
+            if (!this.disabled) {
+                const fieldName = this.id.replace('json-', '');
+                if (this.checked) {
+                    selectedFields.add(fieldName);
+                } else {
+                    selectedFields.delete(fieldName);
+                }
+            }
+        });
+
+        // Ensure disabled fields are always in the selectedFields set
+        if (isDisabled) {
+            selectedFields.add(field.id);
+        }
+    });
+
+    console.log("Context menu updated. Current mode:", isCountyMode ? "County" : "State");
+    console.log("Selected fields:", Array.from(selectedFields));
+}
+
+function selectAllFields() {
+    const fields = getIsCountyMode() ? countyFields : stateFields;
+    fields.forEach(field => {
+        const checkbox = document.getElementById(`json-${field.id}`);
+        if (checkbox) {
+            checkbox.checked = true;
+            selectedFields.add(field.id);
+        }
+    });
+}
+
+function clearAllFields() {
+    const fields = getIsCountyMode() ? countyFields : stateFields;
+    fields.forEach(field => {
+        const checkbox = document.getElementById(`json-${field.id}`);
+        if (checkbox) {
+            checkbox.checked = false;
+            selectedFields.delete(field.id);
+        }
+    });
+}
+
+async function exportJson() {
+    const startTime = new Date().getTime();
+    console.debug("Starting JSON export");
+
+    try {
+        if (exportIcon) exportIcon.style.display = 'none';
+        if (spinnerIcon) spinnerIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (progressBarContainer) progressBarContainer.style.display = 'block';
+        if (progressBar) progressBar.style.width = '0%';
+
+        const isCountyMode = getIsCountyMode();
+        const selectedItems = isCountyMode ? selectedCounties : getSelectedStates();
+
+        if (selectedItems.length === 0) {
+            console.warn(`No ${isCountyMode ? 'counties' : 'states'} selected for export`);
+            showErrorAlert(`No ${isCountyMode ? 'counties' : 'states'} selected for export. Please select ${isCountyMode ? 'counties' : 'states'} and try again.`);
+            return;
+        }
+
+        const exportData = await processItemsConcurrently(selectedItems, isCountyMode);
+        const jsonString = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonString], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        console.debug("Creating download link");
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `selected-${isCountyMode ? 'counties' : 'states'}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+        link.click();
+
+        URL.revokeObjectURL(url);
+
+        const endTime = new Date().getTime();
+        const totalTime = (endTime - startTime) / 1000; // Convert to seconds
+        console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedItems.length} ${isCountyMode ? 'counties' : 'states'}.`);
+        showSuccessAlert('Export completed successfully!');
+
+        // Print error log to console
+        const errorLog = getErrorLog();
+        if (errorLog.length > 0) {
+            console.error("Errors encountered during export:");
+            errorLog.forEach((error, index) => {
+                console.error(`${index + 1}. ${error.countyName}, ${error.stateName}`);
+                console.error(`   Error: ${error.error}`);
+                console.error(`   Wikidata URL: ${error.wikidataUrl}`);
+            });
+        } else {
+            console.log("No errors encountered during export.");
+        }
+        clearErrorLog(); // Clear the error log after printing
+    } catch (error) {
+        console.error('Error during export:', error);
+        console.error('Error stack:', error.stack);
+        showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+    } finally {
+        if (spinnerIcon) spinnerIcon.style.display = 'none';
+        if (exportIcon) exportIcon.style.display = 'inline-block';
+        const progressBarContainer = document.querySelector('#export-json .json-export-progress-bar-container');
+        if (progressBarContainer) progressBarContainer.style.display = 'none';
+        const finalProgressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (finalProgressBar) finalProgressBar.style.width = '0%';
+    }
+}
+
+async function processItemsConcurrently(items, isCountyMode) {
+    const MAX_CONCURRENT_REQUESTS = 10;
+    const exportData = [];
+    let progressIndex = 0;
+
+    const updateProgressBar = (index, total) => {
+        const progressBar = document.querySelector('#export-json .json-export-progress-bar');
+        if (progressBar) {
+            const progress = (index / total) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+    };
+
+    const processBatch = async (batch) => {
+        const results = await Promise.all(batch.map(item => isCountyMode ? processCounty(item) : processState(item)));
+        results.forEach(result => exportData.push(result));
+        progressIndex += batch.length;
+        updateProgressBar(progressIndex, items.length);
+    };
+
+    for (let i = 0; i < items.length; i += MAX_CONCURRENT_REQUESTS) {
+        const batch = items.slice(i, i + MAX_CONCURRENT_REQUESTS);
+        await processBatch(batch);
+    }
+
+    return exportData;
+}
+
+async function processCounty(county) {
+    console.debug("Processing county:", county);
+    const countyData = {};
+    try {
+        const countyName = county.properties.name;
+        const stateName = county.properties.stateName;
+        console.debug("Fetching data for county:", countyName, stateName);
+        const countyDetails = await getCountyData(countyName, stateName);
+        populateData(countyData, county, countyDetails, true);
+    } catch (error) {
+        console.error(`Error fetching data for county:`, county, error);
+    }
+    return countyData;
+}
+
+async function processState(state) {
+    console.debug("Processing state:", state);
+    const stateData = {};
+    try {
+        const stateName = state.properties.name;
+        console.debug("Fetching data for state:", stateName);
+        const stateDetails = await getStateData(stateName);
+        populateData(stateData, state, stateDetails, false);
+    } catch (error) {
+        console.error(`Error fetching data for state:`, state, error);
+    }
+    return stateData;
+}
+
+function populateData(data, item, details, isCounty) {
+    if (details) {
+        selectedFields.forEach(field => {
+            switch (field) {
+                case 'county_name':
+                    if (isCounty) data.county_name = item.properties.name;
+                    break;
+                case 'state_name':
+                    data.state_name = isCounty ? item.properties.stateName : item.properties.name;
+                    break;
+                case 'county_number':
+                    if (isCounty) data.county_number = item.id;
+                    break;
+                case 'population':
+                    data.population = details.population || 'N/A';
+                    break;
+                case 'coordinates':
+                    data.coordinates = details.coordinates.latitude && details.coordinates.longitude ? `${details.coordinates.latitude}, ${details.coordinates.longitude}` : 'N/A';
+                    break;
+                case 'area':
+                    data.area = details.area ? `${details.area.value} ${details.area.unit}` : 'N/A';
+                    break;
+                case 'country':
+                    data.country = details.country || 'N/A';
+                    break;
+                case 'official_website':
+                    data.official_website = details.officialWebsite || 'N/A';
+                    break;
+                case 'capital':
+                    data.capital = details.capital || 'N/A';
+                    break;
+                case 'osm_relation':
+                    data.osm_relation = details.osmRelationUrl || 'N/A';
+                    break;
+                case 'wikipedia':
+                    data.wikipedia = details.wikipediaLink || 'N/A';
+                    break;
+                default:
+                    console.warn(`Unknown field: ${field}`);
+                    break;
+            }
+        });
+    } else {
+        console.warn(`No details found for ${isCounty ? `county: ${item.properties.name}, state: ${item.properties.stateName}` : `state: ${item.properties.name}`}`);
+    }
+}
+
+export function updateContextMenu() {
+    createContextMenu();
+    console.log("Context menu update triggered");
+}
+
+// js/main.js
+
+import { g, path } from './mapSetup.js';
+import { initializeZoom, resetMap, recenterMap, zoomIn, zoomOut, cleanupZoom } from './zoomAndReset.js';
+import { initializeTooltipAndContextMenu } from './tooltipAndContextMenu.js';
+import { initializeColorPicker } from './colorPicker.js';
+import { initializeCounties, clearSelectedCounties } from './countySelection.js';
+import { initializeStates, clearSelectedStates } from './stateSelection.js';
+import { initializeCameraButton } from './cameraButton.js';
+import { initializeJsonExport, updateContextMenu } from './exportJson.js';
+import { initializeCountyMapKey, clearCountyMapKey, toggleCountyMapKey } from './mapKey/countyMapKey.js';
+import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './mapKey/stateMapKey.js';
+import { initializeContextMenus } from './contextMenuUtils.js';
+import { initializeDebugToolbar, updateToolbarVisibility } from './debugToolbar.js';
+
+export let isCountyMode = true;
+
+// Export the function to get the current mode
+export function getIsCountyMode() {
+    return isCountyMode;
+}
+
+let nationData;
+let stateFeatures;
+let countyFeatures;
+
+Promise.all([
+    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json"),
+    d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json")
+]).then(([us, states]) => {
+    stateFeatures = topojson.feature(states, states.objects.states).features;
+    countyFeatures = topojson.feature(us, us.objects.counties).features;
+    nationData = topojson.feature(us, us.objects.nation);
+
+    const stateIdToName = {};
+    stateFeatures.forEach(state => {
+        stateIdToName[state.id] = state.properties.name;
+    });
+
+    initializeCounties(countyFeatures, stateIdToName);
+    initializeStates(stateFeatures);
+
+    g.append("g")
+        .selectAll("path")
+        .data(stateFeatures)
+        .enter().append("path")
+        .attr("class", "state-border")
+        .attr("d", path)
+        .style("fill", "none")
+        .style("stroke", "#000000")
+        .style("stroke-width", "1px");
+
+    initializeZoom(nationData);
+    initializeDebugToolbar(); // Add this line
+});
+
+function toggleMode() {
+    isCountyMode = !isCountyMode;
+    d3.select("#switchTrack").attr("transform", isCountyMode ? "translateX(0)" : "translateX(-50%)");
+    g.selectAll(".county").style("display", isCountyMode ? null : "none");
+    g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
+    updateMapKeyVisibility();
+    updateContextMenu();
+    updateToolbarVisibility(); // Add this line
+    console.log("Mode toggled:", isCountyMode ? "County" : "State");
+}
+
+function updateMapKeyVisibility() {
+    const countyMapKey = document.getElementById('county-map-key');
+    const stateMapKey = document.getElementById('state-map-key');
+    if (isCountyMode) {
+        countyMapKey.style.display = '';
+        stateMapKey.style.display = 'none';
+    } else {
+        countyMapKey.style.display = 'none';
+        stateMapKey.style.display = '';
+    }
+}
+
+function toggleMapKey() {
+    console.log("toggleMapKey called");
+    console.log("Current mode:", isCountyMode ? "County" : "State");
+    if (isCountyMode) {
+        console.log("Toggling county map key");
+        toggleCountyMapKey();
+    } else {
+        console.log("Toggling state map key");
+        toggleStateMapKey();
+    }
+}
+
+d3.select("#reset-button").on("click", () => {
+    resetMap();
+    if (isCountyMode) {
+        clearCountyMapKey();
+        clearSelectedCounties();
+    } else {
+        clearStateMapKey();
+        clearSelectedStates();
+    }
+});
+
+d3.select("#clear-button").on("click", () => {
+    if (isCountyMode) {
+        clearCountyMapKey();
+        clearSelectedCounties();
+    } else {
+        clearStateMapKey();
+        clearSelectedStates();
+    }
+});
+
+d3.select("#recenter-button").on("click", recenterMap);
+d3.select("#zoom-in").on("click", zoomIn);
+d3.select("#zoom-out").on("click", zoomOut);
+d3.select("#switchContainer").on("click", toggleMode);
+document.getElementById('map-key-button').addEventListener('click', toggleMapKey);
+
+initializeTooltipAndContextMenu();
+initializeColorPicker();
+initializeCameraButton();
+initializeJsonExport();
+initializeCountyMapKey();
+initializeStateMapKey();
+initializeContextMenus();
+cleanupZoom();
+
+// js/mapSetup.js
+export const width = window.innerWidth;
+export const height = window.innerHeight;
+
+export const svg = d3.select("#map")
+    .append("svg")
+    .attr("width", "100%")
+    .attr("height", "100%");
+
+export const g = svg.append("g");
+
+export const projection = d3.geoAlbersUsa()
+    .scale(3000)
+    .translate([width / 2, height / 2]);
+
+export const path = d3.geoPath().projection(projection);
+
+// js/state.js
+
+import {
+    getPropertyValueBatch,
+    getLabel,
+    getWikipediaLink,
+    cleanAmount,
+    formatArea
+} from './data/wikiData.js';
+
+import { usStateEntityIds } from './usStates.js';
+
+function normalizeStateName(stateName) {
+    return stateName.replace(/\s+/g, '_');
+}
+
+async function getStateData(stateName) {
+    try {
+        console.debug(`Fetching data for ${stateName}`);
+
+        const normalizedStateName = normalizeStateName(stateName);
+        const wikidataId = usStateEntityIds[normalizedStateName];
+        if (!wikidataId) {
+            console.warn(`No Wikidata ID found for ${stateName}. Normalized name: ${normalizedStateName}`);
+            return null;
+        }
+        console.debug(`Using Wikidata ID for ${stateName}: ${wikidataId}`);
+
+        const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
+            getPropertyValue(wikidataId, 'P1082'), // population
+            getPropertyValue(wikidataId, 'P625'), // coordinates
+            getPropertyValue(wikidataId, 'P2046'), // area
+            getPropertyValue(wikidataId, 'P17'), // country
+            getPropertyValue(wikidataId, 'P856'), // official website
+            getPropertyValue(wikidataId, 'P36'), // capital
+            getPropertyValue(wikidataId, 'P402'), // OSM relation ID
+            getWikipediaLink(wikidataId) // Wikipedia link
+        ]);
+
+        const latitude = coordinates ? coordinates.latitude : null;
+        const longitude = coordinates ? coordinates.longitude : null;
+
+        const [countryLabel, capitalLabel, areaFormatted] = await Promise.all([
+            getLabel(country),
+            getLabel(capital),
+            formatArea(area)
+        ]);
+
+        const osmRelationUrl = osmRelationId ? `https://www.openstreetmap.org/relation/${osmRelationId}` : 'N/A';
+
+        const data = {
+            population: population ? cleanAmount(population.amount) : 'N/A',
+            coordinates: { latitude, longitude },
+            area: areaFormatted || 'N/A',
+            country: countryLabel || 'N/A',
+            officialWebsite: officialWebsite || 'N/A',
+            capital: capitalLabel || 'N/A',
+            osmRelationId: osmRelationId || 'N/A',
+            osmRelationUrl: osmRelationUrl,
+            wikipediaLink: wikipediaLink || 'N/A'
+        };
+        console.debug(`Formatted data for ${stateName}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Error in getStateData:', error);
+        return null;
+    }
+}
+
+function displayStateData(data) {
+    const dataContainer = document.getElementById('geoEntityData');
+    if (data) {
+        dataContainer.innerHTML = `
+            <h3>State Information</h3>
+            <p><strong>Population:</strong> ${data.population}</p>
+            <p><strong>Coordinates:</strong> ${data.coordinates.latitude}, ${data.coordinates.longitude}</p>
+            <p><strong>Area:</strong> ${data.area.value} ${data.area.unit}</p>
+            <p><strong>Country:</strong> ${data.country}</p>
+            <p><strong>Official Website:</strong> ${data.officialWebsite !== 'N/A' ? `<a href="${data.officialWebsite}" target="_blank">${data.officialWebsite}</a>` : 'N/A'}</p>
+            <p><strong>Capital:</strong> ${data.capital}</p>
+            <p><strong>OSM Relation:</strong> ${data.osmRelationUrl !== 'N/A' ? `<a href="${data.osmRelationUrl}" target="_blank">${data.osmRelationUrl}</a>` : 'N/A'}</p>
+            <p><strong>Wikipedia:</strong> ${data.wikipediaLink !== 'N/A' ? `<a href="${data.wikipediaLink}" target="_blank">${data.wikipediaLink}</a>` : 'N/A'}</p>
+        `;
+    } else {
+        dataContainer.innerHTML = '<p>No data available for this state.</p>';
+    }
+}
+
+export async function fetchAndDisplayStateData(stateName) {
+    const spinner = document.getElementById('geoEntityDataSpinner');
+    const dataContainer = document.getElementById('geoEntityData');
+
+    try {
+        spinner.style.display = 'flex';
+        dataContainer.innerHTML = '';
+
+        const data = await getStateData(stateName);
+        displayStateData(data);
+    } catch (error) {
+        console.error('Error fetching state data:', error);
+        dataContainer.innerHTML = '<p>Error fetching state data.</p>';
+    } finally {
+        spinner.style.display = 'none';
+    }
+}
+
+// Export getStateData if it's used in other files
+export { getStateData };
+
+// js/stateSelection.js
+
+import { g, path } from './mapSetup.js';
+import { currentColor, defaultStateColor } from './colorPicker.js';
+import { showTooltip, hideTooltip, showContextMenu } from './tooltipAndContextMenu.js';
+import { updateStateMapKey, removeFromStateMapKey } from './mapKey/stateMapKey.js';
+import { isCountyMode } from './main.js';
+
+export let selectedStates = [];
+export let stateSelection;
+
+let cmdPressed = false;
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Meta") {
+        cmdPressed = true;
+    }
+});
+
+document.addEventListener("keyup", function (event) {
+    if (event.key === "Meta") {
+        cmdPressed = false;
+    }
+});
+
+function toggleStateSelection(element, d) {
+    const currentFill = d3.select(element).style("fill");
+    const defaultColorHex = d3.rgb(defaultStateColor).toString();
+    const currentColorHex = d3.rgb(currentColor).toString();
+
+    const stateIndex = selectedStates.findIndex(state => state.id === d.id);
+
+    if (currentFill === defaultColorHex) {
+        d3.select(element).style("fill", currentColorHex);
+        if (stateIndex === -1) {
+            selectedStates.push({ ...d, color: currentColorHex });
+        } else {
+            selectedStates[stateIndex] = { ...d, color: currentColorHex };
+        }
+        updateStateMapKey(d, currentColorHex);
+    } else {
+        if (currentFill === currentColorHex) {
+            d3.select(element).style("fill", defaultStateColor);
+            selectedStates.splice(stateIndex, 1);
+            removeFromStateMapKey(d, currentColorHex);
+        } else {
+            d3.select(element).style("fill", currentColorHex);
+            if (stateIndex === -1) {
+                selectedStates.push({ ...d, color: currentColorHex });
+            } else {
+                selectedStates[stateIndex] = { ...d, color: currentColorHex };
+            }
+            removeFromStateMapKey(d, currentFill);
+            updateStateMapKey(d, currentColorHex);
+        }
+    }
+}
+
+export function initializeStates(stateFeatures) {
+    stateSelection = g.append("g")
+        .attr("class", "states")
+        .selectAll("path")
+        .data(stateFeatures)
+        .enter().append("path")
+        .attr("d", path)
+        .attr("data-id", d => d.id)
+        .style("fill", defaultStateColor)
+        .style("stroke", "#000000")
+        .style("stroke-width", "1px")
+        .style("display", "none")
+        .on("mouseover", function (event, d) {
+            showTooltip(event, d);
+            if (cmdPressed && !isCountyMode) {
+                toggleStateSelection(this, d);
+            }
+        })
+        .on("mouseout", hideTooltip)
+        .on("click", function (event, d) {
+            if (!cmdPressed && !isCountyMode) {
+                toggleStateSelection(this, d);
+            }
+        })
+        .on("contextmenu", showContextMenu);
+}
+
+export function clearSelectedStates() {
+    selectedStates = [];
+    g.selectAll(".states path")
+        .transition()
+        .duration(750)
+        .style("fill", defaultStateColor);
+}
+
+export function selectAllStates() {
+    g.selectAll(".states path")
+        .each(function (d) {
+            const element = this;
+            const currentFill = d3.select(element).style("fill");
+            const defaultColorHex = d3.rgb(defaultStateColor).toString();
+            const currentColorHex = d3.rgb(currentColor).toString();
+
+            if (currentFill === defaultColorHex) {
+                d3.select(element).style("fill", currentColorHex);
+                selectedStates.push({ ...d, color: currentColorHex });
+                updateStateMapKey(d, currentColorHex);
+            }
+        });
+}
+
+// Add this function to get the selected states
+export function getSelectedStates() {
+    return selectedStates;
+}
+
+// js/tooltipAndContextMenu.js
+
+import { fetchAndDisplayCountyData } from './county.js';
+import { fetchAndDisplayStateData } from './state.js';
+import { isCountyMode } from './main.js';
+
+export const tooltip = d3.select("#map")
+    .append("div")
+    .attr("class", "tooltip");
+
+let activeItem = null;
+let map;
+let itemBorder;
+
+function getRegionType(stateName, countyName) {
+    if (stateName.toLowerCase() === 'louisiana') {
+        return 'Parish';
+    } else if (stateName.toLowerCase() === 'alaska') {
+        if (countyName.toLowerCase().includes('borough')) {
+            return 'Borough';
+        } else if (countyName.toLowerCase().includes('census area')) {
+            return 'Census Area';
+        } else {
+            return 'Municipality';
+        }
+    }
+    return 'County';
+}
+
+export function initializeTooltipAndContextMenu() {
+    d3.select("body").on("click", function () {
+        $('#mapModal').modal('hide');
+    });
+
+    // Add event listener for the close button in the modal footer
+    d3.select("#mapModal .modal-footer button").on("click", function () {
+        $('#mapModal').modal('hide');
+    });
+
+    // Add event listener for the 'X' button in the modal header
+    d3.select("#mapModal .modal-header .close").on("click", function () {
+        $('#mapModal').modal('hide');
+    });
+
+    // Prevent modal from closing when clicking inside it
+    d3.select("#mapModal .modal-content").on("click", function (event) {
+        event.stopPropagation();
+    });
+
+    // Ensure the event listener is attached only once
+    $('#mapModal').on('shown.bs.modal', handleModalShow);
+}
+
+export function showTooltip(event, d) {
+    let content;
+    if (isCountyMode) {
+        const regionType = getRegionType(d.properties.stateName, d.properties.name);
+        content = `${d.properties.name}${regionType !== 'Municipality' ? ' ' + regionType : ''}, ${d.properties.stateName}`;
+    } else {
+        content = d.properties.name;
+    }
+
+    tooltip.style("opacity", 1)
+        .html(content)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+}
+
+export function hideTooltip() {
+    tooltip.style("opacity", 0);
+}
+
+export function showContextMenu(event, d) {
+    event.preventDefault();
+    activeItem = d;
+
+    let regionType, itemName;
+    if (isCountyMode) {
+        regionType = getRegionType(d.properties.stateName, d.properties.name);
+        itemName = `${d.properties.name}${regionType !== 'Municipality' ? ' ' + regionType : ''}`;
+    } else {
+        regionType = 'State';
+        itemName = d.properties.name;
+    }
+
+    console.debug(`Showing context menu for ${itemName}`);
+
+    $('#mapModalLabel').text(`${itemName} Border`);
+    $('#mapModal').modal('show');
+}
+
+function handleModalShow() {
+    if (!map) {
+        initializeMap();
+    } else {
+        map.invalidateSize();
+    }
+
+    $('.spinner-container').show();
+    const selectedItem = activeItem.properties.name;
+    const selectedState = isCountyMode ? activeItem.properties.stateName : selectedItem;
+    fetchItemBorder(selectedItem, selectedState);
+    document.getElementById('geoEntityData').innerHTML = '';  // Clear previous data
+    if (isCountyMode) {
+        const regionType = getRegionType(selectedState, selectedItem);
+        fetchAndDisplayCountyData(selectedItem, selectedState);
+    } else {
+        fetchAndDisplayStateData(selectedItem);
+    }
+}
+
+function initializeMap() {
+    console.debug("Initializing map");
+    map = L.map('modalMap').setView([37.8, -96], 4); // Center of the US
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+function fetchItemBorder(item, state) {
+    console.debug(`Fetching border for ${item}, ${state}`);
+
+    // Remove the previous item border if it exists
+    if (itemBorder) {
+        map.removeLayer(itemBorder);
+        itemBorder = null; // Ensure the reference is cleared
+    }
+
+    let query;
+    if (isCountyMode) {
+        const regionType = getRegionType(state, item);
+        const encodedItem = encodeURIComponent(item);
+        const encodedState = encodeURIComponent(state);
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedItem}${regionType !== 'Municipality' ? '+' + encodeURIComponent(regionType) : ''},+${encodedState}&format=json&polygon_geojson=1`;
+    } else {
+        const encodedState = encodeURIComponent(state);
+        query = `https://nominatim.openstreetmap.org/search?q=${encodedState},+United+States&format=json&polygon_geojson=1`;
+    }
+
+    console.debug(`Querying OSM: ${query}`);
+
+    fetch(query)
+        .then(response => response.json())
+        .then(data => {
+            console.debug(`OSM response:`, data);
+            if (data.length > 0) {
+                // Try to find the best match
+                const bestMatch = data.find(result => result.geojson && result.geojson.type !== 'Point') || data[0];
+
+                if (bestMatch.geojson && bestMatch.geojson.type !== 'Point') {
+                    addItemBorderToMap(bestMatch.geojson);
+                } else if (bestMatch.boundingbox) {
+                    // If we only have a bounding box, create a rectangle
+                    const bbox = bestMatch.boundingbox.map(Number);
+                    const rectangle = [
+                        [bbox[0], bbox[2]],
+                        [bbox[1], bbox[3]]
+                    ];
+                    addItemBorderToMap({ type: 'Polygon', coordinates: [rectangle] });
+                } else {
+                    console.error(`No valid GeoJSON or bounding box data found for ${item}`);
+                    alert(`Unable to display border for ${item}. Only point data available.`);
+                }
+            } else {
+                console.error(`No data found for ${item}`);
+                alert(`No geographic data found for ${item}.`);
+            }
+        })
+        .catch(error => {
+            console.error(`Error fetching border: ${error}`);
+            alert(`Error fetching border data: ${error.message}`);
+        })
+        .finally(() => {
+            $('.spinner-container').hide();
+        });
+}
+
+function addItemBorderToMap(geojson) {
+    itemBorder = L.geoJSON(geojson, {
+        style: {
+            color: 'blue',
+            weight: 2,
+            fillOpacity: 0.2
+        }
+    }).addTo(map);
+    map.fitBounds(itemBorder.getBounds());
+    $('.spinner-container').hide();
+}
+
+export function applyItemInteractions(selection) {
+    selection
+        .on("mouseover", showTooltip)
+        .on("mouseout", hideTooltip)
+        .on("contextmenu", showContextMenu);
+}
+
+// js/usStates.js
+
+export const usStateEntityIds = {
+    Alabama: "Q173",
+    Alaska: "Q797",
+    Arizona: "Q816",
+    Arkansas: "Q1612",
+    California: "Q99",
+    Colorado: "Q1261",
+    Connecticut: "Q779",
+    Delaware: "Q1393",
+    Florida: "Q812",
+    Georgia: "Q1428",
+    Hawaii: "Q782",
+    Idaho: "Q1222",
+    Illinois: "Q1204",
+    Indiana: "Q1415",
+    Iowa: "Q1546",
+    Kansas: "Q1558",
+    Kentucky: "Q1603",
+    Louisiana: "Q1588",
+    Maine: "Q724",
+    Maryland: "Q1391",
+    Massachusetts: "Q771",
+    Michigan: "Q1166",
+    Minnesota: "Q1527",
+    Mississippi: "Q1494",
+    Missouri: "Q1581",
+    Montana: "Q1212",
+    Nebraska: "Q1553",
+    Nevada: "Q1227",
+    New_Hampshire: "Q759",
+    New_Jersey: "Q1408",
+    New_Mexico: "Q1522",
+    New_York: "Q1384",
+    North_Carolina: "Q1454",
+    North_Dakota: "Q1207",
+    Ohio: "Q1397",
+    Oklahoma: "Q1649",
+    Oregon: "Q824",
+    Pennsylvania: "Q1400",
+    Rhode_Island: "Q1387",
+    South_Carolina: "Q1456",
+    South_Dakota: "Q1211",
+    Tennessee: "Q1509",
+    Texas: "Q1439",
+    Utah: "Q829",
+    Vermont: "Q16551",
+    Virginia: "Q1370",
+    Washington: "Q1223",
+    West_Virginia: "Q1371",
+    Wisconsin: "Q1537",
+    Wyoming: "Q1214"
+};
+
+// js/zoomAndReset.js
+
+import { svg, g, path } from './mapSetup.js';
+
+export const zoom = d3.zoom()
+    .scaleExtent([0.5, 8])  // Set minimum and maximum zoom levels
+    .on("zoom", zoomed);
+
+let initialTransform;
+let nationData;
+
+function zoomed(event) {
+    g.attr("transform", event.transform);
+}
+
+export function initializeZoom(nation) {
+    nationData = nation;
+    const { width, height } = getSvgSize();
+    const [[x0, y0], [x1, y1]] = path.bounds(nation);
+    const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
+    const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
+
+    initialTransform = d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale);
+
+    svg.call(zoom)
+        .call(zoom.transform, initialTransform);
+
+    // Add window resize event listener
+    window.addEventListener('resize', handleWindowResize);
+}
+
+export function resetMap() {
+    recenterMap();
+}
+
+export function recenterMap() {
+    const { width, height } = getSvgSize();
+    const [[x0, y0], [x1, y1]] = path.bounds(nationData);
+    const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
+    const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
+
+    svg.transition()
+        .duration(750)  // Smooth transition over 750ms
+        .call(zoom.transform, d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale));
+}
+
+export function zoomIn() {
+    svg.transition().duration(300).call(zoom.scaleBy, 1.5);
+}
+
+export function zoomOut() {
+    svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5);
+}
+
+function handleWindowResize() {
+    const { width, height } = getSvgSize();
+    svg.attr("width", width).attr("height", height);
+
+    const [[x0, y0], [x1, y1]] = path.bounds(nationData);
+    const scale = 0.95 / Math.max((x1 - x0) / width, (y1 - y0) / height);
+    const translate = [width / 2 - scale * (x0 + x1) / 2, height / 2 - scale * (y0 + y1) / 2];
+
+    // Get the current zoom state
+    const currentTransform = d3.zoomTransform(svg.node());
+
+    // Calculate the new transform
+    const newTransform = d3.zoomIdentity
+        .translate(translate[0], translate[1])
+        .scale(scale)
+        .scale(currentTransform.k / scale)
+        .translate(
+            (currentTransform.x - translate[0]) / (currentTransform.k / scale),
+            (currentTransform.y - translate[1]) / (currentTransform.k / scale)
+        );
+
+    // Apply the new transform with a smooth transition
+    svg.transition()
+        .duration(300)
+        .call(zoom.transform, newTransform);
+}
+
+function getSvgSize() {
+    return {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
+}
+
+export function cleanupZoom() {
+    window.removeEventListener('resize', handleWindowResize);
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive US County Map</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="switch/switch.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="toolbar">
+        <!-- Custom switch component integrated here -->
+        <div id="switchContainer" class="switch-container toolbar-button" title="Toggle County/State Mode">
+            <div id="switchTrack" class="switch-track">
+                <div class="switch-button county">County</div>
+                <div class="switch-button state">State</div>
+            </div>
+        </div>
+        <div id="reset-button" class="toolbar-button" title="Reset"><i class="fas fa-sync-alt"></i></div>
+        <div id="clear-button" class="toolbar-button" title="Clear"><i class="fas fa-eraser"></i></div>
+        <div id="recenter-button" class="toolbar-button" title="Recenter"><i class="fas fa-compress-arrows-alt"></i>
+        </div>
+        <div id="camera-button" class="toolbar-button" title="Camera"><i class="fas fa-camera"></i></div>
+        <div id="export-json" class="toolbar-button" title="Export JSON">
+            <i class="fas fa-file-export"></i>
+            <i class="fas fa-spinner fa-spin" style="display: none;"></i>
+            <div class="json-export-progress-bar-container">
+                <div class="json-export-progress-bar"></div>
+            </div>
+        </div>
+        <div id="map-key-button" class="toolbar-button" title="Map Key"><i class="fas fa-key"></i></div>
+        <div class="zoom-controls">
+            <div id="zoom-in" class="zoom-button" title="Zoom In"><i class="fas fa-search-plus"></i></div>
+            <div id="zoom-out" class="zoom-button" title="Zoom Out"><i class="fas fa-search-minus"></i></div>
+        </div>
+    </div>
+
+    <!-- New Debug Toolbar -->
+    <div id="debug-toolbar" class="debug-toolbar">
+        <div class="debug-toolbar-title">Debug Toolbar</div>
+        <button id="select-all-button" class="debug-toolbar-button">Select All</button>
+    </div>
+
+    <div id="county-map-key" class="map-key hidden">
+        <h3>County Map Key</h3>
+        <div id="county-map-key-entries"></div>
+    </div>
+
+    <div id="state-map-key" class="map-key hidden">
+        <h3>State Map Key</h3>
+        <div id="state-map-key-entries"></div>
+    </div>
+
+    <div id="json-export-context-menu" class="context-menu">
+        <div id="json-export-fields-container">
+            <!-- This container will be dynamically filled by JavaScript -->
+        </div>
+        <div class="json-export-context-menu-actions">
+            <button id="select-all-fields">Select All</button>
+            <button id="clear-all-fields">Clear</button>
+        </div>
+    </div>
+
+
+    <div id="color-controls">
+        <div id="color-palette">
+            <button class="color-btn" style="background-color: red;"></button>
+            <button class="color-btn" style="background-color: orange;"></button>
+            <button class="color-btn" style="background-color: yellow;"></button>
+            <button class="color-btn" style="background-color: green;"></button>
+            <button class="color-btn" style="background-color: blue;"></button>
+            <button class="color-btn" style="background-color: indigo;"></button>
+            <button class="color-btn" style="background-color: violet;"></button>
+        </div>
+        <input type="color" id="color-picker" value="#ff0000">
+        <button id="random-color-btn" class="toolbar-button" title="Random Color">🎨</button>
+    </div>
+
+    <div id="map-key" class="map-key hidden">
+        <h3>Map Key</h3>
+        <div id="map-key-entries"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="mapModalLabel">Map Modal Title</h2>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalMap"></div>
+                    <div class="spinner-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading map...</span>
+                        </div>
+                    </div>
+                    <div id="geoEntityDataContainer" class="mt-3">
+                        <div id="geoEntityDataSpinner" class="text-center" style="display:none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading geographic entity data...</span>
+                            </div>
+                        </div>
+                        <div id="geoEntityData">
+                            <!-- Geographic entity data will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imagePreviewModalLabel">Export Preview</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="imagePreviewContainer"></div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="format-selection">
+                        <label class="mr-2" for="formatPNG">Format:</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="exportFormat" id="formatPNG" value="png"
+                                checked>
+                            <label class="form-check-label" for="formatPNG">PNG</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="exportFormat" id="formatJPG" value="jpg">
+                            <label class="form-check-label" for="formatJPG">JPG</label>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="downloadButton">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="switch/switch.js"></script>
+</body>
+
+</html>
+
+/* Global Styles
+-------------------------------------------------- */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Map Styles
+-------------------------------------------------- */
+#map {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background-color: white;
+}
+
+/* Geographic Entity Styles
+-------------------------------------------------- */
+.geo-entity {
+    fill: #f0f0f0;
+    stroke: #7d7d7d;
+    stroke-width: 0.5;
+}
+
+.geo-entity:hover {
+    fill: #e0e0e0;
+}
+
+.geo-entity-border {
+    fill: none;
+    stroke: #000000;
+    stroke-width: 1;
+}
+
+/* Toolbar Styles
+-------------------------------------------------- */
+#toolbar {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.toolbar-button {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    text-align: center;
+    position: relative;
+}
+
+.toolbar-button:hover {
+    background: #f0f0f0;
+}
+
+/* Toolbar Button Tooltip */
+.toolbar-button::after {
+    content: attr(title);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.toolbar-button:hover::after {
+    opacity: 1;
+}
+
+/* Debug Toolbar Styles
+-------------------------------------------------- */
+.debug-toolbar {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.debug-toolbar-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.debug-toolbar-button {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    margin-bottom: 5px;
+}
+
+.debug-toolbar-button:hover {
+    background: #f0f0f0;
+}
+
+.debug-toolbar-dropdown {
+    width: 100%;
+    margin-bottom: 5px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+
+/* Zoom Controls
+-------------------------------------------------- */
+.zoom-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.zoom-button {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+    text-align: center;
+    position: relative;
+}
+
+.zoom-button:hover {
+    background: #f0f0f0;
+}
+
+/* Zoom Button Tooltip */
+.zoom-button::after {
+    content: attr(title);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #000;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.zoom-button:hover::after {
+    opacity: 1;
+}
+
+/* Mode Toggle Styles
+-------------------------------------------------- */
+#mode-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#mode-toggle:hover {
+    background-color: #e0e0e0;
+}
+
+/* Tooltip Styles
+-------------------------------------------------- */
+.tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+/* Color Controls
+-------------------------------------------------- */
+#color-controls {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#color-palette {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.color-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+#color-picker {
+    width: 100%;
+}
+
+#random-color-btn {
+    margin-top: 5px;
+    width: 100%;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#random-color-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* JSON Export Context Menu
+-------------------------------------------------- */
+#json-export-context-menu {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    width: 220px;
+}
+
+#json-export-context-menu div {
+    margin: 5px 0;
+}
+
+#json-export-context-menu label {
+    margin-left: 5px;
+}
+
+.json-export-context-menu-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+.json-export-context-menu-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+}
+
+.json-export-context-menu-button:hover {
+    background-color: #e0e0e0;
+}
+
+.json-export-context-menu-button i {
+    margin-right: 5px;
+}
+
+/* Modal Styles
+-------------------------------------------------- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-dialog {
+    margin: 1.75rem auto;
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 100%;
+    max-height: calc(100vh - 3.5rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 1rem;
+}
+
+.modal-header h5 {
+    margin: 0;
+}
+
+.modal-header .close {
+    padding: 1rem;
+    margin: -1rem -1rem -1rem auto;
+}
+
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    opacity: .75;
+}
+
+/* Spinner Styles
+-------------------------------------------------- */
+.spinner-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Modal Responsiveness */
+@media (max-width: 600px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        min-height: calc(100% - 1rem);
+        max-width: 90vw;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 1rem);
+    }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+    .modal-dialog {
+        max-width: 70vw;
+    }
+}
+
+@media (min-width: 1025px) {
+    .modal-dialog {
+        max-width: 50vw;
+    }
+}
+
+/* JSON Export Progress Bar
+-------------------------------------------------- */
+.json-export-progress-bar-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #ddd;
+    overflow: hidden;
+    display: none;
+}
+
+.json-export-progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+/* Geographic Entity Data Spinner
+-------------------------------------------------- */
+#geoEntityDataSpinner {
+    min-height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal Map
+-------------------------------------------------- */
+#modalMap {
+    height: 50vh;
+    max-height: 400px;
+    width: 100%;
+}
+
+.modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+/* Geographic Entity Data Container
+-------------------------------------------------- */
+#geoEntityDataContainer {
+    margin-top: 20px;
+}
+
+#geoEntityData {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+#geoEntityData h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+#geoEntityData p {
+    margin-bottom: 10px;
+}
+
+/* Key Map
+-------------------------------------------------- */
+.map-key {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.map-key.hidden {
+    display: none;
+}
+
+.map-key-entry {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.key-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.key-name {
+    flex: 1;
+}
+
+/* Utility Classes
+-------------------------------------------------- */
+.hidden {
+    display: none;
+}
+
+/* Custom Alert Styles
+-------------------------------------------------- */
+.alert {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+/* Alert Progress Bar
+-------------------------------------------------- */
+.alert-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+@keyframes alertProgressBar {
+    0% {
+        width: 0;
+    }
+
+    100% {
+        width: 100%;
+    }
+}
+
+/* Image Preview Modal Styles
+-------------------------------------------------- */
+#imagePreviewModal .modal-dialog {
+    max-width: 90vw;
+    max-height: 90vh;
+    margin: 1.75rem auto;
+}
+
+#imagePreviewContainer {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+#imagePreviewContainer img {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    border: 2px solid black;
+}
+
+/* Media Queries for responsiveness */
+@media (min-width: 768px) {
+    #imagePreviewModal .modal-dialog {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    #imagePreviewContainer img {
+        max-height: 75vh;
+    }
+}
+
+@media (min-width: 1200px) {
+    #imagePreviewModal .modal-dialog {
+        max-width: 98vw;
+        max-height: 98vh;
+    }
+
+    #imagePreviewContainer img {
+        max-height: 80vh;
+    }
+}
+
+/* switch.css */
+.switch-container {
+    display: inline-block;
+    position: relative;
+    width: 120px;
+    height: 50px;
+    background-color: #ccc;
+    border-radius: 25px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid black;
+    /* Black border added */
+}
+
+.switch-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s;
+}
+
+.switch-container.state .switch-track {
+    transform: translateX(-50%);
+}
+
+.switch-button {
+    width: 50%;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+}
+
+.county {
+    background-color: #6c757d;
+    /* Neutral color */
+}
+
+.state {
+    background-color: #adb5bd;
+    /* Neutral color */
+}
+
+<!-- switch.html -->
+<div id="switchContainer" class="switch-container">
+    <div id="switchTrack" class="switch-track">
+        <div class="switch-button county">County</div>
+        <div class="switch-button state">State</div>
+    </div>
+</div>
+
+// switch.js
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('.switch-container').forEach(container => {
+        container.addEventListener('click', function () {
+            this.classList.toggle('state');
+        });
+    });
+});

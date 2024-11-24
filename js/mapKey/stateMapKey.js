@@ -1,4 +1,4 @@
-// stateMapKey.js
+// js/mapKey/stateMapKey.js
 
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
 

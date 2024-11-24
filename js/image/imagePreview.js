@@ -1,3 +1,5 @@
+// js/image/imagePreview.js
+
 import { generateBaseImage } from './baseImage.js';
 import { config } from './imageConfig.js';
 
