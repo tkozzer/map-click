@@ -5,7 +5,7 @@
     "main": "js/main.js",
     "scripts": {
         "start": "http-server -p 3000 -c-1",
-        "build": "mkdir -p dist && cp -r index.html js style.css switch images dist/ && uglifyjs-folder js -eo dist/js && cleancss -o dist/style.css style.css"
+        "build": "mkdir -p dist && cp -r index.html js style.css switch dist/ && uglifyjs-folder js -eo dist/js && cleancss -o dist/style.css style.css"
     },
     "devDependencies": {
         "clean-css-cli": "^5.6.2",

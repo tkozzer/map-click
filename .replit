@@ -1,0 +1,21 @@
+modules = ["nodejs-20", "web", "nodejs-22"]
+run = "npm start"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+deploymentTarget = "static"
+publicDir = "dist"
+build = ["sh", "-c", "npm run build"]
+
+[env]
+NODE_ENV = "production"
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 8080
+externalPort = 80

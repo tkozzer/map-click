@@ -5,13 +5,15 @@ import { selectAllCounties, selectCountiesInStates, deselectCountiesInStates } f
 import { selectAllStates } from './stateSelection.js';
 import { getErrorLog, clearErrorLog } from './county.js';
 import { usStateEntityIds } from './usStates.js';
+import { IS_DEVELOPMENT } from './config.js';
 
 let stateDropdown;
 let selectCountiesButton;
 let deselectCountiesButton;
 
-
 export function initializeDebugToolbar() {
+    if (!IS_DEVELOPMENT) return; // Skip initialization if not in development
+
     const selectAllButton = document.getElementById('select-all-button');
     selectAllButton.addEventListener('click', handleSelectAll);
 
@@ -101,6 +103,8 @@ function handleDeselectCounties() {
 }
 
 export function updateToolbarVisibility() {
+    if (!IS_DEVELOPMENT) return; // Skip visibility updates if not in development
+
     const isCountyMode = getIsCountyMode();
     stateDropdown.style.display = isCountyMode ? 'block' : 'none';
     selectCountiesButton.style.display = isCountyMode ? 'block' : 'none';
