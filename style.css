@@ -221,37 +221,58 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 5px;
+    width: 150px;
 }
 
 #color-palette {
     display: flex;
     margin-bottom: 5px;
+    justify-content: space-between;
 }
 
 .color-btn {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     border: none;
-    margin-right: 5px;
+    margin-right: 3px;
     cursor: pointer;
+}
+
+.color-btn:last-child {
+    margin-right: 0;
 }
 
 #color-picker {
     width: 100%;
+    margin-bottom: 5px;
 }
 
 #random-color-btn {
-    margin-top: 5px;
     width: 100%;
     padding: 5px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
 #random-color-btn:hover {
     background-color: #e0e0e0;
+}
+
+#hex-color-input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    display: block;
+    font-family: monospace;
+}
+
+#hex-color-input::placeholder {
+    color: #999;
 }
 
 /* JSON Export Context Menu
@@ -627,4 +648,31 @@ body {
     #imagePreviewContainer img {
         max-height: 80vh;
     }
+}
+
+/* Update the hex input container styles */
+.hex-input-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.hex-prefix {
+    color: #666;
+    margin-right: 2px;
+    font-family: monospace;
+}
+
+#hex-color-input {
+    width: calc(100% - 12px);
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    display: block;
+    font-family: monospace;
+}
+
+#hex-color-input::placeholder {
+    color: #999;
 }

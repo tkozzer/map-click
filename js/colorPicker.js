@@ -8,10 +8,12 @@ export function initializeColorPicker() {
     d3.selectAll(".color-btn").on("click", function () {
         currentColor = this.style.backgroundColor;
         d3.select("#color-picker").property("value", d3.rgb(currentColor).formatHex());
+        d3.select("#hex-color-input").property("value", d3.rgb(currentColor).formatHex().slice(1));
     });
 
     d3.select("#color-picker").on("input", function () {
         currentColor = this.value;
+        d3.select("#hex-color-input").property("value", this.value.slice(1));
     });
 
     // Add event listener for the random color button
@@ -19,6 +21,19 @@ export function initializeColorPicker() {
         const randomColor = generateRandomColor();
         currentColor = randomColor;
         d3.select("#color-picker").property("value", randomColor);
+        d3.select("#hex-color-input").property("value", randomColor.slice(1));
+    });
+
+    // Add event listener for hex color input
+    d3.select("#hex-color-input").on("input", function () {
+        let value = this.value.replace(/[^0-9A-Fa-f]/g, '').slice(0, 6);
+        this.value = value; // Keep the input clean
+
+        // Only update if it's a valid hex color (6 characters)
+        if (value.length === 6) {
+            currentColor = '#' + value;
+            d3.select("#color-picker").property("value", '#' + value);
+        }
     });
 }
 
