@@ -4,7 +4,15 @@ import { svg, g, path } from './mapSetup.js';
 
 export const zoom = d3.zoom()
     .scaleExtent([0.5, 8])  // Set minimum and maximum zoom levels
-    .on("zoom", zoomed);
+    .on("zoom", zoomed)
+    .filter(event => {
+        // Disable double-click zoom
+        if (event.type === 'dblclick') {
+            return false;
+        }
+        // Allow all other zoom events (wheel, pinch, etc.)
+        return !event.ctrlKey && !event.button;
+    });
 
 let initialTransform;
 let nationData;
