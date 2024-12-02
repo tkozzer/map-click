@@ -69,8 +69,13 @@ Promise.all([
 function toggleMode() {
     isCountyMode = !isCountyMode;
     d3.select("#switchTrack").attr("transform", isCountyMode ? "translateX(0)" : "translateX(-50%)");
+
+    // Toggle visibility of counties
     g.selectAll(".county").style("display", isCountyMode ? null : "none");
+
+    // Toggle visibility of states and split-states
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
+    g.selectAll(".split-state").style("display", isCountyMode ? "none" : null);
 
     // Dispatch state mode event
     window.dispatchEvent(new CustomEvent('statemode', {
