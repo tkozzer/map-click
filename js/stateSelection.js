@@ -72,7 +72,9 @@ function toggleStateSelection(element, d) {
         currentElement: element
     });
 
-    const currentFill = d3.select(element).style("fill");
+    // Get the original state path for consistent color checking
+    const originalState = d3.select(`path[data-id="${d.id}"]`);
+    const currentFill = originalState.style("fill");
     const defaultColorHex = d3.rgb(defaultStateColor).toString();
     const currentColorHex = d3.rgb(currentColor).toString();
 
@@ -268,13 +270,23 @@ function toggleStateSelection(element, d) {
     } else {
         console.log('Processing single color state:', result);
         // Single color state
-        const state = d3.select(element);
-        state.style("fill", result)
+        const originalState = d3.select(`path[data-id="${d.id}"]`);
+        originalState.style("fill", result)
             .style('opacity', 1)
             .style('pointer-events', 'all');
+
+        // Also update the clicked element if it's different from the original state
+        const clickedElement = d3.select(element);
+        if (element !== originalState.node()) {
+            clickedElement.style("fill", result)
+                .style('opacity', 1)
+                .style('pointer-events', 'all');
+        }
+
         // Remove any existing cloned paths
         d3.selectAll(`path[data-clone-for="${d.id}"]`).remove();
         d3.selectAll(`g[data-clone-for="${d.id}"]`).remove();
+
         if (stateIndex === -1) {
             selectedStates.push({ ...d, color: result });
         } else {

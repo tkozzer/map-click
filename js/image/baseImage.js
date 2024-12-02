@@ -101,18 +101,81 @@ export async function generateBaseImage(scale) {
                 .style("stroke", "#7d7d7d")
                 .style("stroke-width", `${getScaledValue(config.baseStrokeWidth, scale)}px`);
         } else {
-            offscreenG.selectAll("path")
+            // First create the defs section for patterns
+            const defs = offscreenSvg.append("defs");
+
+            // Draw base states first
+            offscreenG.selectAll("path.state-base")
                 .data(stateFeatures)
                 .join("path")
-                .attr("class", "state")
+                .attr("class", "state-base")
                 .attr("d", offscreenPath)
                 .style("fill", d => {
+                    const clonedPaths = d3.selectAll(`path[data-clone-for="${d.id}"]`);
+                    if (!clonedPaths.empty()) {
+                        return "none"; // Will be handled by the split paths
+                    }
                     const state = g.selectAll(".states path")
                         .filter(function (data) { return data.id === d.id; });
                     return !state.empty() ? state.style("fill") : defaultStateColor;
                 })
                 .style("stroke", "#000000")
                 .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
+
+            // Handle multi-colored states
+            stateFeatures.forEach(d => {
+                const clonedPaths = d3.selectAll(`path[data-clone-for="${d.id}"]`);
+                if (!clonedPaths.empty()) {
+                    const topPath = clonedPaths.filter('[data-clone-type="top"]');
+                    const bottomPath = clonedPaths.filter('[data-clone-type="bottom"]');
+
+                    if (!topPath.empty() && !bottomPath.empty()) {
+                        const topColor = topPath.style("fill");
+                        const bottomColor = bottomPath.style("fill");
+
+                        // Create clip paths for this state
+                        const clipPathTop = defs.append("clipPath")
+                            .attr("id", `export-clip-top-${d.id}`)
+                            .attr("clipPathUnits", "objectBoundingBox");
+
+                        clipPathTop.append("rect")
+                            .attr("x", 0)
+                            .attr("y", 0)
+                            .attr("width", 1)
+                            .attr("height", 0.5);
+
+                        const clipPathBottom = defs.append("clipPath")
+                            .attr("id", `export-clip-bottom-${d.id}`)
+                            .attr("clipPathUnits", "objectBoundingBox");
+
+                        clipPathBottom.append("rect")
+                            .attr("x", 0)
+                            .attr("y", 0.5)
+                            .attr("width", 1)
+                            .attr("height", 0.5);
+
+                        // Create the split paths
+                        offscreenG.append("path")
+                            .attr("d", offscreenPath(d))
+                            .style("fill", topColor)
+                            .attr("clip-path", `url(#export-clip-top-${d.id})`)
+                            .style("stroke", "none");
+
+                        offscreenG.append("path")
+                            .attr("d", offscreenPath(d))
+                            .style("fill", bottomColor)
+                            .attr("clip-path", `url(#export-clip-bottom-${d.id})`)
+                            .style("stroke", "none");
+
+                        // Add stroke on top
+                        offscreenG.append("path")
+                            .attr("d", offscreenPath(d))
+                            .style("fill", "none")
+                            .style("stroke", "#000000")
+                            .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
+                    }
+                }
+            });
         }
 
         // Always draw state borders

@@ -17,6 +17,17 @@ export function initializeMultiColorToggle() {
     });
 }
 
+export function cleanupMultiColorState(stateId) {
+    // Remove any existing cloned paths for this state
+    d3.selectAll(`path[data-clone-for="${stateId}"]`).remove();
+    d3.selectAll(`g[data-clone-for="${stateId}"]`).remove();
+
+    // Show the original state path
+    const originalState = d3.select(`path[data-id="${stateId}"]`);
+    originalState.style('opacity', 1)
+        .style('pointer-events', 'all');
+}
+
 export function handleStateColor(stateId, newColor) {
     console.log('=== handleStateColor START ===');
     console.log('Input:', { stateId, newColor, isMultiColorMode });
@@ -26,11 +37,18 @@ export function handleStateColor(stateId, newColor) {
         // In single color mode, toggle between new color and default
         const currentColors = stateColors.get(stateId) || [];
         console.log('Single color mode - current colors:', currentColors);
-        if (currentColors.length > 0 && currentColors[0] === newColor) {
+
+        // Clean up any multi-color state elements
+        cleanupMultiColorState(stateId);
+
+        // If the state has the same single color, reset to default
+        if (currentColors.length === 1 && currentColors[0] === newColor) {
             stateColors.delete(stateId);
             console.log('Single color mode - resetting to default');
             return null; // Reset to default
         }
+
+        // Always set new color in single color mode, regardless of previous state
         stateColors.set(stateId, [newColor]);
         console.log('Single color mode - setting new color:', newColor);
         return newColor;
