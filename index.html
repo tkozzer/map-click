@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive US County Map</title>
+    <title>Interactive US Map</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="switch/switch.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -18,13 +18,27 @@
 </head>
 
 <body>
+    <div class="mobile-message-overlay">
+        <div class="mobile-message-content">
+            <h2>Desktop Access Required</h2>
+            <p>This application is currently optimized for desktop use only. Mobile access is coming soon!</p>
+        </div>
+    </div>
     <div id="map"></div>
+    <div id="multi-color-toggle">
+        <label>Multi-color Mode</label>
+        <label class="toggle-switch">
+            <input type="checkbox" id="multi-color-checkbox">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+
     <div id="toolbar">
         <!-- Custom switch component integrated here -->
         <div id="switchContainer" class="switch-container toolbar-button" title="Toggle County/State Mode">
             <div id="switchTrack" class="switch-track">
-                <div class="switch-button county">County</div>
                 <div class="switch-button state">State</div>
+                <div class="switch-button county">County</div>
             </div>
         </div>
         <div id="reset-button" class="toolbar-button" title="Reset"><i class="fas fa-sync-alt"></i></div>

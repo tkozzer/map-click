@@ -12,8 +12,9 @@ import { initializeCountyMapKey, clearCountyMapKey, toggleCountyMapKey } from '.
 import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './mapKey/stateMapKey.js';
 import { initializeContextMenus } from './contextMenuUtils.js';
 import { initializeDebugToolbar, updateToolbarVisibility } from './debugToolbar.js';
+import { initializeMultiColorToggle } from './multiColorState.js';
 
-export let isCountyMode = true;
+export let isCountyMode = false;
 
 // Export the function to get the current mode
 export function getIsCountyMode() {
@@ -51,7 +52,18 @@ Promise.all([
         .style("stroke-width", "1px");
 
     initializeZoom(nationData);
-    initializeDebugToolbar(); // Add this line
+    initializeDebugToolbar();
+
+    // Set initial state mode
+    d3.select("#switchTrack").attr("transform", "translateX(-50%)");
+    g.selectAll(".county").style("display", "none");
+    g.selectAll(".states path").style("display", null);
+    updateMapKeyVisibility();
+    updateContextMenu();
+    updateToolbarVisibility();
+    window.dispatchEvent(new CustomEvent('statemode', {
+        detail: { isCountyMode: false }
+    }));
 });
 
 function toggleMode() {
@@ -59,9 +71,15 @@ function toggleMode() {
     d3.select("#switchTrack").attr("transform", isCountyMode ? "translateX(0)" : "translateX(-50%)");
     g.selectAll(".county").style("display", isCountyMode ? null : "none");
     g.selectAll(".states path").style("display", isCountyMode ? "none" : null);
+
+    // Dispatch state mode event
+    window.dispatchEvent(new CustomEvent('statemode', {
+        detail: { isCountyMode }
+    }));
+
     updateMapKeyVisibility();
     updateContextMenu();
-    updateToolbarVisibility(); // Add this line
+    updateToolbarVisibility();
     console.log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 
@@ -124,3 +142,16 @@ initializeCountyMapKey();
 initializeStateMapKey();
 initializeContextMenus();
 cleanupZoom();
+
+// Initialize everything after DOM content is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    initializeMultiColorToggle();
+    initializeTooltipAndContextMenu();
+    initializeColorPicker();
+    initializeCameraButton();
+    initializeJsonExport();
+    initializeCountyMapKey();
+    initializeStateMapKey();
+    initializeContextMenus();
+    cleanupZoom();
+});

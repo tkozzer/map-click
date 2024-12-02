@@ -211,6 +211,98 @@ body {
     transition: opacity 0.3s;
 }
 
+/* Multi-color Toggle Switch
+-------------------------------------------------- */
+#multi-color-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    align-items: center;
+    background: white;
+    padding: 8px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    cursor: help;
+}
+
+#multi-color-toggle::after {
+    content: "Only 2 colors per state";
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    margin-bottom: 5px;
+}
+
+#multi-color-toggle:hover::after {
+    opacity: 1;
+}
+
+#multi-color-toggle.visible {
+    display: flex;
+}
+
+#multi-color-toggle label {
+    margin-right: 10px;
+    font-size: 14px;
+    user-select: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+    background-color: #2196F3;
+}
+
+input:checked+.toggle-slider:before {
+    transform: translateX(26px);
+}
+
 /* Color Controls
 -------------------------------------------------- */
 #color-controls {
@@ -675,4 +767,52 @@ body {
 
 #hex-color-input::placeholder {
     color: #999;
+}
+
+/* Mobile Message Overlay
+-------------------------------------------------- */
+.mobile-message-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 9999;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.mobile-message-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+}
+
+.mobile-message-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.mobile-message-content p {
+    color: #666;
+    line-height: 1.6;
+}
+
+@media screen and (max-width: 884px) {
+    .mobile-message-overlay {
+        display: block;
+    }
+
+    #map,
+    #toolbar,
+    .debug-toolbar,
+    #multi-color-toggle,
+    .map-key {
+        display: none !important;
+    }
 }
