@@ -1,13 +1,8 @@
-// Create a default process object if it doesn't exist
-// if (!window.process) {
-//     window.process = {
-//         env: {
-//             NODE_ENV: 'production' // Default to production
-//         }
-//     };
-// }
+// js/config.js
 
-export const IS_DEVELOPMENT = window.process?.env?.NODE_ENV !== 'production';
+export const IS_DEVELOPMENT = import.meta.env.MODE === 'development';
+console.log('IS_DEVELOPMENT', IS_DEVELOPMENT);
+console.log('import.meta.env', import.meta.env);
 
 // Logging utility functions
 export function log(...args) {

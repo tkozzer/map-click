@@ -7,7 +7,8 @@ const config = {
     },
     build: {
         outDir: 'dist'
-    }
+    },
+    envDir: '.'
 };
 
 export default config; 

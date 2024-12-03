@@ -4,8 +4,8 @@
     "description": "Interactive US County Map application",
     "type": "module",
     "scripts": {
-        "dev": "npx --no-install vite --config vite.config.mjs",
-        "build": "npx --no-install vite build --config vite.config.mjs",
+        "dev": "npx --no-install vite --config vite.config.mjs --mode development",
+        "build": "npx --no-install vite build --config vite.config.mjs --mode production",
         "preview": "npx --no-install vite preview --config vite.config.mjs"
     },
     "devDependencies": {
