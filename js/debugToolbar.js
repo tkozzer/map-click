@@ -5,7 +5,7 @@ import { selectAllCounties, selectCountiesInStates, deselectCountiesInStates } f
 import { selectAllStates } from './stateSelection.js';
 import { getErrorLog, clearErrorLog } from './county.js';
 import { usStateEntityIds } from './usStates.js';
-import { IS_DEVELOPMENT } from './config.js';
+import { IS_DEVELOPMENT, log, error } from './config.js';
 
 let stateDropdown;
 let selectCountiesButton;
@@ -71,6 +71,7 @@ function handleSelectAll() {
 function handleShowErrorLog() {
     const errorLog = getErrorLog();
     if (errorLog.length === 0) {
+        log('No errors logged.');
         alert('No errors logged.');
     } else {
         let errorMessage = 'Errors encountered:\n\n';
@@ -79,6 +80,7 @@ function handleShowErrorLog() {
             errorMessage += `   Error: ${error.error}\n`;
             errorMessage += `   Wikidata URL: ${error.wikidataUrl}\n\n`;
         });
+        error(errorMessage); // Using error() to ensure it's logged in both development and production
         alert(errorMessage);
         clearErrorLog();
     }
@@ -87,8 +89,10 @@ function handleShowErrorLog() {
 function handleSelectCounties() {
     const selectedStates = Array.from(stateDropdown.selectedOptions).map(option => option.value);
     if (selectedStates.length > 0) {
+        log('Selecting counties for states:', selectedStates);
         selectCountiesInStates(selectedStates);
     } else {
+        log('No states selected');
         alert('Please select at least one state.');
     }
 }
@@ -96,8 +100,10 @@ function handleSelectCounties() {
 function handleDeselectCounties() {
     const selectedStates = Array.from(stateDropdown.selectedOptions).map(option => option.value);
     if (selectedStates.length > 0) {
+        log('Deselecting counties for states:', selectedStates);
         deselectCountiesInStates(selectedStates);
     } else {
+        log('No states selected');
         alert('Please select at least one state.');
     }
 }

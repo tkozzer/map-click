@@ -1,6 +1,7 @@
 // js/mapKey/stateMapKey.js
 
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+import { log, warn, debug } from '../config.js';
 
 let stateMapKeyEntries = {};
 let isStateMapKeyVisible = false;
@@ -21,27 +22,27 @@ export function getStateMapKeyVisibility() {
 }
 
 export function toggleStateMapKey() {
-    console.log("toggleStateMapKey called");
+    log("toggleStateMapKey called");
     isStateMapKeyVisible = !isStateMapKeyVisible;
-    console.log("State map key visibility:", isStateMapKeyVisible);
+    log("State map key visibility:", isStateMapKeyVisible);
     updateStateMapKeyVisibility();
 }
 
 function updateStateMapKeyVisibility() {
-    console.log("updateStateMapKeyVisibility called");
+    log("updateStateMapKeyVisibility called");
     const mapKey = document.getElementById('state-map-key');
     if (mapKey) {
-        console.log("State map key element found");
+        log("State map key element found");
         if (isStateMapKeyVisible) {
-            console.log("Showing state map key");
+            log("Showing state map key");
             generateStateMapKey();
             mapKey.classList.remove('hidden');
         } else {
-            console.log("Hiding state map key");
+            log("Hiding state map key");
             mapKey.classList.add('hidden');
         }
     } else {
-        console.log("State map key element not found");
+        log("State map key element not found");
     }
 }
 
@@ -49,7 +50,7 @@ export function updateStateMapKey(state, color) {
     const maxEntries = 20; // You can adjust this value as needed
 
     if (Object.keys(stateMapKeyEntries).length >= maxEntries && !stateMapKeyEntries[color]) {
-        console.warn(`Maximum number of state map key entries (${maxEntries}) reached. Cannot add new color.`);
+        warn(`Maximum number of state map key entries (${maxEntries}) reached. Cannot add new color.`);
         if (isStateMapKeyVisible) {
             updateInfoAlert(`Maximum of ${maxEntries} properties allowed in the state map key. New colors cannot be added.`, 5000);
         }
@@ -97,7 +98,7 @@ function generateStateMapKey() {
         mapKeyContainer.innerHTML = '';
 
         if (Object.keys(stateMapKeyEntries).length === 0) {
-            console.debug('No states selected');
+            debug('No states selected');
             return;
         }
 
@@ -214,4 +215,4 @@ export function getStateMapKeyEntriesCount() {
     return Object.keys(stateMapKeyEntries).length;
 }
 
-console.log("stateMapKey.js loaded");
+debug("stateMapKey.js loaded");

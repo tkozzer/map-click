@@ -7,7 +7,8 @@ import { getStateData } from './state.js';
 import { showSuccessAlert, showErrorAlert } from './customAlerts.js';
 import { showJsonExportContextMenu } from './contextMenuUtils.js';
 import { getIsCountyMode } from './main.js';
-import { getErrorLog, clearErrorLog } from './county.js'; // Add this import
+import { getErrorLog, clearErrorLog } from './county.js';
+import { log, warn, debug, error } from './config.js';
 
 const jsonExportContextMenu = document.getElementById('json-export-context-menu');
 const jsonExportFieldsContainer = document.getElementById('json-export-fields-container');
@@ -96,8 +97,8 @@ function createContextMenu() {
         }
     });
 
-    console.log("Context menu updated. Current mode:", isCountyMode ? "County" : "State");
-    console.log("Selected fields:", Array.from(selectedFields));
+    log("Context menu updated. Current mode:", isCountyMode ? "County" : "State");
+    log("Selected fields:", Array.from(selectedFields));
 }
 
 function selectAllFields() {
@@ -124,7 +125,7 @@ function clearAllFields() {
 
 async function exportJson() {
     const startTime = new Date().getTime();
-    console.debug("Starting JSON export");
+    debug("Starting JSON export");
 
     try {
         if (exportIcon) exportIcon.style.display = 'none';
@@ -138,7 +139,7 @@ async function exportJson() {
         const selectedItems = isCountyMode ? selectedCounties : getSelectedStates();
 
         if (selectedItems.length === 0) {
-            console.warn(`No ${isCountyMode ? 'counties' : 'states'} selected for export`);
+            warn(`No ${isCountyMode ? 'counties' : 'states'} selected for export`);
             showErrorAlert(`No ${isCountyMode ? 'counties' : 'states'} selected for export. Please select ${isCountyMode ? 'counties' : 'states'} and try again.`);
             return;
         }
@@ -148,7 +149,7 @@ async function exportJson() {
         const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
 
-        console.debug("Creating download link");
+        debug("Creating download link");
         const link = document.createElement('a');
         link.href = url;
         link.download = `selected-${isCountyMode ? 'counties' : 'states'}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
@@ -157,27 +158,27 @@ async function exportJson() {
         URL.revokeObjectURL(url);
 
         const endTime = new Date().getTime();
-        const totalTime = (endTime - startTime) / 1000; // Convert to seconds
-        console.debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedItems.length} ${isCountyMode ? 'counties' : 'states'}.`);
+        const totalTime = (endTime - startTime) / 1000;
+        debug(`Export completed successfully. Total time taken: ${totalTime.toFixed(2)} seconds for ${selectedItems.length} ${isCountyMode ? 'counties' : 'states'}.`);
         showSuccessAlert('Export completed successfully!');
 
         // Print error log to console
         const errorLog = getErrorLog();
         if (errorLog.length > 0) {
-            console.error("Errors encountered during export:");
-            errorLog.forEach((error, index) => {
-                console.error(`${index + 1}. ${error.countyName}, ${error.stateName}`);
-                console.error(`   Error: ${error.error}`);
-                console.error(`   Wikidata URL: ${error.wikidataUrl}`);
+            error("Errors encountered during export:");
+            errorLog.forEach((err, index) => {
+                error(`${index + 1}. ${err.countyName}, ${err.stateName}`);
+                error(`   Error: ${err.error}`);
+                error(`   Wikidata URL: ${err.wikidataUrl}`);
             });
         } else {
-            console.log("No errors encountered during export.");
+            log("No errors encountered during export.");
         }
-        clearErrorLog(); // Clear the error log after printing
-    } catch (error) {
-        console.error('Error during export:', error);
-        console.error('Error stack:', error.stack);
-        showErrorAlert(`An error occurred during export: ${error.message}. Please check the console for more details.`);
+        clearErrorLog();
+    } catch (err) {
+        error('Error during export:', err);
+        error('Error stack:', err.stack);
+        showErrorAlert(`An error occurred during export: ${err.message}. Please check the console for more details.`);
     } finally {
         if (spinnerIcon) spinnerIcon.style.display = 'none';
         if (exportIcon) exportIcon.style.display = 'inline-block';
@@ -217,30 +218,30 @@ async function processItemsConcurrently(items, isCountyMode) {
 }
 
 async function processCounty(county) {
-    console.debug("Processing county:", county);
+    debug("Processing county:", county);
     const countyData = {};
     try {
         const countyName = county.properties.name;
         const stateName = county.properties.stateName;
-        console.debug("Fetching data for county:", countyName, stateName);
+        debug("Fetching data for county:", countyName, stateName);
         const countyDetails = await getCountyData(countyName, stateName);
         populateData(countyData, county, countyDetails, true);
-    } catch (error) {
-        console.error(`Error fetching data for county:`, county, error);
+    } catch (err) {
+        error(`Error fetching data for county:`, county, err);
     }
     return countyData;
 }
 
 async function processState(state) {
-    console.debug("Processing state:", state);
+    debug("Processing state:", state);
     const stateData = {};
     try {
         const stateName = state.properties.name;
-        console.debug("Fetching data for state:", stateName);
+        debug("Fetching data for state:", stateName);
         const stateDetails = await getStateData(stateName);
         populateData(stateData, state, stateDetails, false);
-    } catch (error) {
-        console.error(`Error fetching data for state:`, state, error);
+    } catch (err) {
+        error(`Error fetching data for state:`, state, err);
     }
     return stateData;
 }
@@ -283,16 +284,16 @@ function populateData(data, item, details, isCounty) {
                     data.wikipedia = details.wikipediaLink || 'N/A';
                     break;
                 default:
-                    console.warn(`Unknown field: ${field}`);
+                    warn(`Unknown field: ${field}`);
                     break;
             }
         });
     } else {
-        console.warn(`No details found for ${isCounty ? `county: ${item.properties.name}, state: ${item.properties.stateName}` : `state: ${item.properties.name}`}`);
+        warn(`No details found for ${isCounty ? `county: ${item.properties.name}, state: ${item.properties.stateName}` : `state: ${item.properties.name}`}`);
     }
 }
 
 export function updateContextMenu() {
     createContextMenu();
-    console.log("Context menu update triggered");
+    log("Context menu update triggered");
 }

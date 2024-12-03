@@ -2,9 +2,10 @@
 
 import { generateBaseImage } from './baseImage.js';
 import { showSuccessAlert, showErrorAlert } from '../customAlerts.js';
+import { debug, error } from '../config.js';
 
 export async function exportJpg() {
-    console.debug("Exporting as JPG");
+    debug("Exporting as JPG");
 
     const scale = 2; // Adjust the scale as needed for the export
     try {
@@ -14,7 +15,7 @@ export async function exportJpg() {
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(svgNode);
 
-        console.debug("Serialized SVG", svgString);
+        debug("Serialized SVG", svgString);
 
         const canvas = document.createElement("canvas");
         canvas.width = width;
@@ -34,7 +35,7 @@ export async function exportJpg() {
             link.download = filename;
             link.href = canvas.toDataURL("image/jpeg", 0.9); // Use JPEG format with 90% quality
 
-            console.debug("Image ready for download");
+            debug("Image ready for download");
 
             link.click();
             svg.remove();
@@ -42,14 +43,14 @@ export async function exportJpg() {
             // Add success alert
             showSuccessAlert(`Successfully exported as JPG: ${filename}`);
         };
-        image.onerror = function (error) {
-            console.error("Image loading error", error);
+        image.onerror = function (err) {
+            error("Image loading error", err);
             showErrorAlert("Error exporting as JPG. See console for details.");
         };
         image.src = 'data:image/svg+xml;base64,' + btoa(decodeURIComponent(encodeURIComponent(svgString)));
-        console.debug("Image source set", image.src);
-    } catch (error) {
-        console.error("Error generating base image", error);
+        debug("Image source set", image.src);
+    } catch (err) {
+        error("Error generating base image", err);
         showErrorAlert("Error exporting as JPG. See console for details.");
     }
 }

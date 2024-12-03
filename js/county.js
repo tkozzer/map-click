@@ -8,8 +8,8 @@ import {
     formatArea,
     searchWikidata
 } from './data/wikiData.js';
-
 import { alaskaData } from './data/alaska.js';
+import { debug, error } from './config.js';
 
 let errorLog = [];
 
@@ -32,19 +32,19 @@ async function searchWikidataForCounty(countyName, stateName, regionType) {
     for (let query of searchQueries) {
         let searchResults = await searchWikidata(query);
         if (searchResults && searchResults.length > 0) {
-            console.debug(`Found results for query: ${query}`);
+            debug(`Found results for query: ${query}`);
             return searchResults;
         }
     }
 
-    console.debug(`No results found for ${countyName}`);
+    debug(`No results found for ${countyName}`);
     return null;
 }
 
 export async function getCountyData(countyName, stateName) {
     try {
         const regionType = getRegionType(stateName);
-        console.debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
+        debug(`Fetching data for ${countyName} ${regionType}, ${stateName}`);
 
         let wikidataId;
         let wikipediaLink;
@@ -70,7 +70,7 @@ export async function getCountyData(countyName, stateName) {
             wikipediaLink = await getWikipediaLink(wikidataId);
         }
 
-        console.debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
+        debug(`Found Wikidata ID for ${countyName}: ${wikidataId}`);
 
         const propertyIds = ['P1082', 'P625', 'P2046', 'P17', 'P856', 'P36', 'P402'];
         const propertyValues = await getPropertyValueBatch(wikidataId, propertyIds);
@@ -88,14 +88,14 @@ export async function getCountyData(countyName, stateName) {
             wikipediaLink: wikipediaLink || 'N/A'
         };
 
-        console.debug(`Formatted data for ${countyName}:`, data);
+        debug(`Formatted data for ${countyName}:`, data);
         return data;
-    } catch (error) {
-        console.error('Error in getCountyData:', error);
+    } catch (err) {
+        error('Error in getCountyData:', err);
         errorLog.push({
             countyName: countyName,
             stateName: stateName,
-            error: error.message,
+            error: err.message,
             wikidataUrl: `https://www.wikidata.org/wiki/Special:Search?search=${encodeURIComponent(countyName + ' ' + stateName)}&go=Go`
         });
         return null;
@@ -131,8 +131,8 @@ export async function fetchAndDisplayCountyData(countyName, stateName) {
 
         const data = await getCountyData(countyName, stateName);
         displayCountyData(data);
-    } catch (error) {
-        console.error('Error fetching county data:', error);
+    } catch (err) {
+        error('Error fetching county data:', err);
         dataContainer.innerHTML = '<p>Error fetching county data.</p>';
     } finally {
         spinner.style.display = 'none';

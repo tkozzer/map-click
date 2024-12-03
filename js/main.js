@@ -13,6 +13,7 @@ import { initializeStateMapKey, clearStateMapKey, toggleStateMapKey } from './ma
 import { initializeContextMenus } from './contextMenuUtils.js';
 import { initializeDebugToolbar, updateToolbarVisibility } from './debugToolbar.js';
 import { initializeMultiColorToggle } from './multiColorState.js';
+import { log } from './config.js';
 
 export let isCountyMode = false;
 
@@ -85,7 +86,7 @@ function toggleMode() {
     updateMapKeyVisibility();
     updateContextMenu();
     updateToolbarVisibility();
-    console.log("Mode toggled:", isCountyMode ? "County" : "State");
+    log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 
 function updateMapKeyVisibility() {
@@ -101,13 +102,13 @@ function updateMapKeyVisibility() {
 }
 
 function toggleMapKey() {
-    console.log("toggleMapKey called");
-    console.log("Current mode:", isCountyMode ? "County" : "State");
+    log("toggleMapKey called");
+    log("Current mode:", isCountyMode ? "County" : "State");
     if (isCountyMode) {
-        console.log("Toggling county map key");
+        log("Toggling county map key");
         toggleCountyMapKey();
     } else {
-        console.log("Toggling state map key");
+        log("Toggling state map key");
         toggleStateMapKey();
     }
 }
