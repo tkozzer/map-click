@@ -2,6 +2,7 @@
 
 import { mapKeyConfig, getScaledMapKeyValue } from './mapKeyConfig.js';
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+import { warn, debug, error } from '../config.js';
 
 let mapKeyEntries = {};
 let isMapKeyVisible = false;
@@ -36,7 +37,7 @@ export function toggleMapKey() {
 
 export function updateMapKey(county, color) {
     if (Object.keys(mapKeyEntries).length >= mapKeyConfig.maxEntries && !mapKeyEntries[color]) {
-        console.warn(`Maximum number of map key entries (${mapKeyConfig.maxEntries}) reached. Cannot add new color.`);
+        warn(`Maximum number of map key entries (${mapKeyConfig.maxEntries}) reached. Cannot add new color.`);
         if (isMapKeyVisible) {
             updateInfoAlert(`Maximum of ${mapKeyConfig.maxEntries} properties allowed in the map key. New colors cannot be added.`, 5000);
         }
@@ -49,7 +50,7 @@ export function updateMapKey(county, color) {
     mapKeyEntries[color].counties.add(county);
 
     // Add this debug log
-    console.debug('Updated mapKeyEntries:', JSON.stringify(mapKeyEntries, (key, value) => {
+    debug('Updated mapKeyEntries:', JSON.stringify(mapKeyEntries, (key, value) => {
         if (value instanceof Set) return Array.from(value);
         return value;
     }, 2));
@@ -85,10 +86,10 @@ export function clearMapKey() {
 }
 
 export function calculateMapKeyWidth(scale) {
-    console.debug('Calculating map key width. Scale:', scale);
+    debug('Calculating map key width. Scale:', scale);
 
     const numEntries = Object.keys(mapKeyEntries).length;
-    console.debug('Number of entries:', numEntries);
+    debug('Number of entries:', numEntries);
 
     if (numEntries > 0 && isMapKeyVisible) {
         const fontSize = getScaledMapKeyValue(mapKeyConfig.baseFontSize, scale);
@@ -97,7 +98,7 @@ export function calculateMapKeyWidth(scale) {
         const rightPadding = getScaledMapKeyValue(mapKeyConfig.baseRightPadding, scale);
 
         if (isNaN(fontSize) || isNaN(colorBoxSize) || isNaN(labelPadding) || isNaN(rightPadding)) {
-            console.error('Invalid scaled value detected', {
+            error('Invalid scaled value detected', {
                 fontSize,
                 colorBoxSize,
                 labelPadding,
@@ -106,10 +107,10 @@ export function calculateMapKeyWidth(scale) {
             return 0;
         }
 
-        console.debug('Font size:', fontSize);
-        console.debug('Color box size:', colorBoxSize);
-        console.debug('Label padding:', labelPadding);
-        console.debug('Right padding:', rightPadding);
+        debug('Font size:', fontSize);
+        debug('Color box size:', colorBoxSize);
+        debug('Label padding:', labelPadding);
+        debug('Right padding:', rightPadding);
 
         // Create an offscreen canvas to measure text width
         const canvas = document.createElement('canvas');
@@ -129,19 +130,19 @@ export function calculateMapKeyWidth(scale) {
         }
 
         const totalWidth = colorBoxSize + labelPadding + maxLabelWidth + rightPadding;
-        console.debug('Total calculated width:', totalWidth);
+        debug('Total calculated width:', totalWidth);
         return isNaN(totalWidth) ? 0 : totalWidth;  // Ensure it returns a number
     }
-    console.debug('Returning 0 width');
+    debug('Returning 0 width');
     return 0;
 }
 
 export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
-    console.debug('Adding map key entries. startX:', startX, 'svgHeight:', svgHeight, 'keyMapWidth:', keyMapWidth, 'scale:', scale);
+    debug('Adding map key entries. startX:', startX, 'svgHeight:', svgHeight, 'keyMapWidth:', keyMapWidth, 'scale:', scale);
 
     try {
         const numEntries = Object.keys(mapKeyEntries).length;
-        console.debug('Number of map key entries:', numEntries);
+        debug('Number of map key entries:', numEntries);
 
         if (numEntries > 0 && isMapKeyVisible) {
             // Provide default values if scale is undefined
@@ -155,7 +156,7 @@ export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
             const keymapHeight = numEntries * entryHeight;
             const startY = (svgHeight - keymapHeight) / 2;
 
-            console.debug('Calculated dimensions:', {
+            debug('Calculated dimensions:', {
                 fontSize,
                 entryHeight,
                 colorBoxSize,
@@ -186,7 +187,7 @@ export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
                     .attr("fill", color);
 
                 const label = entry.label || `Label for ${color}`;
-                console.debug('Adding label:', label);
+                debug('Adding label:', label);
 
                 const foreignObject = entryGroup.append("foreignObject")
                     .attr("x", colorBoxSize + labelPadding)
@@ -203,15 +204,15 @@ export function addMapKeyEntries(svg, startX, svgHeight, keyMapWidth, scale) {
                     .style("text-overflow", "ellipsis")
                     .text(label);
 
-                console.debug(`Label "${label}" added`);
+                debug(`Label "${label}" added`);
             });
 
-            console.debug('Map key added successfully');
+            debug('Map key added successfully');
         } else {
-            console.debug('Map key not added: either no entries or not visible');
+            debug('Map key not added: either no entries or not visible');
         }
-    } catch (error) {
-        console.error('Error in addMapKeyEntries:', error);
+    } catch (err) {
+        error('Error in addMapKeyEntries:', err);
     }
 }
 
@@ -221,7 +222,7 @@ function generateMapKey() {
         mapKeyContainer.innerHTML = '';
 
         if (Object.keys(mapKeyEntries).length === 0) {
-            console.debug('No counties selected');
+            debug('No counties selected');
             return;
         }
 

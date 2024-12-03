@@ -2,11 +2,12 @@
 
 import { generateBaseImage } from './baseImage.js';
 import { config } from './imageConfig.js';
+import { debug, error } from '../config.js';
 
 let currentPreviewSvg = null;
 
 export async function generatePreview(format) {
-    console.debug(`Generating preview for ${format}`);
+    debug(`Generating preview for ${format}`);
 
     try {
         // Remove any existing preview SVG
@@ -36,8 +37,8 @@ export async function generatePreview(format) {
             const dataUrl = canvas.toDataURL(`image/${format}`);
             document.getElementById('imagePreviewContainer').innerHTML = `<img src="${dataUrl}" alt="Map Preview">`;
         };
-        image.onerror = function (error) {
-            console.error("Image loading error", error);
+        image.onerror = function (err) {
+            error("Image loading error", err);
             document.getElementById('imagePreviewContainer').innerHTML = 'Error generating preview';
             if (currentPreviewSvg) {
                 currentPreviewSvg.remove();
@@ -45,8 +46,8 @@ export async function generatePreview(format) {
             }
         };
         image.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
-    } catch (error) {
-        console.error("Error generating preview", error);
+    } catch (err) {
+        error("Error generating preview", err);
         document.getElementById('imagePreviewContainer').innerHTML = 'Error generating preview';
         if (currentPreviewSvg) {
             currentPreviewSvg.remove();

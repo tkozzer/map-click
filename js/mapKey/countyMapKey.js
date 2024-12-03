@@ -1,6 +1,7 @@
 // js/mapKey/countyMapKey.js
 
 import { showInfoAlert, updateInfoAlert } from '../customAlerts.js';
+import { log, warn, debug } from '../config.js';
 
 let countyMapKeyEntries = {};
 let isCountyMapKeyVisible = false;
@@ -21,27 +22,27 @@ export function getCountyMapKeyVisibility() {
 }
 
 export function toggleCountyMapKey() {
-    console.log("toggleCountyMapKey called");
+    log("toggleCountyMapKey called");
     isCountyMapKeyVisible = !isCountyMapKeyVisible;
-    console.log("County map key visibility:", isCountyMapKeyVisible);
+    log("County map key visibility:", isCountyMapKeyVisible);
     updateCountyMapKeyVisibility();
 }
 
 function updateCountyMapKeyVisibility() {
-    console.log("updateCountyMapKeyVisibility called");
+    log("updateCountyMapKeyVisibility called");
     const mapKey = document.getElementById('county-map-key');
     if (mapKey) {
-        console.log("County map key element found");
+        log("County map key element found");
         if (isCountyMapKeyVisible) {
-            console.log("Showing county map key");
+            log("Showing county map key");
             generateCountyMapKey();
             mapKey.classList.remove('hidden');
         } else {
-            console.log("Hiding county map key");
+            log("Hiding county map key");
             mapKey.classList.add('hidden');
         }
     } else {
-        console.log("County map key element not found");
+        log("County map key element not found");
     }
 }
 
@@ -49,7 +50,7 @@ export function updateCountyMapKey(county, color) {
     const maxEntries = 20; // You can adjust this value as needed
 
     if (Object.keys(countyMapKeyEntries).length >= maxEntries && !countyMapKeyEntries[color]) {
-        console.warn(`Maximum number of county map key entries (${maxEntries}) reached. Cannot add new color.`);
+        warn(`Maximum number of county map key entries (${maxEntries}) reached. Cannot add new color.`);
         if (isCountyMapKeyVisible) {
             updateInfoAlert(`Maximum of ${maxEntries} properties allowed in the county map key. New colors cannot be added.`, 5000);
         }
@@ -97,7 +98,7 @@ function generateCountyMapKey() {
         mapKeyContainer.innerHTML = '';
 
         if (Object.keys(countyMapKeyEntries).length === 0) {
-            console.debug('No counties selected');
+            debug('No counties selected');
             return;
         }
 
@@ -214,4 +215,4 @@ export function getCountyMapKeyEntriesCount() {
     return Object.keys(countyMapKeyEntries).length;
 }
 
-console.log("countyMapKey.js loaded");
+debug("countyMapKey.js loaded");

@@ -10,21 +10,23 @@ import {
 
 import { usStateEntityIds } from './usStates.js';
 
+import { debug, warn, error } from './config.js';
+
 function normalizeStateName(stateName) {
     return stateName.replace(/\s+/g, '_');
 }
 
 async function getStateData(stateName) {
     try {
-        console.debug(`Fetching data for ${stateName}`);
+        debug(`Fetching data for ${stateName}`);
 
         const normalizedStateName = normalizeStateName(stateName);
         const wikidataId = usStateEntityIds[normalizedStateName];
         if (!wikidataId) {
-            console.warn(`No Wikidata ID found for ${stateName}. Normalized name: ${normalizedStateName}`);
+            warn(`No Wikidata ID found for ${stateName}. Normalized name: ${normalizedStateName}`);
             return null;
         }
-        console.debug(`Using Wikidata ID for ${stateName}: ${wikidataId}`);
+        debug(`Using Wikidata ID for ${stateName}: ${wikidataId}`);
 
         const [population, coordinates, area, country, officialWebsite, capital, osmRelationId, wikipediaLink] = await Promise.all([
             getPropertyValue(wikidataId, 'P1082'), // population
@@ -59,10 +61,10 @@ async function getStateData(stateName) {
             osmRelationUrl: osmRelationUrl,
             wikipediaLink: wikipediaLink || 'N/A'
         };
-        console.debug(`Formatted data for ${stateName}:`, data);
+        debug(`Formatted data for ${stateName}:`, data);
         return data;
-    } catch (error) {
-        console.error('Error in getStateData:', error);
+    } catch (err) {
+        error('Error in getStateData:', err);
         return null;
     }
 }
@@ -96,8 +98,8 @@ export async function fetchAndDisplayStateData(stateName) {
 
         const data = await getStateData(stateName);
         displayStateData(data);
-    } catch (error) {
-        console.error('Error fetching state data:', error);
+    } catch (err) {
+        error('Error fetching state data:', err);
         dataContainer.innerHTML = '<p>Error fetching state data.</p>';
     } finally {
         spinner.style.display = 'none';

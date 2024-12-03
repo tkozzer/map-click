@@ -1,3 +1,5 @@
+import { log, error } from './config.js';
+
 export let isMultiColorMode = false;
 export let stateColors = new Map(); // Map<stateId, string[]>
 
@@ -13,7 +15,7 @@ export function initializeMultiColorToggle() {
     // Handle toggle changes
     checkbox.addEventListener('change', (event) => {
         isMultiColorMode = event.target.checked;
-        console.log('Multi-color mode:', isMultiColorMode);
+        log('Multi-color mode:', isMultiColorMode);
     });
 }
 
@@ -29,14 +31,14 @@ export function cleanupMultiColorState(stateId) {
 }
 
 export function handleStateColor(stateId, newColor) {
-    console.log('=== handleStateColor START ===');
-    console.log('Input:', { stateId, newColor, isMultiColorMode });
-    console.log('Current state colors:', stateColors);
+    log('=== handleStateColor START ===');
+    log('Input:', { stateId, newColor, isMultiColorMode });
+    log('Current state colors:', stateColors);
 
     if (!isMultiColorMode) {
         // In single color mode, toggle between new color and default
         const currentColors = stateColors.get(stateId) || [];
-        console.log('Single color mode - current colors:', currentColors);
+        log('Single color mode - current colors:', currentColors);
 
         // Clean up any multi-color state elements
         cleanupMultiColorState(stateId);
@@ -44,37 +46,37 @@ export function handleStateColor(stateId, newColor) {
         // If the state has the same single color, reset to default
         if (currentColors.length === 1 && currentColors[0] === newColor) {
             stateColors.delete(stateId);
-            console.log('Single color mode - resetting to default');
+            log('Single color mode - resetting to default');
             return null; // Reset to default
         }
 
         // Always set new color in single color mode, regardless of previous state
         stateColors.set(stateId, [newColor]);
-        console.log('Single color mode - setting new color:', newColor);
+        log('Single color mode - setting new color:', newColor);
         return newColor;
     }
 
     // Multi-color mode
     let colors = stateColors.get(stateId) || [];
-    console.log('Multi-color mode - existing colors:', colors);
+    log('Multi-color mode - existing colors:', colors);
 
     // Always set the new color if the state has no colors
     if (colors.length === 0) {
-        console.log('Multi-color mode - first color:', newColor);
+        log('Multi-color mode - first color:', newColor);
         stateColors.set(stateId, [newColor]);
         return newColor;
     }
 
     // If trying to use the same color again, prevent it
     if (colors.includes(newColor)) {
-        console.log('Multi-color mode - color already used:', newColor);
+        log('Multi-color mode - color already used:', newColor);
         return colors.length > 1 ? colors : colors[0];
     }
 
     // Add second color if we only have one color
     if (colors.length === 1) {
         colors = [colors[0], newColor];
-        console.log('Multi-color mode - adding second color:', colors);
+        log('Multi-color mode - adding second color:', colors);
         stateColors.set(stateId, colors);
         return colors;
     }
@@ -87,7 +89,7 @@ export function handleStateColor(stateId, newColor) {
         const oldColors = [...colors];
         const newColors = [newColor, oldColors[0]];  // New color on top, previous top color moves down
 
-        console.log('Multi-color mode - color shift operation:', {
+        log('Multi-color mode - color shift operation:', {
             oldColors,
             newColors,
             operation: {
@@ -108,11 +110,11 @@ export function handleStateColor(stateId, newColor) {
                 newColor: newColor
             }
         };
-        console.log('Multi-color mode - shift result:', result);
+        log('Multi-color mode - shift result:', result);
         return result;
     }
 
-    console.log('=== handleStateColor END ===');
+    log('=== handleStateColor END ===');
     return colors;
 }
 
@@ -127,12 +129,12 @@ export function clearStateColors() {
 // Create a pattern for two colors
 export function createMultiColorPattern(colors) {
     if (!Array.isArray(colors) || colors.length < 2) {
-        console.error('Invalid colors array:', colors);
+        error('Invalid colors array:', colors);
         return colors[0] || '#f0f0f0'; // Return single color or default
     }
 
     const clipPathId = `split-${colors[0].replace(/[^a-zA-Z0-9]/g, '')}-${colors[1].replace(/[^a-zA-Z0-9]/g, '')}`;
-    console.log('Creating split:', clipPathId);
+    log('Creating split:', clipPathId);
 
     // Check if elements already exist
     if (document.getElementById(`${clipPathId}-top`) && document.getElementById(`${clipPathId}-bottom`)) {

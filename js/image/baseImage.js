@@ -6,56 +6,57 @@ import { defaultCountyColor, defaultStateColor } from '../colorPicker.js';
 import { getCountyMapKeyEntries, calculateCountyMapKeyWidth, addCountyMapKeyEntries, getCountyMapKeyVisibility } from '../mapKey/countyMapKey.js';
 import { getStateMapKeyEntries, calculateStateMapKeyWidth, addStateMapKeyEntries, getStateMapKeyVisibility } from '../mapKey/stateMapKey.js';
 import { getIsCountyMode } from '../main.js';
+import { debug, error } from '../config.js';
 
 export async function generateBaseImage(scale) {
-    console.debug(`Generating base image with scale ${scale}`);
+    debug(`Generating base image with scale ${scale}`);
 
     const height = getScaledValue(config.baseHeight, scale);
     const mapWidth = getScaledValue(config.baseMapWidth, scale);
     const leftBuffer = getScaledValue(config.baseLeftBuffer, scale);
     let rightBuffer = getScaledValue(config.baseRightBuffer, scale);
 
-    console.debug('Height:', height);
-    console.debug('Map Width:', mapWidth);
-    console.debug('Left Buffer:', leftBuffer);
-    console.debug('Initial Right Buffer:', rightBuffer);
+    debug('Height:', height);
+    debug('Map Width:', mapWidth);
+    debug('Left Buffer:', leftBuffer);
+    debug('Initial Right Buffer:', rightBuffer);
 
     if (isNaN(height) || isNaN(mapWidth) || isNaN(leftBuffer) || isNaN(rightBuffer)) {
-        console.error('Invalid dimensions:', { height, mapWidth, leftBuffer, rightBuffer });
+        error('Invalid dimensions:', { height, mapWidth, leftBuffer, rightBuffer });
         throw new Error('Invalid dimensions');
     }
 
     const isCountyMode = getIsCountyMode();
     const mapKeyEntries = isCountyMode ? getCountyMapKeyEntries() : getStateMapKeyEntries();
     const hasMapKey = Object.keys(mapKeyEntries).length > 0 && (isCountyMode ? getCountyMapKeyVisibility() : getStateMapKeyVisibility());
-    console.debug('Has Map Key:', hasMapKey);
-    console.debug('Map Key Entries:', mapKeyEntries);
+    debug('Has Map Key:', hasMapKey);
+    debug('Map Key Entries:', mapKeyEntries);
 
     let mapKeyWidth = 0;
     if (hasMapKey) {
         mapKeyWidth = isCountyMode ? calculateCountyMapKeyWidth(scale) : calculateStateMapKeyWidth(scale);
-        console.debug('Calculated Map Key Width:', mapKeyWidth);
+        debug('Calculated Map Key Width:', mapKeyWidth);
 
         if (isNaN(mapKeyWidth)) {
-            console.error('Invalid map key width:', mapKeyWidth);
+            error('Invalid map key width:', mapKeyWidth);
             mapKeyWidth = 0;
         }
 
         // Adjust right buffer to accommodate the map key
         rightBuffer = Math.max(rightBuffer, mapKeyWidth + getScaledValue(30, scale)); // 30 is an additional padding
-        console.debug('Adjusted Right Buffer:', rightBuffer);
+        debug('Adjusted Right Buffer:', rightBuffer);
 
         if (isNaN(rightBuffer)) {
-            console.error('Invalid right buffer:', rightBuffer);
+            error('Invalid right buffer:', rightBuffer);
             throw new Error('Invalid right buffer');
         }
     }
 
     const totalWidth = leftBuffer + mapWidth + rightBuffer;
-    console.debug('Total Width:', totalWidth);
+    debug('Total Width:', totalWidth);
 
     if (isNaN(totalWidth)) {
-        console.error('Invalid total width:', totalWidth);
+        error('Invalid total width:', totalWidth);
         throw new Error('Invalid total width');
     }
 
@@ -191,11 +192,11 @@ export async function generateBaseImage(scale) {
 
         if (hasMapKey) {
             const mapKeyStartX = leftBuffer + mapWidth;
-            console.debug('Map Key Start X:', mapKeyStartX);
-            console.debug('Adding map key with parameters:', {
-                startX: mapKeyStartX,
-                height,
-                mapKeyWidth,
+            debug('Map Key Start X:', mapKeyStartX);
+            debug('Adding map key with parameters:', {
+                mapKeyStartX,
+                svgHeight: height,
+                keyMapWidth: mapKeyWidth,
                 scale
             });
             if (isCountyMode) {
@@ -205,10 +206,10 @@ export async function generateBaseImage(scale) {
             }
         }
 
-        console.debug('Base image generation completed successfully');
+        debug('Base image generation completed successfully');
         return { svg: offscreenSvg, width: totalWidth, height };
     } catch (error) {
-        console.error('Error generating base image:', error);
+        error('Error generating base image:', error);
         throw error;
     }
 }

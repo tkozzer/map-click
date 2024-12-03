@@ -13,6 +13,7 @@ import {
     resetState,
     getStateColors
 } from './multiColorState.js';
+import { log } from './config.js';
 
 export let selectedStates = [];
 export let stateSelection;
@@ -32,7 +33,7 @@ document.addEventListener("keyup", function (event) {
 });
 
 function resetStateToDefault(element, d) {
-    console.log('Double-click reset:', {
+    log('Double-click reset:', {
         stateId: d.id,
         stateName: d.properties.name,
         currentColors: getStateColors(d.id)
@@ -65,8 +66,8 @@ function resetStateToDefault(element, d) {
 }
 
 function toggleStateSelection(element, d) {
-    console.log('=== toggleStateSelection START ===');
-    console.log('State clicked:', {
+    log('=== toggleStateSelection START ===');
+    log('State clicked:', {
         id: d.id,
         name: d.properties.name,
         currentElement: element
@@ -78,24 +79,24 @@ function toggleStateSelection(element, d) {
     const defaultColorHex = d3.rgb(defaultStateColor).toString();
     const currentColorHex = d3.rgb(currentColor).toString();
 
-    console.log('Colors:', {
+    log('Colors:', {
         currentFill,
         defaultColorHex,
         selectedColor: currentColorHex
     });
 
     const stateIndex = selectedStates.findIndex(state => state.id === d.id);
-    console.log('State index in selectedStates:', stateIndex);
+    log('State index in selectedStates:', stateIndex);
 
     const result = handleStateColor(d.id, currentColorHex);
-    console.log('handleStateColor result:', result);
+    log('handleStateColor result:', result);
 
     if (result === null) {
-        console.log('Resetting state to default');
+        log('Resetting state to default');
         resetStateToDefault(element, d);
     } else if (result && result.type === 'shift') {
-        console.log('Processing color shift:', result);
-        console.log('Processing color shift for state:', {
+        log('Processing color shift:', result);
+        log('Processing color shift for state:', {
             stateName: d.properties.name,
             oldColors: result.oldColors,
             newColors: result.colors,
@@ -121,7 +122,7 @@ function toggleStateSelection(element, d) {
 
         // Create new pattern for shifted colors
         const splitInfo = createMultiColorPattern(result.colors);
-        console.log('New pattern created for shifted colors:', splitInfo);
+        log('New pattern created for shifted colors:', splitInfo);
 
         // Create two copies of the state path for each color
         const topHalf = container.append('path')
@@ -172,15 +173,15 @@ function toggleStateSelection(element, d) {
         // Update map key for current colors
         result.colors.forEach(color => updateStateMapKey(d, color));
 
-        console.log('Color shift completed:', {
+        log('Color shift completed:', {
             state: d.properties.name,
             finalColors: result.colors
         });
     } else if (Array.isArray(result)) {
-        console.log('Processing multi-color state:', result);
+        log('Processing multi-color state:', result);
         // Multi-color state (first two colors)
         const splitInfo = createMultiColorPattern(result);
-        console.log('Split info:', splitInfo);
+        log('Split info:', splitInfo);
 
         // Remove any existing cloned paths
         d3.selectAll(`path[data-clone-for="${d.id}"]`).remove();
@@ -195,7 +196,7 @@ function toggleStateSelection(element, d) {
             .attr('class', 'split-state')
             .attr('data-clone-for', d.id)
             .on("dblclick", function (event) {
-                console.log('Double-click detected on cloned state container:', {
+                log('Double-click detected on cloned state container:', {
                     stateId: d.id,
                     stateName: d.properties.name,
                     event: event.type
@@ -249,7 +250,7 @@ function toggleStateSelection(element, d) {
                 }
             })
             .on("dblclick", function (event) {
-                console.log('Double-click detected on original state:', {
+                log('Double-click detected on original state:', {
                     stateId: d.id,
                     stateName: d.properties.name,
                     event: event.type
@@ -268,7 +269,7 @@ function toggleStateSelection(element, d) {
         // Update map key for both colors
         result.forEach(color => updateStateMapKey(d, color));
     } else {
-        console.log('Processing single color state:', result);
+        log('Processing single color state:', result);
         // Single color state
         const originalState = d3.select(`path[data-id="${d.id}"]`);
         originalState.style("fill", result)
@@ -295,7 +296,7 @@ function toggleStateSelection(element, d) {
         updateStateMapKey(d, result);
     }
 
-    console.log('=== toggleStateSelection END ===');
+    log('=== toggleStateSelection END ===');
 }
 
 export function initializeStates(stateFeatures) {
@@ -324,7 +325,7 @@ export function initializeStates(stateFeatures) {
         })
         .on("dblclick", function (event, d) {
             if (!isCountyMode) {
-                console.log('Double-click detected on state:', {
+                log('Double-click detected on state:', {
                     stateId: d.id,
                     stateName: d.properties.name,
                     event: event.type

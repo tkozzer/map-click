@@ -3,6 +3,7 @@
 import { fetchAndDisplayCountyData } from './county.js';
 import { fetchAndDisplayStateData } from './state.js';
 import { isCountyMode } from './main.js';
+import { debug, error } from './config.js';
 
 export const tooltip = d3.select("#map")
     .append("div")
@@ -83,7 +84,7 @@ export function showContextMenu(event, d) {
         itemName = d.properties.name;
     }
 
-    console.debug(`Showing context menu for ${itemName}`);
+    debug(`Showing context menu for ${itemName}`);
 
     $('#mapModalLabel').text(`${itemName} Border`);
     $('#mapModal').modal('show');
@@ -110,7 +111,7 @@ function handleModalShow() {
 }
 
 function initializeMap() {
-    console.debug("Initializing map");
+    debug("Initializing map");
     map = L.map('modalMap').setView([37.8, -96], 4); // Center of the US
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
@@ -119,7 +120,7 @@ function initializeMap() {
 }
 
 function fetchItemBorder(item, state) {
-    console.debug(`Fetching border for ${item}, ${state}`);
+    debug(`Fetching border for ${item}, ${state}`);
 
     // Remove the previous item border if it exists
     if (itemBorder) {
@@ -138,12 +139,12 @@ function fetchItemBorder(item, state) {
         query = `https://nominatim.openstreetmap.org/search?q=${encodedState},+United+States&format=json&polygon_geojson=1`;
     }
 
-    console.debug(`Querying OSM: ${query}`);
+    debug(`Querying OSM: ${query}`);
 
     fetch(query)
         .then(response => response.json())
         .then(data => {
-            console.debug(`OSM response:`, data);
+            debug(`OSM response:`, data);
             if (data.length > 0) {
                 // Try to find the best match
                 const bestMatch = data.find(result => result.geojson && result.geojson.type !== 'Point') || data[0];
@@ -159,17 +160,17 @@ function fetchItemBorder(item, state) {
                     ];
                     addItemBorderToMap({ type: 'Polygon', coordinates: [rectangle] });
                 } else {
-                    console.error(`No valid GeoJSON or bounding box data found for ${item}`);
+                    error(`No valid GeoJSON or bounding box data found for ${item}`);
                     alert(`Unable to display border for ${item}. Only point data available.`);
                 }
             } else {
-                console.error(`No data found for ${item}`);
+                error(`No data found for ${item}`);
                 alert(`No geographic data found for ${item}.`);
             }
         })
-        .catch(error => {
-            console.error(`Error fetching border: ${error}`);
-            alert(`Error fetching border data: ${error.message}`);
+        .catch(err => {
+            error(`Error fetching border: ${err}`);
+            alert(`Error fetching border data: ${err.message}`);
         })
         .finally(() => {
             $('.spinner-container').hide();
