@@ -856,7 +856,9 @@ input:checked+.toggle-slider:before {
     #toolbar,
     .debug-toolbar,
     #multi-color-toggle,
-    .map-key {
+    .map-key,
+    .beta-label,
+    .isolation-mode-label {
         display: none !important;
     }
 }
@@ -1066,4 +1068,69 @@ input:checked+.toggle-slider:before {
 #small-states-list {
     margin-top: -5px;
     margin-bottom: 10px;
+}
+
+/* Isolation Mode Label
+-------------------------------------------------- */
+.isolation-mode-label {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background-color: #000;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    cursor: default;
+    min-width: 140px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.isolation-mode-label span {
+    transition: filter 0.2s, opacity 0.2s;
+    display: inline-block;
+}
+
+.isolation-mode-close {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.isolation-mode-label:hover .isolation-mode-close {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.isolation-mode-label:hover span {
+    filter: blur(2px);
+    opacity: 0.3;
+}
+
+.isolation-mode-close:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Hide label immediately on click */
+.isolation-mode-label.removing {
+    display: none;
 }

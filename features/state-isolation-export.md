@@ -9,6 +9,36 @@ As a user, I want to:
 - When in state mode: select a region and generate an image export of that isolated region so that I can export an image of the isolated region
 - Have the exported image include the map legend matching the current mode's configuration
 
+## Implemented Features (Phase 1)
+### Region Selection Interface
+- Added "Isolate" option in the settings (gear) dropdown menu
+- Implemented a modal interface for region selection
+- Created a responsive modal that scales with window size
+- Centered modal positioning both vertically and horizontally
+
+### Region Selection Functionality
+- Implemented predefined region selection (Northeast, Midwest, South, West)
+- Added ability to select multiple regions simultaneously
+- Implemented visual feedback for selected regions on the mini map
+- Added "Custom" mode for individual state selection
+
+### Small States Selection
+- Added easy-access buttons for hard-to-click states (RI, DE, CT, NJ, NH, VT, MA, MD, DC)
+- Small state buttons automatically sync with region selections
+- Small state buttons appear when in custom mode
+- Implemented proper state syncing between map and buttons
+
+### User Controls
+- Added "Clear All" button to reset all selections
+- Implemented smooth transitions between region and custom modes
+- Added proper state management between modes
+- Maintained selection state when switching between modes
+
+## Remaining User Stories
+- When in county mode: select a single state on the map and generate an image export of that isolated state
+- When in state mode: select a region and generate an image export of that isolated region
+- Have the exported image include the map legend matching the current mode's configuration
+
 ## Technical Requirements
 
 ### Isolation Functionality
@@ -19,11 +49,11 @@ As a user, I want to:
 - Maintain the geographical context while highlighting the selected state
 
 #### Region Isolation (State Mode)
-- Implement region selection mechanism
-- Add visual feedback for the selected region
+✓ Implement region selection mechanism
+✓ Add visual feedback for the selected region
 - Implement a mechanism to de-emphasize or hide other regions
 - Maintain the geographical context while highlighting the selected region
-- Handle the multi-state nature of regions appropriately
+✓ Handle the multi-state nature of regions appropriately
 
 ### Image Export
 - Create an export function to capture the isolated state view
@@ -32,25 +62,25 @@ As a user, I want to:
 - Ensure the export maintains the visual styling and quality
 
 ## UI/UX Considerations
-- Clear visual indication of state/region selection
-- Intuitive controls for triggering the export
+✓ Clear visual indication of state/region selection
+✓ Intuitive controls for triggering the selection
 - Smooth transitions when isolating states or regions
 - Clear feedback during the export process
-- Clear indication of which mode is active (state or region isolation)
+✓ Clear indication of which mode is active (state or region isolation)
 
 ## Implementation Notes
 - Consider using HTML5 Canvas or SVG for the export functionality
 - Evaluate browser compatibility for image export features
 - Consider resolution and scaling factors for the exported images
-- Implement proper state grouping for regional isolation
+✓ Implement proper state grouping for regional isolation
 - Consider the visual treatment of state borders within a selected region
 
 ## Future Enhancements
-- Multiple state/region selection capability
+✓ Multiple state/region selection capability
 - Custom export options (size, format, quality)
 - Ability to add labels or annotations before export
 - Batch export functionality
-- Custom region definition capability
+✓ Custom region definition capability
 
 ## Questions to Address
 - What should be the default export format and resolution?
