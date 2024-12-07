@@ -216,7 +216,7 @@ body {
 #multi-color-toggle {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     display: none;
     align-items: center;
     background: white;
@@ -231,7 +231,7 @@ body {
     content: "Only 2 colors per state";
     position: absolute;
     bottom: 100%;
-    right: 0;
+    left: 0;
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 5px 10px;
