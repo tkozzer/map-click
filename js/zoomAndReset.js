@@ -3,7 +3,7 @@
 import { svg, g, path } from './mapSetup.js';
 
 export const zoom = d3.zoom()
-    .scaleExtent([0.5, 8])  // Set minimum and maximum zoom levels
+    .scaleExtent([0.3, 8])  // Lowered minimum zoom level from 0.5 to 0.3
     .on("zoom", zoomed)
     .filter(event => {
         // Disable double-click zoom
@@ -57,7 +57,7 @@ export function zoomIn() {
 }
 
 export function zoomOut() {
-    svg.transition().duration(300).call(zoom.scaleBy, 1 / 1.5);
+    svg.transition().duration(300).call(zoom.scaleBy, 0.5);  // Changed from 1/1.5 to 0.5 for more aggressive zoom out
 }
 
 function handleWindowResize() {

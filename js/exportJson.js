@@ -45,8 +45,23 @@ const stateFields = [
 ];
 
 export function initializeJsonExport() {
-    exportJsonButton.addEventListener('contextmenu', showJsonExportContextMenu);
-    exportJsonButton.addEventListener('click', exportJson);
+    exportJsonButton.addEventListener('contextmenu', (e) => {
+        // Prevent context menu if button is disabled
+        if (exportJsonButton.classList.contains('disabled')) {
+            e.preventDefault();
+            return;
+        }
+        showJsonExportContextMenu(e);
+    });
+
+    exportJsonButton.addEventListener('click', (e) => {
+        // Prevent click if button is disabled
+        if (exportJsonButton.classList.contains('disabled')) {
+            e.preventDefault();
+            return;
+        }
+        exportJson(e);
+    });
 
     document.getElementById('select-all-fields').addEventListener('click', selectAllFields);
     document.getElementById('clear-all-fields').addEventListener('click', clearAllFields);
@@ -124,6 +139,11 @@ function clearAllFields() {
 }
 
 async function exportJson() {
+    // Return early if the button is disabled
+    if (exportJsonButton.classList.contains('disabled')) {
+        return;
+    }
+
     const startTime = new Date().getTime();
     debug("Starting JSON export");
 
