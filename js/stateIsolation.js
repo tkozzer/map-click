@@ -6,10 +6,10 @@ import { zoom, recenterMap } from './zoomAndReset.js';
 let stateIsolationModal;
 let miniMapSvg;
 let regions;
-let selectedRegions = new Set();
-let isCustomMode = false;
-let customSelectedStates = new Set();
-let isIsolationMode = false;
+export let selectedRegions = new Set();
+export let isCustomMode = false;
+export let customSelectedStates = new Set();
+export let isIsolationMode = false;
 
 async function loadRegions() {
     try {
@@ -230,14 +230,27 @@ function toggleCustomMode() {
     }
 }
 
-function clearAllSelections() {
+export function clearAllSelections() {
+    // Clear all selections
     selectedRegions.clear();
     customSelectedStates.clear();
     isCustomMode = false;
+
+    // Clear all button active states (regions and small states)
     document.querySelectorAll('.region-buttons .btn, .small-states-buttons .btn').forEach(btn => {
         btn.classList.remove('active');
     });
+
+    // Hide small states list
     document.getElementById('small-states-list').style.display = 'none';
+
+    // Update the mini-map if it exists
+    if (miniMapSvg) {
+        miniMapSvg.selectAll('.mini-map-state')
+            .classed('selected', false);
+    }
+
+    // Update the visual state
     updateVisualState();
     updateApplyButtonState();
 }
@@ -377,9 +390,6 @@ function exitIsolation() {
     d3.selectAll('path[data-clone-for]')
         .style('display', null);
 
-    // Reset zoom to show entire US with transition
-    recenterMap();
-
     // Reset selections
     selectedRegions.clear();
     customSelectedStates.clear();
@@ -391,6 +401,9 @@ function exitIsolation() {
     // Reset isolation mode flag
     isIsolationMode = false;
     log('Isolation Mode Disabled');
+
+    // Recenter the map to show entire US
+    recenterMap();
 }
 
 function enterCustomMode() {
