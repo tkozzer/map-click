@@ -167,16 +167,35 @@ function handleRegionClick(event) {
 }
 
 function toggleRegion(regionName) {
-    if (isCustomMode) return;
-
     const button = document.querySelector(`.region-buttons .btn[data-region="${regionName}"]`);
+    const region = regions.find(r => r.name === regionName);
 
-    if (selectedRegions.has(regionName)) {
-        selectedRegions.delete(regionName);
-        button.classList.remove('active');
+    if (!region) return;
+
+    if (isCustomMode) {
+        // In custom mode, add/remove all states in the region to custom selection
+        const allStatesSelected = region.states.every(state => customSelectedStates.has(state));
+
+        if (allStatesSelected) {
+            // Remove all states in this region
+            region.states.forEach(state => customSelectedStates.delete(state));
+            button.classList.remove('active');
+            selectedRegions.delete(regionName); // Also remove from regions selection
+        } else {
+            // Add all states in this region
+            region.states.forEach(state => customSelectedStates.add(state));
+            button.classList.add('active');
+            selectedRegions.add(regionName); // Also add to regions selection
+        }
     } else {
-        selectedRegions.add(regionName);
-        button.classList.add('active');
+        // In region mode, toggle the region selection
+        if (selectedRegions.has(regionName)) {
+            selectedRegions.delete(regionName);
+            button.classList.remove('active');
+        } else {
+            selectedRegions.add(regionName);
+            button.classList.add('active');
+        }
     }
 
     updateVisualState();
@@ -199,7 +218,17 @@ function enterCustomMode() {
     // Update UI
     document.getElementById('custom-region-button').classList.add('active');
     document.getElementById('small-states-list').style.display = 'block';
-    updateSmallStatesButtons();
+
+    // Update small state buttons to reflect current selections
+    document.querySelectorAll('.small-states-buttons .btn').forEach(button => {
+        const stateName = button.dataset.state;
+        if (customSelectedStates.has(stateName)) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
+
     updateMapInteractions();
 }
 
@@ -210,6 +239,17 @@ function exitCustomMode() {
     // Update UI
     document.getElementById('custom-region-button').classList.remove('active');
     document.getElementById('small-states-list').style.display = 'none';
+
+    // Update region buttons to reflect current selections
+    document.querySelectorAll('.region-buttons .btn[data-region]').forEach(button => {
+        const regionName = button.dataset.region;
+        if (selectedRegions.has(regionName)) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
+
     updateMapInteractions();
 }
 
@@ -242,10 +282,30 @@ function toggleCustomMode() {
     }
 }
 
+function clearAllSelections() {
+    // Clear all selections
+    selectedRegions.clear();
+    customSelectedStates.clear();
+
+    // Clear all button active states (regions and small states)
+    document.querySelectorAll('.region-buttons .btn, .small-states-buttons .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Exit custom mode
+    isCustomMode = false;
+    document.getElementById('custom-region-button').classList.remove('active');
+    document.getElementById('small-states-list').style.display = 'none';
+
+    // Update the visual state
+    updateMapInteractions();
+}
+
 export function initializeStateIsolation() {
     const isolateButton = document.getElementById('isolate-button');
     const modalElement = document.getElementById('stateIsolationModal');
     const customButton = document.getElementById('custom-region-button');
+    const clearAllButton = document.getElementById('clearAllSelectionsButton');
 
     // Load regions data
     loadRegions();
@@ -276,10 +336,8 @@ export function initializeStateIsolation() {
     // Handle region button clicks
     document.querySelectorAll('.region-buttons .btn[data-region]').forEach(button => {
         button.addEventListener('click', (e) => {
-            if (!isCustomMode) {
-                const regionName = e.target.dataset.region;
-                toggleRegion(regionName);
-            }
+            const regionName = e.target.dataset.region;
+            toggleRegion(regionName);
         });
     });
 
@@ -295,6 +353,9 @@ export function initializeStateIsolation() {
 
     // Handle custom button click
     customButton.addEventListener('click', toggleCustomMode);
+
+    // Handle clear all button click
+    clearAllButton.addEventListener('click', clearAllSelections);
 
     // Initialize mini map when modal is shown
     modalElement.addEventListener('shown.bs.modal', () => {

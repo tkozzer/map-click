@@ -938,9 +938,28 @@ input:checked+.toggle-slider:before {
 
 /* State Isolation Modal Styles
 -------------------------------------------------- */
+#stateIsolationModal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+}
+
+#stateIsolationModal .modal-dialog {
+    max-width: 90vw;
+    margin: 0;
+    transform: none !important;
+}
+
+#stateIsolationModal .modal-dialog.modal-xl {
+    min-width: min(90vw, 1140px);
+}
+
 #isolationMapContainer {
     width: 100%;
-    height: 400px;
+    height: 60vh;
+    min-height: 400px;
+    max-height: 800px;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 4px;
@@ -956,8 +975,15 @@ input:checked+.toggle-slider:before {
     max-height: 100%;
 }
 
-#stateIsolationModal .modal-dialog {
-    max-width: 1000px;
+@media (max-width: 768px) {
+    #stateIsolationModal .modal-dialog {
+        max-width: 95vw;
+    }
+
+    #isolationMapContainer {
+        height: 50vh;
+        min-height: 300px;
+    }
 }
 
 #stateIsolationModal .modal-body {

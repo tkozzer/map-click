@@ -109,7 +109,7 @@
         <!-- State Isolation Modal -->
         <div class="modal" id="stateIsolationModal" tabindex="-1" role="dialog"
             aria-labelledby="stateIsolationModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="stateIsolationModalLabel">Isolate Region</h5>
@@ -168,8 +168,12 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="applyIsolationButton">Apply</button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearAllSelectionsButton">Clear
+                            All</button>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="applyIsolationButton">Apply</button>
+                        </div>
                     </div>
                 </div>
             </div>
