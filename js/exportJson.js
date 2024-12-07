@@ -63,6 +63,28 @@ export function initializeJsonExport() {
         exportJson(e);
     });
 
+    // Initialize gear button dropdown behavior
+    const gearButton = document.getElementById('gear-button');
+    const gearDropdown = gearButton.querySelector('.gear-dropdown');
+    let isDropdownOpen = false;
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!gearButton.contains(e.target) && isDropdownOpen) {
+            gearDropdown.style.display = 'none';
+            isDropdownOpen = false;
+            gearButton.title = 'Settings'; // Restore tooltip when dropdown closes
+        }
+    });
+
+    // Toggle dropdown only on gear button click
+    gearButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isDropdownOpen = !isDropdownOpen;
+        gearDropdown.style.display = isDropdownOpen ? 'block' : 'none';
+        gearButton.title = isDropdownOpen ? '' : 'Settings'; // Remove tooltip when dropdown is open
+    });
+
     document.getElementById('select-all-fields').addEventListener('click', selectAllFields);
     document.getElementById('clear-all-fields').addEventListener('click', clearAllFields);
 

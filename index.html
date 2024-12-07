@@ -57,11 +57,21 @@
             </div>
             <div id="camera-button" class="toolbar-button" title="Camera"><i class="fas fa-camera"></i></div>
             <div id="map-key-button" class="toolbar-button" title="Map Key"><i class="fas fa-key"></i></div>
-            <div id="export-json" class="toolbar-button disabled" title="Coming soon">
-                <i class="fas fa-file-export"></i>
-                <i class="fas fa-spinner fa-spin" style="display: none;"></i>
-                <div class="json-export-progress-bar-container">
-                    <div class="json-export-progress-bar"></div>
+            <div id="gear-button" class="toolbar-button" title="Settings">
+                <i class="fas fa-gear"></i>
+                <div class="gear-dropdown">
+                    <div class="gear-dropdown-item" id="isolate-button">
+                        <i class="fas fa-crop"></i>
+                        <span>Isolate</span>
+                    </div>
+                    <div class="gear-dropdown-item disabled" id="export-json">
+                        <i class="fas fa-file-export"></i>
+                        <span>Export JSON</span>
+                        <i class="fas fa-spinner fa-spin" style="display: none;"></i>
+                        <div class="json-export-progress-bar-container">
+                            <div class="json-export-progress-bar"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="zoom-controls">
@@ -96,6 +106,74 @@
             </div>
         </div>
 
+        <!-- State Isolation Modal -->
+        <div class="modal" id="stateIsolationModal" tabindex="-1" role="dialog"
+            aria-labelledby="stateIsolationModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="stateIsolationModalLabel">Isolate Region</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div id="isolationMapContainer">
+                                    <!-- Mini map will be initialized here -->
+                                </div>
+                                <div id="small-states-list" class="text-center" style="display: none;">
+                                    <div class="small-states-buttons">
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Rhode Island">RI</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Delaware">DE</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Connecticut">CT</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="New Jersey">NJ</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="New Hampshire">NH</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Vermont">VT</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Massachusetts">MA</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="Maryland">MD</button>
+                                        <button class="btn btn-sm btn-outline-secondary"
+                                            data-state="District of Columbia">DC</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="region-selection">
+                                    <h6>Predefined Regions</h6>
+                                    <div class="region-buttons">
+                                        <button class="btn btn-outline-primary mb-2 w-100"
+                                            data-region="Northeast">Northeast</button>
+                                        <button class="btn btn-outline-primary mb-2 w-100"
+                                            data-region="Midwest">Midwest</button>
+                                        <button class="btn btn-outline-primary mb-2 w-100"
+                                            data-region="South">South</button>
+                                        <button class="btn btn-outline-primary mb-2 w-100"
+                                            data-region="West">West</button>
+                                        <button class="btn btn-outline-primary mb-2 w-100"
+                                            id="custom-region-button">Custom</button>
+                                    </div>
+                                    <div class="mt-3">
+                                        <small class="text-muted">Click a region to select it, or create a custom region
+                                            by selecting states on the map.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="applyIsolationButton">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div id="color-controls">
             <div id="color-palette">
