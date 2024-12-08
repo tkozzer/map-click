@@ -11,6 +11,13 @@ export let isCustomMode = false;
 export let customSelectedStates = new Set();
 export let isIsolationMode = false;
 
+// Add variables to store temporary state
+let tempSelectedRegions = new Set();
+let tempCustomSelectedStates = new Set();
+let tempIsCustomMode = false;
+
+let isolationModeLabel = null;
+
 async function loadRegions() {
     try {
         const response = await fetch('resources/regions.json');
@@ -120,37 +127,45 @@ function updateMapInteractions() {
 }
 
 function updateVisualState() {
-    // Clear all selections first
-    miniMapSvg.selectAll('.mini-map-state')
-        .classed('selected', false);
-    document.querySelectorAll('.region-buttons .btn').forEach(btn => {
-        btn.classList.remove('active');
+    // Only update mini-map if it exists
+    if (miniMapSvg) {
+        // Clear all selections first
+        miniMapSvg.selectAll('.mini-map-state')
+            .classed('selected', false);
+
+        if (isCustomMode) {
+            // In custom mode, show individual state selections
+            customSelectedStates.forEach(stateName => {
+                miniMapSvg.selectAll('.mini-map-state')
+                    .filter(d => d.properties.name === stateName)
+                    .classed('selected', true);
+            });
+            updateSmallStatesButtons();
+        } else {
+            // In region mode, show region selections
+            selectedRegions.forEach(regionName => {
+                miniMapSvg.selectAll('.region-group')
+                    .filter(function () {
+                        return this.getAttribute('data-region') === regionName;
+                    })
+                    .selectAll('.mini-map-state')
+                    .classed('selected', true);
+            });
+        }
+    }
+
+    // Update region buttons to reflect current state
+    document.querySelectorAll('.region-buttons .btn[data-region]').forEach(button => {
+        const regionName = button.getAttribute('data-region');
+        if (selectedRegions.has(regionName)) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
     });
 
-    if (isCustomMode) {
-        // In custom mode, show individual state selections
-        customSelectedStates.forEach(stateName => {
-            miniMapSvg.selectAll('.mini-map-state')
-                .filter(d => d.properties.name === stateName)
-                .classed('selected', true);
-        });
-    } else {
-        // In region mode, show region selections
-        selectedRegions.forEach(regionName => {
-            // Update button state
-            const regionButton = document.querySelector(`.region-buttons .btn[data-region="${regionName}"]`);
-            if (regionButton) {
-                regionButton.classList.add('active');
-            }
-            // Update mini-map state
-            miniMapSvg.selectAll('.region-group')
-                .filter(function () {
-                    return this.getAttribute('data-region') === regionName;
-                })
-                .selectAll('.mini-map-state')
-                .classed('selected', true);
-        });
-    }
+    // Update apply button state
+    updateApplyButtonState();
 }
 
 function handleStateClick(event, d) {
@@ -218,6 +233,19 @@ function toggleState(stateName) {
         customSelectedStates.add(stateName);
         log(`Custom Mode: Selected state ${stateName}`);
     }
+
+    // Update small state button appearance
+    const stateButton = document.querySelector(`.small-states-buttons .btn[data-state="${stateName}"]`);
+    if (stateButton) {
+        if (customSelectedStates.has(stateName)) {
+            stateButton.classList.add('btn-primary');
+            stateButton.classList.remove('btn-outline-primary');
+        } else {
+            stateButton.classList.remove('btn-primary');
+            stateButton.classList.add('btn-outline-primary');
+        }
+    }
+
     updateVisualState();
     updateApplyButtonState();
 }
@@ -228,6 +256,7 @@ function toggleCustomMode() {
     } else {
         enterCustomMode();
     }
+    updateVisualState();
 }
 
 export function clearAllSelections() {
@@ -236,23 +265,97 @@ export function clearAllSelections() {
     customSelectedStates.clear();
     isCustomMode = false;
 
-    // Clear all button active states (regions and small states)
-    document.querySelectorAll('.region-buttons .btn, .small-states-buttons .btn').forEach(btn => {
+    // Reset all UI elements
+    // Reset region buttons
+    document.querySelectorAll('.region-buttons .btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-primary');
         btn.classList.remove('active');
     });
 
-    // Hide small states list
-    document.getElementById('small-states-list').style.display = 'none';
-
-    // Update the mini-map if it exists
-    if (miniMapSvg) {
-        miniMapSvg.selectAll('.mini-map-state')
-            .classed('selected', false);
+    // Reset custom button
+    const customButton = document.getElementById('custom-region-button');
+    if (customButton) {
+        customButton.classList.remove('btn-primary');
+        customButton.classList.add('btn-outline-primary');
+        customButton.classList.remove('active');
     }
 
-    // Update the visual state
+    // Reset small states list
+    const smallStatesList = document.getElementById('small-states-list');
+    if (smallStatesList) {
+        smallStatesList.style.display = 'none';
+        document.querySelectorAll('.small-states-buttons .btn').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+            btn.classList.remove('active');
+        });
+    }
+
+    // Reset mini-map if it exists
+    if (miniMapSvg) {
+        // Clear all state selections
+        miniMapSvg.selectAll('.mini-map-state')
+            .classed('selected', false);
+
+        // Clear all region selections
+        miniMapSvg.selectAll('.region-group')
+            .selectAll('.mini-map-state')
+            .classed('selected', false);
+
+        // Clear any highlighted states
+        miniMapSvg.selectAll('.mini-map-state')
+            .classed('highlighted', false);
+    }
+
+    // Update visual state and apply button
     updateVisualState();
     updateApplyButtonState();
+
+    log('Cleared all selections');
+}
+
+function createIsolationLabel() {
+    // Remove any existing label first
+    if (isolationModeLabel) {
+        isolationModeLabel.remove();
+    }
+
+    // Create new label
+    const label = document.createElement('div');
+    label.className = 'isolation-mode-label';
+
+    const labelText = document.createElement('span');
+    labelText.textContent = 'ISOLATION MODE';
+    label.appendChild(labelText);
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'isolation-mode-close';
+    closeButton.innerHTML = '×';
+    closeButton.setAttribute('aria-label', 'Exit isolation mode');
+    closeButton.setAttribute('type', 'button');
+
+    // Direct click handler
+    const handleClick = () => {
+        exitIsolation();
+        closeButton.removeEventListener('click', handleClick);
+    };
+
+    closeButton.addEventListener('click', handleClick);
+    label.appendChild(closeButton);
+
+    // Store the reference
+    isolationModeLabel = label;
+
+    document.body.appendChild(label);
+    return label;
+}
+
+function removeIsolationLabel() {
+    if (isolationModeLabel) {
+        isolationModeLabel.remove();
+        isolationModeLabel = null;
+    }
 }
 
 function applyIsolation() {
@@ -298,10 +401,6 @@ function applyIsolation() {
             return selectedStates.has(stateName) ? null : 'none';
         });
 
-    // Get the viewport dimensions
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
     // Calculate bounds of selected states
     let bounds = [[Infinity, Infinity], [-Infinity, -Infinity]];
     d3.selectAll('.states path')
@@ -321,10 +420,13 @@ function applyIsolation() {
     const x = (x0 + x1) / 2;
     const y = (y0 + y1) / 2;
 
-    // Add more padding (20% on each side) to zoom out a bit more
-    const padding = 0.8;
-    const scale = padding * Math.min(width / dx, height / dy);
-    const translate = [width / 2 - scale * x, height / 2 - scale * y + 30]; // Added 30px vertical offset to account for toolbar
+    // Get the viewport dimensions
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Add padding (20% on each side)
+    const scale = 0.8 * Math.min(width / dx, height / dy);
+    const translate = [width / 2 - scale * x, height / 2 - scale * y + 30];
 
     // Close the modal first
     const modal = bootstrap.Modal.getInstance(document.getElementById('stateIsolationModal'));
@@ -333,51 +435,24 @@ function applyIsolation() {
     }
 
     // Apply the zoom transform with transition
-    setTimeout(() => {
-        svg.transition()
-            .duration(750)
-            .call(zoom.transform, d3.zoomIdentity
-                .translate(translate[0], translate[1])
-                .scale(scale));
-    }, 100);
+    svg.transition()
+        .duration(750)
+        .call(zoom.transform, d3.zoomIdentity
+            .translate(translate[0], translate[1])
+            .scale(scale));
 
     // Set isolation mode flag
     isIsolationMode = true;
     log('Isolation Mode Enabled');
 
-    // Remove any existing isolation mode label
-    const existingLabel = document.querySelector('.isolation-mode-label');
-    if (existingLabel) {
-        existingLabel.remove();
-    }
-
-    // Create and show isolation mode label with close button
-    const label = document.createElement('div');
-    label.className = 'isolation-mode-label';
-
-    const labelText = document.createElement('span');
-    labelText.textContent = 'ISOLATION MODE';
-    label.appendChild(labelText);
-
-    const closeButton = document.createElement('button');
-    closeButton.className = 'isolation-mode-close';
-    closeButton.innerHTML = '×';
-    closeButton.setAttribute('aria-label', 'Exit isolation mode');
-    closeButton.setAttribute('type', 'button');
-
-    // Direct click handler
-    const handleClick = () => {
-        label.remove();
-        exitIsolation();
-        closeButton.removeEventListener('click', handleClick);
-    };
-
-    closeButton.addEventListener('click', handleClick);
-    label.appendChild(closeButton);
-    document.body.appendChild(label);
+    // Create and show isolation mode label
+    createIsolationLabel();
 }
 
 function exitIsolation() {
+    // Remove the isolation mode label
+    removeIsolationLabel();
+
     // Show all state paths
     d3.selectAll('.states path')
         .style('display', null);
@@ -390,17 +465,54 @@ function exitIsolation() {
     d3.selectAll('path[data-clone-for]')
         .style('display', null);
 
-    // Reset selections
+    // Reset isolation mode flag first
+    isIsolationMode = false;
+    log('Isolation Mode Disabled');
+
+    // Reset all state
     selectedRegions.clear();
     customSelectedStates.clear();
     isCustomMode = false;
 
-    // Update visual state
-    updateVisualState();
+    // Reset all UI elements
+    // Reset region buttons
+    document.querySelectorAll('.region-buttons .btn').forEach(btn => {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-primary');
+        btn.classList.remove('active');  // Remove any active state
+    });
 
-    // Reset isolation mode flag
-    isIsolationMode = false;
-    log('Isolation Mode Disabled');
+    // Reset custom button
+    const customButton = document.getElementById('custom-region-button');
+    if (customButton) {
+        customButton.classList.remove('btn-primary');
+        customButton.classList.add('btn-outline-primary');
+        customButton.classList.remove('active');  // Remove any active state
+    }
+
+    // Reset small states list
+    const smallStatesList = document.getElementById('small-states-list');
+    if (smallStatesList) {
+        smallStatesList.style.display = 'none';
+        document.querySelectorAll('.small-states-buttons .btn').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-primary');
+            btn.classList.remove('active');  // Remove any active state
+        });
+    }
+
+    // Reset mini-map if it exists
+    if (miniMapSvg) {
+        miniMapSvg.selectAll('.mini-map-state')
+            .classed('selected', false);
+        miniMapSvg.selectAll('.region-group')
+            .selectAll('.mini-map-state')
+            .classed('selected', false);
+    }
+
+    // Update visual state and apply button
+    updateVisualState();
+    updateApplyButtonState();
 
     // Recenter the map to show entire US
     recenterMap();
@@ -408,7 +520,15 @@ function exitIsolation() {
 
 function enterCustomMode() {
     isCustomMode = true;
-    customSelectedStates.clear();
+    log('Entered Custom Mode');
+
+    // Show small states list
+    document.getElementById('small-states-list').style.display = 'block';
+
+    // Update custom button state
+    const customButton = document.getElementById('custom-region-button');
+    customButton.classList.add('btn-primary');
+    customButton.classList.remove('btn-outline-primary');
 
     // Convert all selected regions to individual state selections
     selectedRegions.forEach(regionName => {
@@ -420,51 +540,40 @@ function enterCustomMode() {
         }
     });
 
-    log('Entered Custom Mode');
-    if (selectedRegions.size > 0) {
-        log('- Converted Regions to States:', Array.from(customSelectedStates).join(', '));
-    }
-
-    // Update UI
-    document.getElementById('custom-region-button').classList.add('active');
-    document.getElementById('small-states-list').style.display = 'block';
-    updateSmallStatesButtons();
+    // Update map interactions
     updateMapInteractions();
+    updateVisualState();
 }
 
 function exitCustomMode() {
     isCustomMode = false;
-    customSelectedStates.clear();
-
     log('Exited Custom Mode');
-    if (selectedRegions.size > 0) {
-        log('- Active Regions:', Array.from(selectedRegions).join(', '));
-    }
 
-    // Update UI
-    document.getElementById('custom-region-button').classList.remove('active');
+    // Hide small states list
     document.getElementById('small-states-list').style.display = 'none';
 
-    // Update region buttons to reflect current selections
-    document.querySelectorAll('.region-buttons .btn[data-region]').forEach(button => {
-        const regionName = button.dataset.region;
-        if (selectedRegions.has(regionName)) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
-        }
-    });
+    // Update custom button state
+    const customButton = document.getElementById('custom-region-button');
+    customButton.classList.remove('btn-primary');
+    customButton.classList.add('btn-outline-primary');
 
+    // Clear custom selections
+    customSelectedStates.clear();
+
+    // Update map interactions
     updateMapInteractions();
+    updateVisualState();
 }
 
 function updateSmallStatesButtons() {
     document.querySelectorAll('.small-states-buttons .btn').forEach(button => {
         const stateName = button.dataset.state;
         if (customSelectedStates.has(stateName)) {
-            button.classList.add('active');
+            button.classList.add('btn-primary');
+            button.classList.remove('btn-outline-primary');
         } else {
-            button.classList.remove('active');
+            button.classList.remove('btn-primary');
+            button.classList.add('btn-outline-primary');
         }
     });
 }
@@ -475,6 +584,11 @@ function showIsolationModal() {
         stateIsolationModal = new bootstrap.Modal(document.getElementById('stateIsolationModal'));
     }
 
+    // Store current state when opening modal
+    tempSelectedRegions = new Set(selectedRegions);
+    tempCustomSelectedStates = new Set(customSelectedStates);
+    tempIsCustomMode = isCustomMode;
+
     // If we're in isolation mode, ensure the current mode and selections are reflected
     if (isIsolationMode) {
         if (isCustomMode) {
@@ -482,9 +596,7 @@ function showIsolationModal() {
         } else {
             exitCustomMode();
         }
-    } else {
-        // Reset selections if not in isolation mode
-        clearAllSelections();
+        updateVisualState();
     }
 
     // Show the modal
@@ -559,7 +671,28 @@ export function initializeStateIsolation() {
             gearDropdown.style.display = 'none';
         }
 
+        // Store current state when opening modal
+        tempSelectedRegions = new Set(selectedRegions);
+        tempCustomSelectedStates = new Set(customSelectedStates);
+        tempIsCustomMode = isCustomMode;
+
         stateIsolationModal.show();
+    });
+
+    // Initialize mini map when modal is shown
+    modalElement.addEventListener('shown.bs.modal', () => {
+        initializeMiniMap();
+    });
+
+    // Handle modal close without applying
+    modalElement.addEventListener('hidden.bs.modal', () => {
+        // Always restore the previous state when closing without applying
+        selectedRegions = new Set(tempSelectedRegions);
+        customSelectedStates = new Set(tempCustomSelectedStates);
+        isCustomMode = tempIsCustomMode;
+
+        updateVisualState();
+        updateApplyButtonState();
     });
 
     // Handle region button clicks
@@ -583,16 +716,15 @@ export function initializeStateIsolation() {
     // Handle clear all button click
     clearAllButton.addEventListener('click', clearAllSelections);
 
-    // Initialize mini map when modal is shown
-    modalElement.addEventListener('shown.bs.modal', () => {
-        initializeMiniMap();
-        // Initialize apply button state
-        updateApplyButtonState();
-    });
-
     // Handle apply button click
     document.getElementById('applyIsolationButton').addEventListener('click', () => {
-        if (!document.getElementById('applyIsolationButton').classList.contains('disabled')) {
+        const hasSelections = isCustomMode ? customSelectedStates.size > 0 : selectedRegions.size > 0;
+        if (hasSelections) {
+            // Update the temporary state with current selections
+            tempSelectedRegions = new Set(selectedRegions);
+            tempCustomSelectedStates = new Set(customSelectedStates);
+            tempIsCustomMode = isCustomMode;
+
             applyIsolation();
         }
     });

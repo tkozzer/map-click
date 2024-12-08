@@ -56,16 +56,7 @@ export function initializeZoom(nation) {
 }
 
 export function resetMap() {
-    if (isIsolationMode) {
-        // In isolation mode, first recenter on the current selection
-        recenterMap();
-        // Then clear the selections
-        clearAllSelections();
-    } else {
-        // In standard mode, clear any selections and recenter on full US
-        clearAllSelections();
-        recenterMap();
-    }
+    recenterMap();
 }
 
 export function recenterMap() {

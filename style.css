@@ -1134,3 +1134,13 @@ input:checked+.toggle-slider:before {
 .isolation-mode-label.removing {
     display: none;
 }
+
+.small-states-buttons .btn.btn-primary {
+    color: white;
+}
+
+.small-states-buttons .btn {
+    min-width: 40px;
+    font-size: 0.875rem;
+    padding: 4px 8px;
+}
