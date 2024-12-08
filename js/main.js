@@ -87,6 +87,7 @@ function toggleMode() {
     updateMapKeyVisibility();
     updateContextMenu();
     updateToolbarVisibility();
+    updateUIForMode(isCountyMode);
     log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 
@@ -190,7 +191,6 @@ export function updateUIForMode(isCountyMode) {
 
     // Update other UI elements as needed
     updateContextMenu();
-    updateMultiColorToggleVisibility();
 }
 
 initializeStateIsolation();

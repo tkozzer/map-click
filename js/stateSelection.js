@@ -11,7 +11,8 @@ import {
     clearStateColors,
     isMultiColorMode,
     resetState,
-    getStateColors
+    getStateColors,
+    cleanupMultiColorState
 } from './multiColorState.js';
 import { log } from './config.js';
 
@@ -34,23 +35,38 @@ document.addEventListener("keyup", function (event) {
 
 function resetStateToDefault(element, d) {
     log(`[RESET STATE] Starting reset for state: ${d.properties.name}`);
-    const currentFill = d3.select(element).style("fill");
-    log(`[RESET STATE] Current fill color: ${currentFill}`);
 
-    d3.select(element)
+    // Clean up multi-color state elements first
+    cleanupMultiColorState(d.id);
+    resetState(d.id);  // Reset state in multiColorState manager
+
+    // Get the original state element
+    const originalState = d3.select(`path[data-id="${d.id}"]`);
+
+    // Get current colors before resetting
+    const stateIndex = selectedStates.findIndex(s => s.id === d.id);
+    if (stateIndex !== -1) {
+        const state = selectedStates[stateIndex];
+        if (state.colors) {
+            // Remove all colors from map key for multi-color state
+            state.colors.forEach(color => removeFromStateMapKey(d, color));
+        } else if (state.color) {
+            // Remove single color from map key
+            removeFromStateMapKey(d, state.color);
+        }
+        selectedStates.splice(stateIndex, 1);
+        log(`[RESET STATE] Removing ${d.properties.name} from selected states array`);
+    }
+
+    // Reset the original state element
+    originalState
         .transition()
         .duration(750)
         .style("fill", defaultStateColor)
-        .style('opacity', 1);
+        .style('opacity', 1)
+        .style('pointer-events', 'all');
 
     log(`[RESET STATE] Set fill to default color: ${defaultStateColor}`);
-
-    // Remove from selected states if present
-    const index = selectedStates.findIndex(s => s.id === d.id);
-    if (index !== -1) {
-        log(`[RESET STATE] Removing ${d.properties.name} from selected states array`);
-        selectedStates.splice(index, 1);
-    }
 }
 
 function toggleStateSelection(element, d) {
