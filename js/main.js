@@ -14,6 +14,7 @@ import { initializeContextMenus } from './contextMenuUtils.js';
 import { initializeDebugToolbar, updateToolbarVisibility } from './debugToolbar.js';
 import { initializeMultiColorToggle } from './multiColorState.js';
 import { log } from './config.js';
+import { initializeStateIsolation } from './stateIsolation.js';
 
 export let isCountyMode = false;
 
@@ -86,6 +87,7 @@ function toggleMode() {
     updateMapKeyVisibility();
     updateContextMenu();
     updateToolbarVisibility();
+    updateUIForMode(isCountyMode);
     log("Mode toggled:", isCountyMode ? "County" : "State");
 }
 
@@ -161,3 +163,34 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeContextMenus();
     cleanupZoom();
 });
+
+export function updateUIForMode(isCountyMode) {
+    // Update the switch UI
+    const stateButton = document.querySelector('.switch-button.state');
+    const countyButton = document.querySelector('.switch-button.county');
+
+    if (isCountyMode) {
+        stateButton.classList.remove('active');
+        countyButton.classList.add('active');
+    } else {
+        stateButton.classList.add('active');
+        countyButton.classList.remove('active');
+    }
+
+    // Enable/disable the isolate button based on mode
+    const isolateButton = document.getElementById('isolate-button');
+    if (isolateButton) {
+        if (isCountyMode) {
+            isolateButton.classList.add('disabled');
+            isolateButton.title = 'Region isolation is only available in state mode';
+        } else {
+            isolateButton.classList.remove('disabled');
+            isolateButton.removeAttribute('title');
+        }
+    }
+
+    // Update other UI elements as needed
+    updateContextMenu();
+}
+
+initializeStateIsolation();

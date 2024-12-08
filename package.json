@@ -1,7 +1,7 @@
 {
     "name": "interactive-us-county-map",
-    "version": "1.0.0",
-    "description": "Interactive US County Map application",
+    "version": "1.1.0",
+    "description": "Interactive US Map application",
     "type": "module",
     "scripts": {
         "dev": "npx --no-install vite --config vite.config.mjs --mode development",

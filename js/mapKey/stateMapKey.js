@@ -68,41 +68,70 @@ export function updateStateMapKey(state, color) {
 }
 
 export function removeFromStateMapKey(state, color) {
+    log(`[MAP KEY] Attempting to remove state ${state?.properties?.name} with color ${color}`);
     if (stateMapKeyEntries[color]) {
-        stateMapKeyEntries[color].states.delete(state);
-        if (stateMapKeyEntries[color].states.size === 0) {
-            delete stateMapKeyEntries[color];
+        log(`[MAP KEY] Found entry for color ${color}`);
+
+        // Convert the Set to an array to find and remove the state by name
+        const states = Array.from(stateMapKeyEntries[color].states);
+        const stateToRemove = states.find(s => s.properties.name === state.properties.name);
+
+        if (stateToRemove) {
+            log(`[MAP KEY] Found state ${state.properties.name} in the set`);
+            stateMapKeyEntries[color].states.delete(stateToRemove);
+
+            if (stateMapKeyEntries[color].states.size === 0) {
+                log(`[MAP KEY] No more states with color ${color}, removing color entry`);
+                delete stateMapKeyEntries[color];
+            }
+
+            if (isStateMapKeyVisible) {
+                log(`[MAP KEY] Map key is visible, regenerating display`);
+                generateStateMapKey();
+            }
+        } else {
+            log(`[MAP KEY] State ${state.properties.name} not found in the set`);
         }
-        if (isStateMapKeyVisible) {
-            generateStateMapKey();
-        }
+
+        log(`[MAP KEY] Current entries:`, stateMapKeyEntries);
+    } else {
+        log(`[MAP KEY] No entry found for color ${color}`);
     }
 }
 
 export function clearStateMapKey() {
+    log(`[MAP KEY] Clearing all entries`);
+    log(`[MAP KEY] Previous entries:`, stateMapKeyEntries);
     stateMapKeyEntries = {};
     const mapKeyContainer = document.getElementById('state-map-key-entries');
     if (mapKeyContainer) {
         mapKeyContainer.innerHTML = '';
+        log(`[MAP KEY] Cleared map key container`);
     }
     const mapKey = document.getElementById('state-map-key');
     if (mapKey && !mapKey.classList.contains('hidden')) {
         mapKey.classList.add('hidden');
         isStateMapKeyVisible = false;
+        log(`[MAP KEY] Hidden map key`);
     }
+    log(`[MAP KEY] State map key cleared`);
 }
 
 function generateStateMapKey() {
+    log(`[MAP KEY] Generating state map key`);
+    log(`[MAP KEY] Current entries:`, stateMapKeyEntries);
+
     const mapKeyContainer = document.getElementById('state-map-key-entries');
     if (mapKeyContainer) {
         mapKeyContainer.innerHTML = '';
 
         if (Object.keys(stateMapKeyEntries).length === 0) {
-            debug('No states selected');
+            log(`[MAP KEY] No entries to display`);
             return;
         }
 
         Object.entries(stateMapKeyEntries).forEach(([color, entry], index) => {
+            log(`[MAP KEY] Adding entry for color ${color} with ${entry.states.size} states`);
             const entryDiv = document.createElement('div');
             entryDiv.className = 'map-key-entry';
 
@@ -138,6 +167,10 @@ function generateStateMapKey() {
             entryDiv.appendChild(statesCount);
             mapKeyContainer.appendChild(entryDiv);
         });
+
+        log(`[MAP KEY] Finished generating map key display`);
+    } else {
+        warn(`[MAP KEY] Could not find map key container element`);
     }
 }
 
