@@ -7,8 +7,29 @@ import { getCountyMapKeyEntries, calculateCountyMapKeyWidth, addCountyMapKeyEntr
 import { getStateMapKeyEntries, calculateStateMapKeyWidth, addStateMapKeyEntries, getStateMapKeyVisibility } from '../mapKey/stateMapKey.js';
 import { getIsCountyMode } from '../main.js';
 import { debug, error } from '../config.js';
+import { isIsolationMode, selectedRegions, customSelectedStates, isCustomMode } from '../stateIsolation.js';
+import { adjustProjectionForIsolation } from './isolationPreview.js';
+
+let regions = [];
+
+// Load regions data
+async function loadRegions() {
+    try {
+        const response = await fetch('resources/regions.json');
+        const data = await response.json();
+        regions = data.regions;
+    } catch (err) {
+        error('Error loading regions:', err);
+        regions = [];
+    }
+}
 
 export async function generateBaseImage(scale) {
+    // Load regions if not already loaded
+    if (regions.length === 0) {
+        await loadRegions();
+    }
+
     debug(`Generating base image with scale ${scale}`);
 
     const height = getScaledValue(config.baseHeight, scale);
@@ -82,18 +103,42 @@ export async function generateBaseImage(scale) {
         const countyFeatures = topojson.feature(us, us.objects.counties).features;
         const stateFeatures = topojson.feature(states, states.objects.states).features;
 
+        // Helper function to check if a state should be visible in isolation mode
+        const isStateVisible = (stateId) => {
+            if (!isIsolationMode) return true;
+            const state = stateFeatures.find(s => s.id === stateId);
+            if (!state) return false;
+
+            if (isCustomMode) {
+                return customSelectedStates.has(state.properties.name);
+            } else {
+                // Check if the state's region is selected
+                const stateRegion = regions.find(r => r.states.includes(state.properties.name));
+                return stateRegion && selectedRegions.has(stateRegion.name);
+            }
+        };
+
         const offscreenProjection = d3.geoAlbersUsa()
             .scale(getScaledValue(1500, scale))
             .translate([mapWidth / 2, height / 2]);
 
         const offscreenPath = d3.geoPath().projection(offscreenProjection);
 
+        // If in isolation mode, adjust the projection
+        const adjustedPath = await adjustProjectionForIsolation(
+            stateFeatures,
+            offscreenPath,
+            mapWidth,
+            height,
+            scale
+        );
+
         if (isCountyMode) {
             offscreenG.selectAll("path")
                 .data(countyFeatures)
                 .join("path")
                 .attr("class", "county")
-                .attr("d", offscreenPath)
+                .attr("d", adjustedPath)
                 .style("fill", d => {
                     const county = g.selectAll("path.county")
                         .filter(function (data) { return data.id === d.id; });
@@ -110,7 +155,8 @@ export async function generateBaseImage(scale) {
                 .data(stateFeatures)
                 .join("path")
                 .attr("class", "state-base")
-                .attr("d", offscreenPath)
+                .attr("d", adjustedPath)
+                .style("display", d => isStateVisible(d.id) ? null : "none")
                 .style("fill", d => {
                     const clonedPaths = d3.selectAll(`path[data-clone-for="${d.id}"]`);
                     if (!clonedPaths.empty()) {
@@ -125,6 +171,9 @@ export async function generateBaseImage(scale) {
 
             // Handle multi-colored states
             stateFeatures.forEach(d => {
+                // Skip if state should not be visible in isolation mode
+                if (!isStateVisible(d.id)) return;
+
                 const clonedPaths = d3.selectAll(`path[data-clone-for="${d.id}"]`);
                 if (!clonedPaths.empty()) {
                     const topPath = clonedPaths.filter('[data-clone-type="top"]');
@@ -157,20 +206,20 @@ export async function generateBaseImage(scale) {
 
                         // Create the split paths
                         offscreenG.append("path")
-                            .attr("d", offscreenPath(d))
+                            .attr("d", adjustedPath(d))
                             .style("fill", topColor)
                             .attr("clip-path", `url(#export-clip-top-${d.id})`)
                             .style("stroke", "none");
 
                         offscreenG.append("path")
-                            .attr("d", offscreenPath(d))
+                            .attr("d", adjustedPath(d))
                             .style("fill", bottomColor)
                             .attr("clip-path", `url(#export-clip-bottom-${d.id})`)
                             .style("stroke", "none");
 
                         // Add stroke on top
                         offscreenG.append("path")
-                            .attr("d", offscreenPath(d))
+                            .attr("d", adjustedPath(d))
                             .style("fill", "none")
                             .style("stroke", "#000000")
                             .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * 2, scale)}px`);
@@ -179,13 +228,14 @@ export async function generateBaseImage(scale) {
             });
         }
 
-        // Always draw state borders
+        // Always draw state borders, but respect isolation mode
         offscreenG.append("g")
             .selectAll("path")
             .data(stateFeatures)
             .join("path")
             .attr("class", "state-border")
-            .attr("d", offscreenPath)
+            .attr("d", adjustedPath)
+            .style("display", d => isStateVisible(d.id) ? null : "none")
             .style("fill", "none")
             .style("stroke", "#000000")
             .style("stroke-width", `${getScaledValue(config.baseStrokeWidth * (isCountyMode ? 1 : 2), scale)}px`);
@@ -208,8 +258,8 @@ export async function generateBaseImage(scale) {
 
         debug('Base image generation completed successfully');
         return { svg: offscreenSvg, width: totalWidth, height };
-    } catch (error) {
-        error('Error generating base image:', error);
-        throw error;
+    } catch (err) {
+        error('Error generating base image:', err);
+        throw err;
     }
 }
