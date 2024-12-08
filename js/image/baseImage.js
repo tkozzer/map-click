@@ -9,25 +9,13 @@ import { getIsCountyMode } from '../main.js';
 import { debug, error } from '../config.js';
 import { isIsolationMode, selectedRegions, customSelectedStates, isCustomMode } from '../stateIsolation.js';
 import { adjustProjectionForIsolation } from './isolationPreview.js';
-
-let regions = [];
-
-// Load regions data
-async function loadRegions() {
-    try {
-        const response = await fetch('resources/regions.json');
-        const data = await response.json();
-        regions = data.regions;
-    } catch (err) {
-        error('Error loading regions:', err);
-        regions = [];
-    }
-}
+import { regions } from '../data/regions.js';
 
 export async function generateBaseImage(scale) {
-    // Load regions if not already loaded
+
+    // Check if regions are loaded
     if (regions.length === 0) {
-        await loadRegions();
+        error('Regions not loaded');
     }
 
     debug(`Generating base image with scale ${scale}`);

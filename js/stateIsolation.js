@@ -3,10 +3,10 @@ import { log } from './config.js';
 import { svg, g, path, projection } from './mapSetup.js';
 import { zoom, recenterMap } from './zoomAndReset.js';
 import { enterIsolationMode as stateManagerEnterIsolation, exitIsolationMode as stateManagerExitIsolation } from './stateManager.js';
+import { regions } from './data/regions.js';
 
 let stateIsolationModal;
 let miniMapSvg;
-let regions;
 export let selectedRegions = new Set();
 export let isCustomMode = false;
 export let customSelectedStates = new Set();
@@ -18,16 +18,6 @@ let tempCustomSelectedStates = new Set();
 let tempIsCustomMode = false;
 
 let isolationModeLabel = null;
-
-async function loadRegions() {
-    try {
-        const response = await fetch('resources/regions.json');
-        const data = await response.json();
-        regions = data.regions;
-    } catch (error) {
-        console.error('Error loading regions:', error);
-    }
-}
 
 // Helper function to get region from state name
 function getRegionForState(stateName) {
@@ -987,7 +977,4 @@ export function initializeStateIsolation() {
             applyIsolation();
         }
     });
-
-    // Load regions data
-    loadRegions();
 } 

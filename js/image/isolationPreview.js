@@ -1,27 +1,14 @@
 import { isIsolationMode, selectedRegions, customSelectedStates, isCustomMode } from '../stateIsolation.js';
 import { getScaledValue } from './imageConfig.js';
 import { debug, error } from '../config.js';
+import { regions } from '../data/regions.js';
 
-let regions = [];
-
-// Load regions data
-async function loadRegions() {
-    try {
-        const response = await fetch('resources/regions.json');
-        const data = await response.json();
-        regions = data.regions;
-    } catch (err) {
-        error('Error loading regions:', err);
-        regions = [];
-    }
-}
-
-export async function adjustProjectionForIsolation(stateFeatures, offscreenPath, mapWidth, height, baseScale) {
+export function adjustProjectionForIsolation(stateFeatures, offscreenPath, mapWidth, height, baseScale) {
     if (!isIsolationMode) return offscreenPath;
 
     // Load regions if not already loaded
     if (regions.length === 0) {
-        await loadRegions();
+        error('Regions not loaded');
     }
 
     // Get visible states based on current isolation mode

@@ -5,23 +5,12 @@ import {
     isIsolationMode,
     selectedRegions,
     customSelectedStates,
-    isCustomMode,
-    clearAllSelections
+    isCustomMode
 } from './stateIsolation.js';
+import { regions } from './data/regions.js';
 
 let initialTransform;
 let nationData;
-let regions;
-
-// Load regions data
-fetch('resources/regions.json')
-    .then(response => response.json())
-    .then(data => {
-        regions = data.regions;
-    })
-    .catch(error => {
-        console.error('Error loading regions:', error);
-    });
 
 export const zoom = d3.zoom()
     .scaleExtent([0.3, 8])  // Lowered minimum zoom level from 0.5 to 0.3
