@@ -746,6 +746,82 @@ function initializeTooltips() {
             display: inline-block;
             position: relative;
         }
+
+        /* Modal layout adjustments */
+        #stateIsolationModal .modal-dialog {
+            max-width: 1200px;
+        }
+
+        #stateIsolationModal .modal-body .row {
+            margin: 0;
+        }
+
+        #stateIsolationModal .modal-body .col-md-8 {
+            padding-right: 20px;
+            flex: 0 0 75%;
+            max-width: 75%;
+        }
+
+        #stateIsolationModal .modal-body .col-md-4 {
+            padding-left: 0;
+            flex: 0 0 25%;
+            max-width: 25%;
+        }
+
+        .predefined-regions-container {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .predefined-regions-container h6 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .region-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+            overflow: visible;
+        }
+
+        .region-buttons .btn {
+            width: 100%;
+            text-align: center;
+            padding: 6px 12px;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        #small-states-list {
+            margin-top: 15px;
+        }
+
+        .small-states-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .small-states-buttons .btn {
+            padding: 4px 8px;
+            min-width: 40px;
+            font-size: 12px;
+        }
+
+        /* Ensure the description text stays within bounds */
+        .region-description {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #6c757d;
+        }
     `;
     document.head.appendChild(style);
 
