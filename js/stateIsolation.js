@@ -2,6 +2,7 @@ import { getIsCountyMode } from './main.js';
 import { log } from './config.js';
 import { svg, g, path, projection } from './mapSetup.js';
 import { zoom, recenterMap } from './zoomAndReset.js';
+import { enterIsolationMode as stateManagerEnterIsolation, exitIsolationMode as stateManagerExitIsolation } from './stateManager.js';
 
 let stateIsolationModal;
 let miniMapSvg;
@@ -380,6 +381,9 @@ function applyIsolation() {
         log('- Included States:', Array.from(selectedStates).join(', '));
     }
 
+    // Call state manager's enterIsolationMode with the selected states
+    stateManagerEnterIsolation(Array.from(selectedStates));
+
     // Hide state borders for non-selected states
     d3.selectAll('.state-border')
         .style('display', function (d) {
@@ -466,6 +470,9 @@ function applyIsolation() {
 }
 
 function exitIsolation() {
+    // Call state manager's exitIsolationMode
+    stateManagerExitIsolation();
+
     // Remove the isolation mode label
     removeIsolationLabel();
 

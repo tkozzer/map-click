@@ -33,35 +33,23 @@ document.addEventListener("keyup", function (event) {
 });
 
 function resetStateToDefault(element, d) {
-    log('Double-click reset:', {
-        stateId: d.id,
-        stateName: d.properties.name,
-        currentColors: getStateColors(d.id)
-    });
+    log(`[RESET STATE] Starting reset for state: ${d.properties.name}`);
+    const currentFill = d3.select(element).style("fill");
+    log(`[RESET STATE] Current fill color: ${currentFill}`);
 
-    // First reset the state colors in our data structure
-    resetState(d.id);
+    d3.select(element)
+        .transition()
+        .duration(750)
+        .style("fill", defaultStateColor)
+        .style('opacity', 1);
 
-    // Find and reset the original state path
-    const originalState = d3.select(`path[data-id="${d.id}"]`);
-    originalState.style("fill", defaultStateColor)
-        .style('opacity', 1)
-        .style('pointer-events', 'all');
+    log(`[RESET STATE] Set fill to default color: ${defaultStateColor}`);
 
-    // Remove any existing cloned paths
-    d3.selectAll(`path[data-clone-for="${d.id}"]`).remove();
-    d3.selectAll(`g[data-clone-for="${d.id}"]`).remove();
-
-    // Remove from selected states and map key
-    const stateIndex = selectedStates.findIndex(state => state.id === d.id);
-    if (stateIndex !== -1) {
-        const state = selectedStates[stateIndex];
-        if (state.colors) {
-            state.colors.forEach(color => removeFromStateMapKey(d, color));
-        } else if (state.color) {
-            removeFromStateMapKey(d, state.color);
-        }
-        selectedStates.splice(stateIndex, 1);
+    // Remove from selected states if present
+    const index = selectedStates.findIndex(s => s.id === d.id);
+    if (index !== -1) {
+        log(`[RESET STATE] Removing ${d.properties.name} from selected states array`);
+        selectedStates.splice(index, 1);
     }
 }
 
@@ -368,4 +356,43 @@ export function selectAllStates() {
 
 export function getSelectedStates() {
     return selectedStates;
+}
+
+export function resetStateById(stateId) {
+    log(`[RESET STATE] Attempting to reset state with ID: ${stateId}`);
+    const statePath = d3.select(`path[data-id="${stateId}"]`);
+    if (!statePath.empty()) {
+        const stateData = statePath.datum();
+        log(`[RESET STATE] Found state with ID ${stateId}, name: ${stateData.properties.name}`);
+        resetStateToDefault(statePath.node(), stateData);
+        log(`[RESET STATE] Successfully reset state ${stateData.properties.name} to default color`);
+    } else {
+        log(`[RESET STATE] Could not find state with ID: ${stateId}`);
+    }
+}
+
+export function resetStateByName(stateName) {
+    log(`[RESET STATE] Attempting to reset state by name: ${stateName}`);
+    g.selectAll(".states path")
+        .filter(d => d.properties.name === stateName)
+        .each(function (d) {
+            log(`[RESET STATE] Found state ${stateName} with ID ${d.id}, resetting to default`);
+            resetStateToDefault(this, d);
+            log(`[RESET STATE] Successfully reset ${stateName} to default color`);
+        });
+}
+
+export function getStateColor(stateName) {
+    log(`[COLOR CHECK] Getting color for state: ${stateName}`);
+    const statePath = g.selectAll(".states path")
+        .filter(d => d.properties.name === stateName);
+
+    if (!statePath.empty()) {
+        const color = statePath.style("fill");
+        log(`[COLOR CHECK] Found color for ${stateName}: ${color}`);
+        return color;
+    }
+
+    log(`[COLOR CHECK] No state found with name: ${stateName}`);
+    return null;
 }
