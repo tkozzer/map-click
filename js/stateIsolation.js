@@ -610,14 +610,27 @@ function handleRegionButtonClick(event) {
     const regionName = event.target.getAttribute('data-region');
     if (!regionName) return;
 
+    const region = regions.find(r => r.name === regionName);
+    if (!region) return;
+
     if (selectedRegions.has(regionName)) {
         selectedRegions.delete(regionName);
         event.target.classList.remove('active');
         log(`Region Mode: Deselected ${regionName} region`);
+
+        // Clear any states from this region from customSelectedStates
+        region.states.forEach(stateName => {
+            customSelectedStates.delete(stateName);
+        });
     } else {
         selectedRegions.add(regionName);
         event.target.classList.add('active');
         log(`Region Mode: Selected ${regionName} region`);
+
+        // Add all states from this region to customSelectedStates
+        region.states.forEach(stateName => {
+            customSelectedStates.add(stateName);
+        });
     }
 
     // Update the mini-map to reflect the selection
@@ -628,23 +641,189 @@ function handleRegionButtonClick(event) {
         .selectAll('.mini-map-state')
         .classed('selected', selectedRegions.has(regionName));
 
+    // Update small state buttons
+    updateSmallStatesButtons();
+
     // Update apply button state
     updateApplyButtonState();
 }
 
 function updateApplyButtonState() {
     const applyButton = document.getElementById('applyIsolationButton');
-    const hasSelections = isCustomMode ? customSelectedStates.size > 0 : selectedRegions.size > 0;
+    const allRegions = regions.map(r => r.name);
+    const allRegionsSelected = allRegions.every(regionName => selectedRegions.has(regionName));
 
-    if (hasSelections) {
-        applyButton.classList.remove('disabled');
-        applyButton.removeAttribute('disabled');
+    // Get all states from all regions
+    const allStates = new Set();
+    regions.forEach(region => {
+        region.states.forEach(state => allStates.add(state));
+    });
+
+    if (isCustomMode) {
+        // In custom mode, check if the selection is different from having all states
+        const hasCustomSelection = customSelectedStates.size > 0 &&
+            (customSelectedStates.size !== allStates.size ||
+                Array.from(allStates).some(state => !customSelectedStates.has(state)));
+
+        if (hasCustomSelection) {
+            applyButton.classList.remove('disabled');
+            applyButton.removeAttribute('disabled');
+            applyButton.removeAttribute('data-tooltip');
+        } else {
+            applyButton.classList.add('disabled');
+            applyButton.setAttribute('disabled', '');
+            const message = customSelectedStates.size === 0
+                ? 'Please select at least one state to isolate'
+                : 'Your selection includes all states - please customize your selection';
+            applyButton.setAttribute('data-tooltip', message);
+        }
     } else {
-        applyButton.classList.add('disabled');
-        applyButton.setAttribute('disabled', '');
+        // In region mode, check if all regions are selected
+        if (selectedRegions.size > 0 && !allRegionsSelected) {
+            applyButton.classList.remove('disabled');
+            applyButton.removeAttribute('disabled');
+            applyButton.removeAttribute('data-tooltip');
+        } else {
+            applyButton.classList.add('disabled');
+            applyButton.setAttribute('disabled', '');
+            const message = selectedRegions.size === 0
+                ? 'Please select at least one region to isolate'
+                : 'Selecting all regions is equivalent to standard mode - please select fewer regions';
+            applyButton.setAttribute('data-tooltip', message);
+        }
     }
 }
 
+function createTooltipContainer() {
+    const existing = document.getElementById('apply-button-tooltip');
+    if (existing) return existing;
+
+    const tooltip = document.createElement('div');
+    tooltip.id = 'apply-button-tooltip';
+    tooltip.className = 'custom-tooltip';
+    document.body.appendChild(tooltip);
+    return tooltip;
+}
+
+function initializeTooltips() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .custom-tooltip {
+            display: none;
+            position: fixed;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1060;
+            pointer-events: none;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .custom-tooltip::after {
+            content: '';
+            position: absolute;
+            border-width: 6px;
+            border-style: solid;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .custom-tooltip.above::after {
+            bottom: -6px;
+            border-color: #333 transparent transparent;
+        }
+
+        .custom-tooltip.below::after {
+            top: -6px;
+            border-color: transparent transparent #333;
+        }
+
+        .button-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+    `;
+    document.head.appendChild(style);
+
+    const tooltip = createTooltipContainer();
+    const applyButton = document.getElementById('applyIsolationButton');
+
+    if (applyButton) {
+        // Create wrapper div
+        const wrapper = document.createElement('div');
+        wrapper.className = 'button-wrapper';
+
+        // Insert wrapper before button and move button into it
+        applyButton.parentNode.insertBefore(wrapper, applyButton);
+        wrapper.appendChild(applyButton);
+
+        const updateTooltipPosition = () => {
+            const rect = wrapper.getBoundingClientRect();
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const spaceAbove = rect.top;
+            const spaceBelow = viewportHeight - rect.bottom;
+
+            // Determine if tooltip should go above or below based on available space
+            const preferredPosition = spaceAbove > tooltipRect.height + 10 ? 'above' : 'below';
+
+            tooltip.classList.remove('above', 'below');
+            tooltip.classList.add(preferredPosition);
+
+            // Calculate left position to ensure tooltip stays within viewport width
+            let left = rect.left + (rect.width - tooltipRect.width) / 2;
+            const minLeft = 10; // Minimum padding from left edge
+            const maxLeft = window.innerWidth - tooltipRect.width - 10; // Maximum left position
+            left = Math.max(minLeft, Math.min(left, maxLeft));
+
+            if (preferredPosition === 'above') {
+                tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+            } else {
+                tooltip.style.top = `${rect.bottom + 8}px`;
+            }
+            tooltip.style.left = `${left}px`;
+        };
+
+        wrapper.addEventListener('mouseenter', () => {
+            log('Mouse entered Apply button wrapper');
+            if (applyButton.hasAttribute('disabled')) {
+                const message = applyButton.getAttribute('data-tooltip');
+                if (message) {
+                    log('Button is disabled, showing tooltip with message:', message);
+                    tooltip.textContent = message;
+                    tooltip.style.display = 'block';
+                    // Need to wait for a frame for the tooltip to have dimensions
+                    requestAnimationFrame(() => {
+                        updateTooltipPosition();
+                    });
+                }
+            } else {
+                log('Button is not disabled, no tooltip shown');
+            }
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+            log('Mouse left Apply button wrapper');
+            tooltip.style.display = 'none';
+        });
+
+        // Update position on scroll or resize if tooltip is visible
+        const handlePositionUpdate = () => {
+            if (tooltip.style.display === 'block') {
+                updateTooltipPosition();
+            }
+        };
+
+        window.addEventListener('scroll', handlePositionUpdate);
+        window.addEventListener('resize', handlePositionUpdate);
+    }
+}
+
+// Add this line to your existing initialization code
 export function initializeStateIsolation() {
     const isolateButton = document.getElementById('isolate-button');
     const modalElement = document.getElementById('stateIsolationModal');
@@ -679,9 +858,10 @@ export function initializeStateIsolation() {
         stateIsolationModal.show();
     });
 
-    // Initialize mini map when modal is shown
+    // Initialize mini map and tooltips when modal is shown
     modalElement.addEventListener('shown.bs.modal', () => {
         initializeMiniMap();
+        initializeTooltips(); // Initialize tooltips when modal is shown
     });
 
     // Handle modal close without applying
