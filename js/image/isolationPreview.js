@@ -47,29 +47,48 @@ export async function adjustProjectionForIsolation(stateFeatures, offscreenPath,
         features: visibleStates
     };
 
-    // Calculate the effective dimensions with padding
-    const padding = 100; // 100px padding on all sides
-    const effectiveWidth = mapWidth - (padding * 2);
-    const effectiveHeight = height - (padding * 2);
+    // Define margins and key dimensions
+    const margins = {
+        left: 100,    // Left margin
+        right: 0,     // No right margin since key will be flush with map
+        vertical: 100 // Top and bottom margins
+    };
+
+    // Calculate map key dimensions
+    const hasMapKey = document.querySelector('.map-key') !== null;
+    const mapKey = {
+        width: hasMapKey ? 180 : 0,  // Width of map key if present
+        spacing: 0                    // No space between map and key
+    };
+
+    // Calculate the available space for the map
+    // The map should extend right up to where the key begins
+    const mapSpace = {
+        width: hasMapKey ?
+            mapWidth - (margins.left + mapKey.width) :  // If key exists, extend map right up to it
+            mapWidth - (margins.left + margins.right),  // If no key, use full width minus margins
+        height: height - (margins.vertical * 2)
+    };
 
     // Create a new projection
     const projection = d3.geoAlbersUsa();
 
-    // Use fitSize to automatically calculate the appropriate scale and translation
-    projection.fitSize([effectiveWidth, effectiveHeight], visibleFeatures);
+    // Fit the map to the available space
+    projection.fitSize([mapSpace.width, mapSpace.height], visibleFeatures);
 
     // Get the calculated values
     const scale = projection.scale();
     const [tx, ty] = projection.translate();
 
-    // Create the final projection with adjusted translation to account for padding
+    // Create the final projection with adjusted translation
     const newProjection = d3.geoAlbersUsa()
         .scale(scale)
-        .translate([tx + padding, ty + padding]);
+        .translate([tx + margins.left, ty + margins.vertical]);
 
     debug('Isolation preview adjustments:', {
-        effectiveWidth,
-        effectiveHeight,
+        mapSpace,
+        margins,
+        mapKey,
         scale,
         translate: newProjection.translate(),
         visibleStates: visibleStates.length

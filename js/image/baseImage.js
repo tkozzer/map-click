@@ -64,7 +64,9 @@ export async function generateBaseImage(scale) {
         }
 
         // Adjust right buffer to accommodate the map key
-        rightBuffer = Math.max(rightBuffer, mapKeyWidth + getScaledValue(30, scale)); // 30 is an additional padding
+        // In isolation mode, we don't want extra padding between map and key
+        const keyPadding = isIsolationMode ? 0 : getScaledValue(30, scale);
+        rightBuffer = Math.max(rightBuffer, mapKeyWidth + keyPadding);
         debug('Adjusted Right Buffer:', rightBuffer);
 
         if (isNaN(rightBuffer)) {
