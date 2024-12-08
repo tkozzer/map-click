@@ -445,6 +445,22 @@ function applyIsolation() {
     isIsolationMode = true;
     log('Isolation Mode Enabled');
 
+    // Disable state/county toggle
+    const switchContainer = document.querySelector('.switch-container');
+    if (switchContainer) {
+        switchContainer.style.pointerEvents = 'none';
+        switchContainer.style.opacity = '0.6';
+        switchContainer.setAttribute('data-tooltip', 'Mode switching is disabled during isolation mode');
+
+        // Add wrapper for tooltip if not already present
+        if (!switchContainer.parentElement.classList.contains('button-wrapper')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'button-wrapper';
+            switchContainer.parentNode.insertBefore(wrapper, switchContainer);
+            wrapper.appendChild(switchContainer);
+        }
+    }
+
     // Create and show isolation mode label
     createIsolationLabel();
 }
@@ -516,6 +532,14 @@ function exitIsolation() {
 
     // Recenter the map to show entire US
     recenterMap();
+
+    // Re-enable state/county toggle
+    const switchContainer = document.querySelector('.switch-container');
+    if (switchContainer) {
+        switchContainer.style.pointerEvents = '';
+        switchContainer.style.opacity = '';
+        switchContainer.removeAttribute('data-tooltip');
+    }
 }
 
 function enterCustomMode() {
@@ -747,80 +771,9 @@ function initializeTooltips() {
             position: relative;
         }
 
-        /* Modal layout adjustments */
-        #stateIsolationModal .modal-dialog {
-            max-width: 1200px;
-        }
-
-        #stateIsolationModal .modal-body .row {
-            margin: 0;
-        }
-
-        #stateIsolationModal .modal-body .col-md-8 {
-            padding-right: 20px;
-            flex: 0 0 75%;
-            max-width: 75%;
-        }
-
-        #stateIsolationModal .modal-body .col-md-4 {
-            padding-left: 0;
-            flex: 0 0 25%;
-            max-width: 25%;
-        }
-
-        .predefined-regions-container {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 15px;
-            height: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .predefined-regions-container h6 {
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .region-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 8px;
-            overflow: visible;
-        }
-
-        .region-buttons .btn {
-            width: 100%;
-            text-align: center;
-            padding: 6px 12px;
-            margin: 0;
-            font-size: 14px;
-        }
-
-        #small-states-list {
-            margin-top: 15px;
-        }
-
-        .small-states-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            justify-content: center;
-        }
-
-        .small-states-buttons .btn {
-            padding: 4px 8px;
-            min-width: 40px;
-            font-size: 12px;
-        }
-
-        /* Ensure the description text stays within bounds */
-        .region-description {
-            margin-top: 10px;
-            font-size: 13px;
-            color: #6c757d;
+        /* Maintain switch component styles when disabled */
+        .switch-container[data-tooltip] {
+            transition: opacity 0.3s ease;
         }
     `;
     document.head.appendChild(style);
@@ -896,6 +849,49 @@ function initializeTooltips() {
 
         window.addEventListener('scroll', handlePositionUpdate);
         window.addEventListener('resize', handlePositionUpdate);
+    }
+
+    // Add tooltip for switch container when disabled
+    const switchContainer = document.querySelector('.switch-container');
+    if (switchContainer) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'button-wrapper';
+        switchContainer.parentNode.insertBefore(wrapper, switchContainer);
+        wrapper.appendChild(switchContainer);
+
+        wrapper.addEventListener('mouseenter', () => {
+            const message = switchContainer.getAttribute('data-tooltip');
+            if (message && switchContainer.style.pointerEvents === 'none') {
+                const tooltip = createTooltipContainer();
+                tooltip.textContent = message;
+                tooltip.classList.remove('above', 'below');
+                tooltip.classList.add('below');
+                tooltip.style.display = 'block';
+
+                const rect = wrapper.getBoundingClientRect();
+                const tooltipRect = tooltip.getBoundingClientRect();
+
+                // Position below the switch with some padding
+                const top = rect.bottom + 8;
+                let left = rect.left + (rect.width - tooltipRect.width) / 2;
+
+                // Ensure tooltip stays within viewport bounds
+                const viewportWidth = window.innerWidth;
+                const minLeft = 10;
+                const maxLeft = viewportWidth - tooltipRect.width - 10;
+                left = Math.max(minLeft, Math.min(left, maxLeft));
+
+                tooltip.style.top = `${top}px`;
+                tooltip.style.left = `${left}px`;
+            }
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+            const tooltip = document.getElementById('apply-button-tooltip');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        });
     }
 }
 
